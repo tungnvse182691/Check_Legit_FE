@@ -9,99 +9,151 @@ export function AdminOverview() {
   const totalLegit = legitList.length;
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 md:p-8">
-      <div className="max-w-max-width mx-auto space-y-gutter">
-        <header className="mb-8">
-          <div className="flex flex-wrap items-center gap-4 justify-between">
-            <h2 className="text-headline-md font-bold text-on-surface">Tổng quan hệ thống</h2>
-            <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-label-sm uppercase border border-primary/20">Hệ thống quản trị</span>
+    <div className="flex-grow overflow-y-auto p-6 md:p-8 space-y-8 animate-fade-in">
+      <div className="max-w-6xl mx-auto space-y-8">
+        
+        {/* Header section with Forest Green touchpoints */}
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <span className="text-[#2e7d32] text-xs font-black uppercase tracking-widest bg-emerald-50 border border-emerald-100 px-3.5 py-1 rounded-full inline-block mb-1.5">
+              Hệ thống cảnh giới tối cao
+            </span>
+            <h2 className="text-2xl md:text-3.5xl font-black text-slate-900 tracking-tight">Tổng quan hệ thống</h2>
+            <p className="text-xs text-slate-500 mt-0.5">Số liệu thống kê thời gian thực từ cơ sở dữ liệu quốc gia Check Zone.</p>
           </div>
+          <span className="bg-emerald-55 bg-emerald-50 text-[#2e7d32] px-4 py-2 rounded-2xl font-mono text-xs font-bold border border-emerald-200 shadow-sm inline-flex items-center gap-1.5 self-start sm:self-auto uppercase">
+            <span className="w-2 h-2 rounded-full bg-[#2e7d32] animate-ping"></span>
+            Máy chủ đồng bộ • LIVE
+          </span>
         </header>
 
-        {/* Stats Section */}
+        {/* Stats Grid section using clean, white minimalist cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-inverse-surface border border-outline-variant p-6 rounded-xl flex flex-col justify-between shadow-sm">
+          
+          {/* Card 1: Total Reports */}
+          <div className="bg-white border border-outline-variant rounded-2xl p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start">
-              <span className="text-surface-variant font-label-sm uppercase tracking-wider text-slate-300 text-xs">Tổng tố cáo (gốc)</span>
-              <span className="material-symbols-outlined text-red-500">gpp_bad</span>
+              <span className="text-slate-500 font-bold uppercase tracking-wider text-[10px]">Tổng tố cáo bị nộp</span>
+              <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center">
+                <span className="material-symbols-outlined text-red-600 text-sm font-bold">gpp_bad</span>
+              </div>
             </div>
             <div className="mt-4">
-              <div className="font-label-numeric text-[32px] font-extrabold text-white">{totalReports} vụ việc</div>
+              <p className="text-3xl font-black text-slate-900 tracking-tight">
+                {totalReports} <span className="text-xs font-medium text-slate-450 text-slate-500 font-sans">đơn nộp</span>
+              </p>
             </div>
           </div>
 
-          <div className="bg-inverse-surface border border-outline-variant p-6 rounded-xl flex flex-col justify-between shadow-sm">
+          {/* Card 2: Pending Approval */}
+          <div className="bg-white border border-outline-variant rounded-2xl p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start">
-              <span className="text-surface-variant font-label-sm uppercase tracking-wider text-slate-300 text-xs text-amber-500">Yêu cầu Chờ duyệt</span>
-              <span className="material-symbols-outlined text-amber-500">gpp_maybe</span>
+              <span className="text-slate-500 font-bold uppercase tracking-wider text-[10px]">Yêu cầu chờ thẩm định</span>
+              <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center">
+                <span className="material-symbols-outlined text-amber-600 text-sm font-bold">gpp_maybe</span>
+              </div>
             </div>
             <div className="mt-4">
-              <div className="font-label-numeric text-[32px] font-extrabold text-amber-500">{pendingReports} hồ sơ</div>
+              <p className="text-3xl font-black text-amber-600 tracking-tight">
+                {pendingReports} <span className="text-xs font-medium text-slate-450 text-slate-500 font-sans">hồ sơ</span>
+              </p>
             </div>
           </div>
 
-          <div className="bg-inverse-surface border border-outline-variant p-6 rounded-xl flex flex-col justify-between shadow-sm">
+          {/* Card 3: Approved & Blacklisted */}
+          <div className="bg-white border border-outline-variant rounded-2xl p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start">
-              <span className="text-surface-variant font-label-sm uppercase tracking-wider text-slate-300 text-xs text-emerald-500">Đã phê duyệt công khai</span>
-              <span className="material-symbols-outlined text-emerald-500">verified_user</span>
+              <span className="text-slate-500 font-bold uppercase tracking-wider text-[10px]">Đã phê duyệt công khai</span>
+              <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                <span className="material-symbols-outlined text-red-700 text-sm font-bold">shield_with_house</span>
+              </div>
             </div>
             <div className="mt-4">
-              <div className="font-label-numeric text-[32px] font-extrabold text-emerald-500">{approvedReports} vụ</div>
+              <p className="text-3xl font-black text-red-600 tracking-tight">
+                {approvedReports} <span className="text-xs font-medium text-slate-450 text-slate-500 font-sans">đối tượng</span>
+              </p>
             </div>
           </div>
 
-          <div className="bg-inverse-surface border border-outline-variant p-6 rounded-xl flex flex-col justify-between shadow-sm">
+          {/* Card 4: Legit Merchant */}
+          <div className="bg-white border border-outline-variant rounded-2xl p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start">
-              <span className="text-surface-variant font-label-sm uppercase tracking-wider text-slate-300 text-xs">Cửa hàng Uy tín (Ký Quỹ)</span>
-              <span className="material-symbols-outlined text-secondary">verified</span>
+              <span className="text-slate-500 font-bold uppercase tracking-wider text-[10px]">Hộ kinh doanh ký quỹ</span>
+              <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center">
+                <span className="material-symbols-outlined text-[#2e7d32] text-sm font-bold">verified_user</span>
+              </div>
             </div>
             <div className="mt-4">
-              <div className="font-label-numeric text-[32px] font-extrabold text-white">{totalLegit} thương hiệu</div>
+              <p className="text-3xl font-black text-[#2e7d32] tracking-tight">
+                {totalLegit} <span className="text-xs font-medium text-slate-450 text-slate-500 font-sans">cửa hàng</span>
+              </p>
             </div>
           </div>
+
         </div>
 
-        {/* Detailed Data Table */}
-        <div className="bg-inverse-surface border border-outline-variant rounded-xl overflow-hidden shadow-sm mt-8">
-          <div className="px-8 py-6 border-b border-outline-variant flex justify-between items-center bg-black/20">
-            <h3 className="text-white font-headline-md">Nhật ký hoạt động gần đây</h3>
+        {/* Detailed Activity table with clean, light design */}
+        <div className="bg-white border border-outline-variant rounded-2xl overflow-hidden shadow-sm">
+          <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+            <div>
+              <h3 className="font-black text-slate-900 text-base uppercase tracking-tight">Chi tiết hoạt động mới nộp</h3>
+              <p className="text-xs text-slate-500 mt-0.5">Khớp lệnh tố giác mới từ nguồn cộng đồng Check Zone.</p>
+            </div>
           </div>
+          
           <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead className="bg-black/40 text-surface-variant text-label-sm uppercase tracking-widest text-slate-300 text-xs">
-                <tr>
-                  <th className="px-8 py-4">Sản Phẩm / Tên người gửi</th>
-                  <th className="px-8 py-4">Chi tiết / Định danh</th>
-                  <th className="px-8 py-4">Trạng thái duyệt</th>
-                  <th className="px-8 py-4">Thời gian</th>
+            <table className="w-full text-left border-collapse min-w-[650px] text-xs">
+              <thead>
+                <tr className="bg-slate-50 border-b border-light border-slate-100 text-slate-600 uppercase font-bold text-[10px] tracking-widest opacity-80">
+                  <th className="px-6 py-4 pl-8">Đối tượng lừa đảo</th>
+                  <th className="px-6 py-4">Định vị thông tin giao dịch</th>
+                  <th className="px-6 py-4 text-center">Trạng thái duyệt</th>
+                  <th className="px-6 py-4 text-right pr-8">Thời gian</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-outline-variant/30">
-                {scams.slice(0, 5).map((scam) => (
-                  <tr key={scam.id} className="hover:bg-white/5 transition-colors">
-                    <td className="px-8 py-4 flex items-center gap-3">
-                      <div className="w-8 h-8 rounded bg-primary/20 flex items-center justify-center shrink-0">
-                        <span className="material-symbols-outlined text-primary text-[18px]">person_off</span>
+              <tbody className="divide-y divide-slate-100 font-medium">
+                {scams.slice(0, 6).map((scam) => (
+                  <tr key={scam.id} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-6 py-4 pl-8">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center shrink-0 border border-red-100">
+                          <span className="material-symbols-outlined text-red-650 text-sm font-bold text-red-600">person_off</span>
+                        </div>
+                        <div>
+                          <p className="font-extrabold text-slate-950 text-sm uppercase tracking-tight">{scam.name}</p>
+                          <span className="text-[10px] text-slate-500 capitalize bg-slate-100 px-1.5 py-0.5 rounded mt-0.5 inline-block">
+                            {scam.type}
+                          </span>
+                        </div>
                       </div>
-                      <span className="text-white text-body-md font-bold text-sm">{scam.name}</span>
                     </td>
-                    <td className="px-8 py-4 text-slate-300 text-xs block truncate max-w-xs md:max-w-md">
-                      {scam.accountNumber} ({scam.bankName})
+                    <td className="px-6 py-4">
+                      <p className="font-mono text-xs font-black text-slate-800">{scam.accountNumber || "N/A"}</p>
+                      <p className="text-[10px] text-slate-500 mt-0.5">{scam.bankName || "Zalo/Mạng xã hội"}</p>
                     </td>
-                    <td className="px-8 py-4">
+                    <td className="px-6 py-4 text-center">
                       {scam.status === "Đã phê duyệt" ? (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-error-container text-on-error-container border border-error/50">ĐÃ TỐ CÁO</span>
+                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold bg-red-50 text-red-800 border border-red-100 uppercase tracking-wide">
+                          <span className="w-1.5 h-1.5 rounded-full bg-red-650 bg-red-600"></span>
+                          ĐÃ BAN Blacklist
+                        </span>
                       ) : (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-500 border border-amber-500/50">CHỜ DUYỆT</span>
+                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 uppercase tracking-wide">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
+                          YÊU CẦU Thẩm Định
+                        </span>
                       )}
                     </td>
-                    <td className="px-8 py-4 text-slate-400 font-label-numeric text-xs">{scam.date || "Cách đây 5m"}</td>
+                    <td className="px-6 py-4 text-right pr-8 font-mono text-slate-400 text-[10px]">
+                      {scam.time || "Cách đây 5 phút"}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         </div>
+
       </div>
     </div>
   );

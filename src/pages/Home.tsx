@@ -12,12 +12,6 @@ export function Home() {
     searchedTerm: string;
   } | null>(null);
 
-  // Dynamic counter metrics
-  const approvedScamsCount = scams.filter((s) => s.status === "Đã phê duyệt").length;
-  // Calculate a nice demo sum: base count of 12480 plus dynamically approved ones
-  const totalScamsPhá = 12480 + approvedScamsCount;
-  const totalMoneyLấyLại = "8.540.000.000 VNĐ";
-
   // Newest 4 approved scams
   const latestScams = scams
     .filter((s) => s.status === "Đã phê duyệt")
@@ -80,28 +74,31 @@ export function Home() {
   };
 
   return (
-    <div className="pt-8">
-      {/* Hero Section */}
-      <section className="relative py-24 bg-surface-container-lowest overflow-hidden border-b border-outline-variant">
+    <div className="pt-4">
+      {/* Hero Section - Shrunk to 70% width */}
+      <section className="relative py-20 bg-surface-container-lowest overflow-hidden border-b border-outline-variant">
         <div className="absolute inset-0 opacity-5 pointer-events-none">
-          <div className="absolute inset-0 bg-[radial-gradient(#b80035_1px,transparent_1px)] [background-size:20px_20px]"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(#2e7d32_1px,transparent_1px)] [background-size:20px_20px]"></div>
         </div>
-        <div className="relative z-10 max-w-max-width mx-auto px-4 sm:px-6 md:px-margin-desktop text-center">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-display-lg mb-4 text-on-surface font-extrabold tracking-tight leading-tight">
-            Tra cứu thông tin lừa đảo nhanh chóng
+        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
+          <span className="bg-emerald-50 text-emerald-800 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full inline-block mb-4">
+            HỆ THỐNG AN NINH CHỐNG SCAM 24/7
+          </span>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl mb-4 text-on-surface font-extrabold tracking-tight leading-tight">
+            Tra cứu thông tin tin cậy & phòng chống lừa đảo
           </h1>
-          <p className="text-sm sm:text-body-lg text-on-surface-variant mb-8 sm:mb-12 max-w-2xl mx-auto">
-            Hệ thống xác minh danh tính và cảnh báo lừa đảo trực tuyến hàng đầu, giúp bạn giao dịch an toàn và minh bạch.
+          <p className="text-sm sm:text-body-lg text-on-surface-variant mb-10 max-w-2xl mx-auto">
+            Hệ thống xác minh danh tính hàng đầu, giúp bạn dễ dàng kiểm tra lịch sử uy tín hoặc tố cáo các hành vi gian lận trực tuyến.
           </p>
           
           {/* Central Search Bar */}
-          <div className="max-w-4xl mx-auto relative mb-8">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center bg-white border-2 border-primary p-2 rounded-xl shadow-lg focus-within:ring-2 focus-within:ring-primary/20 gap-2">
+          <div className="max-w-3xl mx-auto relative mb-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center bg-white border-2 border-primary/80 p-2 rounded-2xl shadow-md focus-within:ring-4 focus-within:ring-primary/15 gap-2 transition-all duration-300">
               <div className="flex items-center flex-grow py-1 sm:py-0">
-                <span className="material-symbols-outlined px-3 text-outline">search</span>
+                <span className="material-symbols-outlined px-3 text-emerald-700">search</span>
                 <input 
-                  className="w-full border-none focus:ring-0 font-body-md py-2 sm:py-4 outline-none text-sm sm:text-base text-on-surface" 
-                  placeholder="Nhập số điện thoại, số tài khoản hoặc tên để kiểm tra..." 
+                  className="w-full border-none focus:ring-0 font-body-md py-2.5 outline-none text-sm sm:text-base text-on-surface" 
+                  placeholder="Nhập số điện thoại, zalo, số tài khoản hoặc tên để tra cứu..." 
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
@@ -110,160 +107,170 @@ export function Home() {
               </div>
               <button 
                 onClick={handleSearch}
-                className="bg-primary text-white cursor-pointer px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-bold hover:brightness-110 active:scale-95 transition-all text-sm sm:text-base shrink-0 uppercase tracking-wider"
+                className="bg-primary text-white cursor-pointer px-8 py-3.5 rounded-xl font-bold hover:brightness-110 hover:scale-[1.02] active:scale-95 transition-all text-sm sm:text-base shrink-0 uppercase tracking-wider"
               >
                 KIỂM TRA
               </button>
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Search Result Box */}
-          {searchResult && (
-            <div className="max-w-4xl mx-auto text-left mb-6 animate-fade-in">
-              {searchResult.status === "scam" && (
-                <div className="bg-error-container border-4 border-error p-4 sm:p-6 rounded-xl shadow-md">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    <span className="material-symbols-outlined text-error text-5xl shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>gpp_bad</span>
-                    <div className="flex-grow">
-                      <h3 className="text-lg sm:text-headline-md font-bold text-error uppercase">XÁC ĐỊNH LỪA ĐẢO TRÙNG KHỚP!</h3>
-                      <p className="text-xs sm:text-body-md text-on-error-container font-semibold mt-1">
-                        Thông tin "<span className="underline font-bold">{searchResult.searchedTerm}</span>" trùng khớp với hồ sơ lừa đảo đã xác thực của <span className="font-extrabold text-red-700">{searchResult.item.name}</span>!
-                      </p>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4 mt-4 bg-white/70 p-3 sm:p-4 rounded-lg text-xs sm:text-sm border border-error/20">
-                        <div><strong className="text-on-surface-variant">Số tài khoản:</strong> {searchResult.item.accountNumber} ({searchResult.item.bankName})</div>
-                        <div><strong className="text-on-surface-variant">SĐT / Zalo:</strong> {searchResult.item.phone || "Không có"}</div>
-                        <div className="md:col-span-2"><strong className="text-on-surface-variant">Mô tả vụ việc:</strong> {searchResult.item.desc}</div>
-                      </div>
-                    </div>
-                    <div className="w-full sm:w-auto mt-2 sm:mt-0">
-                      <Link 
-                        to={`/reports/${searchResult.item.id}`} 
-                        className="block text-center bg-error text-white font-bold px-5 py-3 rounded-lg text-xs sm:text-label-sm hover:opacity-90 active:scale-95 transition-all uppercase"
-                      >
-                        XEM BẰNG CHỨNG
-                      </Link>
-                    </div>
+      {/* Hero Action Buttons Container (Replaced Statistics Area) */}
+      <section className="bg-white py-12 border-b border-outline-variant">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="bg-slate-50 p-6 sm:p-8 rounded-3xl border border-outline-variant flex flex-col sm:flex-row gap-6 justify-center items-stretch">
+            <Link 
+              to="/legit" 
+              className="w-full sm:w-1/2 flex items-center justify-center gap-3 bg-primary text-white hover:bg-emerald-800 py-4.5 px-6 rounded-2xl font-bold hover:scale-[1.02] hover:shadow-lg transition-all duration-300 text-center shadow-sm cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-2xl">verified</span>
+              <span>XEM DANH SÁCH LEGIT</span>
+            </Link>
+            <Link 
+              to="/report" 
+              className="w-full sm:w-1/2 flex items-center justify-center gap-3 bg-red-600 text-white hover:bg-red-700 py-4.5 px-6 rounded-2xl font-bold hover:scale-[1.02] hover:shadow-lg transition-all duration-300 text-center shadow-sm cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-2xl">gpp_bad</span>
+              <span>BÁO CÁO LỪA ĐẢO</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Search Result Box Panel (if active) */}
+      {searchResult && (
+        <section className="max-w-4xl mx-auto px-6 py-4 mt-6 animate-fade-in">
+          {searchResult.status === "scam" && (
+            <div className="bg-red-50 border-4 border-red-500 p-5 sm:p-6 rounded-3xl shadow-lg">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <span className="material-symbols-outlined text-red-600 text-5xl shrink-0">gpp_bad</span>
+                <div className="flex-grow">
+                  <h3 className="text-lg sm:text-headline-md font-extrabold text-red-600 uppercase">XÁC ĐỊNH LỪA ĐẢO TRÙNG KHỚP!</h3>
+                  <p className="text-xs sm:text-body-md text-red-950 font-semibold mt-1">
+                    Thông tin "<span className="underline font-bold">{searchResult.searchedTerm}</span>" trùng khớp với hồ sơ lừa đảo đã xác thực của <span className="font-extrabold text-red-700">{searchResult.item.name}</span>!
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4 mt-4 bg-white/80 p-4 rounded-2xl text-xs sm:text-sm border border-red-200 shadow-inner">
+                    <div><strong className="text-on-surface-variant">Số tài khoản:</strong> {searchResult.item.accountNumber} ({searchResult.item.bankName})</div>
+                    <div><strong className="text-on-surface-variant">SĐT / Zalo:</strong> {searchResult.item.phone || "Không có"}</div>
+                    <div className="md:col-span-2"><strong className="text-on-surface-variant">Mô tả vụ việc:</strong> {searchResult.item.desc}</div>
                   </div>
                 </div>
-              )}
-
-              {searchResult.status === "legit" && (
-                <div className="bg-emerald-50 border-4 border-emerald-500 p-6 rounded-xl shadow-md">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    <span className="material-symbols-outlined text-emerald-600 text-5xl shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
-                    <div className="flex-grow">
-                      <h3 className="text-headline-md font-bold text-emerald-800 uppercase">THƯƠNG HIỆU UY TÍN ĐÃ XÁC MINH!</h3>
-                      <p className="text-body-md text-emerald-900 font-semibold mt-1">
-                        Đối tượng "<span className="underline">{searchResult.searchedTerm}</span>" là <span className="font-extrabold">{searchResult.item.name}</span>, đối tác uy tín được ký quỹ bảo hiểm giao dịch thành công.
-                      </p>
-                      <div className="grid grid-cols-3 gap-2 mt-4 bg-white/70 p-3 rounded-lg text-xs text-emerald-900 text-center">
-                        <div>
-                          <p className="text-[10px] text-on-surface-variant uppercase">Quỹ Ký quỹ</p>
-                          <p className="font-bold text-sm text-emerald-700">{(searchResult.item.insurance).toLocaleString("vi-VN")}đ</p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] text-on-surface-variant uppercase">Điểm tín nhiệm</p>
-                          <p className="font-bold text-sm text-emerald-700">{searchResult.item.score}/100</p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] text-on-surface-variant uppercase">Giao dịch</p>
-                          <p className="font-bold text-sm text-emerald-700">{searchResult.item.successTrans} GD</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="w-full sm:w-auto mt-4 sm:mt-0">
-                      <Link 
-                        to={`/legit/${searchResult.item.id}`} 
-                        className="block text-center bg-emerald-600 text-white font-bold px-6 py-3 rounded-lg text-label-sm hover:opacity-90 active:scale-95 transition-all"
-                      >
-                        XEM CỬA HÀNG
-                      </Link>
-                    </div>
-                  </div>
+                <div className="w-full sm:w-auto mt-2 sm:mt-0">
+                  <Link 
+                    to={`/reports/${searchResult.item.id}`} 
+                    className="block text-center bg-red-600 text-white font-bold px-6 py-3 rounded-xl text-xs sm:text-label-sm hover:scale-[1.05] hover:shadow-md transition-all uppercase whitespace-nowrap"
+                  >
+                    XEM BẰNG CHỨNG
+                  </Link>
                 </div>
-              )}
-
-              {searchResult.status === "not_found" && (
-                <div className="bg-slate-50 border-4 border-slate-400 p-6 rounded-xl shadow-md">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    <span className="material-symbols-outlined text-slate-500 text-5xl shrink-0">gpp_maybe</span>
-                    <div className="flex-grow">
-                      <h3 className="text-headline-md font-bold text-slate-700 uppercase">CHƯA CÓ BÁO CÁO VI PHẠM</h3>
-                      <p className="text-body-md text-slate-600 mt-1">
-                        Hệ thống hiện chưa thấy báo cáo lừa đảo hoặc thông tin tín nhiệm đã đăng ký nào trùng khớp với "<span className="underline">{searchResult.searchedTerm}</span>".
-                      </p>
-                      <p className="text-xs text-slate-500 mt-2">
-                        *Lưu ý: Việc chưa có báo cáo không đồng nghĩa đối tượng an toàn 100%. Luôn thực hiện giao dịch trung gian hoặc kiểm tra kỹ lưỡng trước khi chuyển khoản.
-                      </p>
-                    </div>
-                    <div className="w-full sm:w-auto mt-4 sm:mt-0">
-                      <button 
-                        onClick={() => setSearchResult(null)}
-                        className="block w-full text-center bg-slate-600 text-white font-bold px-6 py-3 rounded-lg text-label-sm hover:opacity-90 transition-all cursor-pointer"
-                      >
-                        ĐÓNG
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
           )}
-        </div>
-      </section>
 
-      {/* Counter Widget */}
-      <section className="bg-inverse-surface py-12">
-        <div className="max-w-max-width mx-auto px-6 md:px-margin-desktop grid grid-cols-1 md:grid-cols-2 gap-gutter text-center">
-          <div className="flex flex-col items-center">
-            <div className="text-label-sm text-secondary-fixed mb-2 uppercase tracking-widest text-slate-400">Số vụ lừa đảo đã phá</div>
-            <div className="font-label-numeric text-4xl font-bold text-primary-container bg-black/30 px-6 py-2 rounded-lg border border-primary/30">
-              {totalScamsPhá.toLocaleString("vi-VN")}
-            </div>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="text-label-sm text-secondary-fixed mb-2 uppercase tracking-widest text-slate-400">Tổng số tiền đã lấy lại</div>
-            <div className="font-label-numeric text-4xl font-bold text-primary-container bg-black/30 px-6 py-2 rounded-lg border border-primary/30">
-              {totalMoneyLấyLại}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Main Content: Two-column layout */}
-      <section className="max-w-max-width mx-auto px-6 md:px-margin-desktop py-16 grid grid-cols-1 lg:grid-cols-12 gap-gutter">
-        {/* Left Column: Scam Reports */}
-        <div className="lg:col-span-7 bg-error-container/10 border border-error/20 rounded-2xl overflow-hidden flex flex-col justify-between">
-          <div>
-            <div className="bg-error-container p-6 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-error" style={{ fontVariationSettings: "'FILL' 1" }}>gpp_bad</span>
-                <h2 className="text-headline-md font-bold text-on-error-container">Tố cáo mới nhất</h2>
+          {searchResult.status === "legit" && (
+            <div className="bg-emerald-50 border-4 border-emerald-500 p-5 sm:p-6 rounded-3xl shadow-lg">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <span className="material-symbols-outlined text-emerald-600 text-5xl shrink-0">verified</span>
+                <div className="flex-grow">
+                  <h3 className="text-headline-md font-extrabold text-emerald-800 uppercase">THƯƠNG HIỆU UY TÍN ĐÃ XÁC MINH!</h3>
+                  <p className="text-body-md text-emerald-950 font-semibold mt-1">
+                    Đối tượng "<span className="underline">{searchResult.searchedTerm}</span>" là <span className="font-extrabold">{searchResult.item.name}</span>, đối tác uy tín được ký quỹ bảo hiểm giao dịch thành công.
+                  </p>
+                  <div className="grid grid-cols-3 gap-2 mt-4 bg-white/80 p-4 rounded-2xl text-xs text-emerald-900 text-center border border-emerald-200">
+                    <div>
+                      <p className="text-[10px] text-on-surface-variant uppercase">Quỹ Ký quỹ</p>
+                      <p className="font-bold text-sm text-emerald-700">{(searchResult.item.insurance).toLocaleString("vi-VN")}đ</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-on-surface-variant uppercase">Điểm tín nhiệm</p>
+                      <p className="font-bold text-sm text-emerald-700">{searchResult.item.score}/100</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-on-surface-variant uppercase">Giao dịch</p>
+                      <p className="font-bold text-sm text-emerald-700">{searchResult.item.successTrans} GD</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="w-full sm:w-auto mt-4 sm:mt-0">
+                  <Link 
+                    to={`/legit/${searchResult.item.id}`} 
+                    className="block text-center bg-emerald-600 text-white font-bold px-6 py-3 rounded-xl text-label-sm hover:scale-[1.05] hover:shadow-md transition-all whitespace-nowrap"
+                  >
+                    XEM CỬA HÀNG
+                  </Link>
+                </div>
               </div>
-              <Link to="/reports" className="text-on-error-container underline text-label-sm font-bold">Xem tất cả</Link>
             </div>
-            <div className="p-4 sm:p-6 space-y-4">
+          )}
+
+          {searchResult.status === "not_found" && (
+            <div className="bg-slate-50 border-4 border-slate-400 p-5 sm:p-6 rounded-3xl shadow-lg">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <span className="material-symbols-outlined text-slate-500 text-5xl shrink-0">gpp_maybe</span>
+                <div className="flex-grow">
+                  <h3 className="text-headline-md font-bold text-slate-700 uppercase">CHƯA CÓ BÁO CÁO VI PHẠM</h3>
+                  <p className="text-body-md text-slate-600 mt-1">
+                    Hệ thống hiện chưa thấy báo cáo lừa đảo hoặc thông tin tín nhiệm đã đăng ký nào trùng khớp với "<span className="underline">{searchResult.searchedTerm}</span>".
+                  </p>
+                  <p className="text-xs text-slate-500 mt-2">
+                    *Lưu ý: Việc chưa có báo cáo không đồng nghĩa đối tượng an toàn 100%. Luôn thực hiện giao dịch trung gian hoặc kiểm tra kỹ lưỡng trước khi chuyển khoản.
+                  </p>
+                </div>
+                <div className="w-full sm:w-auto mt-4 sm:mt-0">
+                  <button 
+                    onClick={() => setSearchResult(null)}
+                    className="block w-full text-center bg-slate-600 text-white font-bold px-6 py-3 rounded-xl text-label-sm hover:opacity-90 transition-all cursor-pointer"
+                  >
+                    ĐÓNG
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* Main Content Area - Dropping recent reports and legit database into separate sequential full-width layout lines */}
+      <section className="max-w-4xl mx-auto px-6 py-12 space-y-16">
+        
+        {/* Recent Reports Block - Full Width on a layout line */}
+        <div className="bg-red-50/25 border border-red-200 rounded-3xl overflow-hidden flex flex-col justify-between shadow-sm">
+          <div>
+            <div className="bg-red-100/60 p-6 flex items-center justify-between border-b border-red-200">
+              <div className="flex items-center gap-3">
+                <span className="material-symbols-outlined text-red-600 font-bold">gpp_bad</span>
+                <h2 className="text-xl sm:text-headline-md font-extrabold text-red-900">Tố cáo mới nhất</h2>
+              </div>
+              <Link to="/reports" className="text-red-700 hover:text-red-900 underline text-label-sm font-bold">Xem tất cả</Link>
+            </div>
+            
+            {/* List of reports with deep rounded cards, smooth hover scaling effects */}
+            <div className="p-6 space-y-4">
               {latestScams.map((report) => (
-                <div key={report.id} className="bg-white p-4 border-l-4 border-error shadow-sm rounded-r-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div 
+                  key={report.id} 
+                  className="bg-white p-5 border-l-4 border-red-600 rounded-2xl shadow-sm hover:scale-[1.02] hover:shadow-md transition-all duration-300 flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+                >
                   <div className="flex-grow pr-2 w-full">
-                    <div className="font-bold text-body-md mb-1 flex flex-wrap items-center gap-2">
-                      <span className="text-on-surface">{report.name}</span>
-                      <span className="bg-error-container text-on-error-container text-[10px] font-bold px-2 py-0.5 rounded uppercase">
+                    <div className="font-extrabold text-body-md mb-1.5 flex flex-wrap items-center gap-2">
+                      <span className="text-on-surface text-base">{report.name}</span>
+                      <span className="bg-red-50 text-red-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase border border-red-100">
                         {report.type}
                       </span>
                     </div>
-                    <div className="text-on-surface-variant text-xs font-mono mb-2">
+                    <div className="text-on-surface-variant text-xs font-mono mb-2 bg-slate-50 py-1.5 px-3 rounded-lg inline-block">
                       SĐT: {report.phone || "---"} | TK: {report.accountNumber} ({report.bankName})
                     </div>
-                    <div className="text-on-surface-variant text-xs sm:text-sm line-clamp-2">{report.desc}</div>
+                    <div className="text-on-surface-variant text-sm line-clamp-2 leading-relaxed">{report.desc}</div>
                   </div>
-                  <div className="text-left sm:text-right shrink-0 w-full sm:w-auto mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-dashed border-outline-variant flex sm:flex-col justify-between items-center sm:items-end">
+                  <div className="text-left md:text-right shrink-0 w-full md:w-auto pt-3 md:pt-0 border-t md:border-t-0 border-dashed border-slate-200 flex md:flex-col justify-between items-center md:items-end">
                     <div>
-                      <div className="font-label-numeric text-error font-bold text-sm sm:text-base">{(report.amount).toLocaleString("vi-VN")}đ</div>
-                      <div className="text-[10px] text-outline uppercase font-bold">{report.time}</div>
+                      <div className="font-label-numeric text-red-600 font-extrabold text-base sm:text-lg">{(report.amount).toLocaleString("vi-VN")}đ</div>
+                      <div className="text-[10px] text-on-surface-variant font-bold uppercase">{report.time}</div>
                     </div>
-                    <Link to={`/reports/${report.id}`} className="inline-block bg-error-container sm:bg-transparent text-on-error-container sm:text-primary px-3 py-1 sm:p-0 rounded text-xs font-bold hover:underline mt-1">
-                      Chi tiết <span className="align-middle text-xs font-normal">→</span>
+                    <Link to={`/reports/${report.id}`} className="inline-block bg-red-50 hover:bg-red-100 text-red-800 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-colors mt-2">
+                      Chi tiết →
                     </Link>
                   </div>
                 </div>
@@ -272,54 +279,141 @@ export function Home() {
           </div>
         </div>
 
-        {/* Right Column: Legit List */}
-        <div className="lg:col-span-5 bg-white border border-outline-variant rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between">
+        {/* Legit List Block - Sequential full-width section */}
+        <div className="bg-slate-50 border border-outline-variant rounded-3xl overflow-hidden shadow-sm flex flex-col justify-between">
           <div>
-            <div className="bg-surface-container-high p-6 flex items-center justify-between border-b border-outline-variant">
+            <div className="bg-emerald-50 p-6 flex items-center justify-between border-b border-emerald-200">
               <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
-                <h2 className="text-headline-md font-bold text-on-surface">Danh sách uy tín</h2>
+                <span className="material-symbols-outlined text-primary font-bold">verified</span>
+                <h2 className="text-xl sm:text-headline-md font-extrabold text-emerald-950">Danh sách uy tín đã ký quỹ</h2>
               </div>
-              <span className="text-secondary text-label-sm font-bold uppercase tracking-widest">Uy tín</span>
+              <span className="text-primary text-label-sm font-extrabold uppercase tracking-widest bg-white px-3 py-1 rounded-full border border-emerald-100">Uy tín</span>
             </div>
-            <div className="divide-y divide-outline-variant">
+            
+            {/* List with hover scaling */}
+            <div className="divide-y divide-outline-variant bg-white">
               {topLegit.map((legit) => (
-                <Link to={`/legit/${legit.id}`} key={legit.id} className="p-6 flex items-center gap-4 hover:bg-surface-container-low transition-colors block">
-                  <img src={legit.img} alt="Avatar" className="w-12 h-12 rounded-full object-cover shrink-0 border border-slate-200"/>
+                <Link 
+                  to={`/legit/${legit.id}`} 
+                  key={legit.id} 
+                  className="p-6 flex items-center gap-4 hover:bg-emerald-50/40 hover:scale-[1.01] transition-all duration-300 block"
+                >
+                  <img src={legit.img} alt="Avatar" className="w-14 h-14 rounded-full object-cover shrink-0 border-2 border-emerald-100 shadow-sm"/>
                   <div className="flex-grow">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold font-body-md text-on-surface text-sm sm:text-base">{legit.name}</span>
-                      <span className="material-symbols-outlined text-secondary text-base" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                      <span className="font-extrabold font-body-md text-on-surface text-base">{legit.name}</span>
+                      <span className="material-symbols-outlined text-primary text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
                     </div>
-                    <div className="text-xs text-on-surface-variant line-clamp-1">{legit.role}</div>
+                    <div className="text-xs text-on-surface-variant mt-0.5 font-medium">{legit.role}</div>
                   </div>
                   <div className="text-right shrink-0">
-                    <div className="text-secondary font-bold font-label-numeric">{legit.score}/100</div>
-                    <div className="text-[10px] text-outline">{(legit.insurance).toLocaleString("vi-VN")}đ Quỹ</div>
+                    <div className="text-primary font-extrabold font-label-numeric text-base">{legit.score}/100</div>
+                    <div className="text-[10px] text-on-surface-variant bg-slate-100 px-2 py-0.5 rounded-full mt-1 inline-block">{(legit.insurance).toLocaleString("vi-VN")}đ Quỹ</div>
                   </div>
                 </Link>
               ))}
             </div>
           </div>
-          <div className="p-6 bg-surface-container-low text-center border-t border-outline-variant">
-            <Link to="/legit" className="text-primary font-bold text-label-sm hover:underline">XEM DANH SÁCH UY TÍN ĐẦY ĐỦ</Link>
+          <div className="p-6 bg-slate-50 text-center border-t border-outline-variant">
+            <Link to="/legit" className="text-primary hover:text-emerald-800 font-extrabold text-label-sm uppercase tracking-wider block hover:underline">XEM DANH SÁCH UY TÍN ĐẦY ĐỦ</Link>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="max-w-max-width mx-auto px-6 md:px-margin-desktop mb-24">
-        <div className="bg-primary text-on-primary rounded-3xl p-12 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
+      {/* CTA Section - Replaced banner with new text and Forest Green scheme */}
+      <section className="max-w-4xl mx-auto px-6 mb-16">
+        <div className="bg-primary hover:scale-[1.01] transition-all duration-300 text-on-primary rounded-3xl p-10 sm:p-12 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 shadow-md">
           <div className="relative z-10 text-center md:text-left">
-            <h2 className="text-headline-lg font-bold mb-4">Bạn vừa gặp một kẻ lừa đảo?</h2>
-            <p className="text-body-lg opacity-90 max-w-xl">Hãy báo cáo ngay để cộng đồng cùng phòng tránh. Mỗi thông tin của bạn góp phần làm trong sạch không gian mạng.</p>
+            <span className="bg-white/20 text-white text-[10px] font-bold uppercase tracking-widest px-3.5 py-1 rounded-full inline-block mb-3 border border-white/10">Hồ sơ tín nhiệm</span>
+            <h2 className="text-2xl sm:text-headline-lg font-extrabold mb-4 leading-snug">
+              Hãy tạo hồ sơ để tăng độ tin cậy với khách hàng và cộng đồng
+            </h2>
+            <p className="text-body-md opacity-90 max-w-xl leading-relaxed">
+              Tích lũy quỹ bảo hiểm giao dịch, nâng cao điểm tín nhiệm, khẳng định uy tín thương hiệu số để phát triển kinh doanh vững vàng.
+            </p>
           </div>
-          <Link to="/report" className="relative z-10 bg-white text-primary px-10 py-5 rounded-xl font-bold text-headline-md active:scale-95 duration-100 shadow-xl inline-block text-center">
-            TỐ CÁO NGAY
+          <Link 
+            to="/legit" 
+            className="relative z-10 bg-white text-primary px-8 py-4.5 rounded-2xl font-bold hover:scale-[1.05] hover:shadow-xl active:scale-95 transition-all duration-300 inline-block text-center whitespace-nowrap"
+          >
+            Tạo Hồ Sơ Legit Ngay
           </Link>
           <div className="absolute right-0 top-0 opacity-10 scale-150 translate-x-1/4 -translate-y-1/4">
-            <span className="material-symbols-outlined text-[200px]" style={{ fontVariationSettings: "'FILL' 1" }}>gpp_bad</span>
+            <span className="material-symbols-outlined text-[200px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
           </div>
+        </div>
+      </section>
+
+      {/* News/Blog Section Placeholder - Grid of 3 minimal card placeholders */}
+      <section className="max-w-4xl mx-auto px-6 mb-24">
+        <div className="flex items-center gap-3 mb-8">
+          <span className="material-symbols-outlined text-primary text-3xl font-bold">newspaper</span>
+          <h2 className="text-2xl font-extrabold text-on-surface">Tin tức cảnh báo mới</h2>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Article Card 1 */}
+          <article className="bg-white border border-outline-variant rounded-2xl overflow-hidden shadow-sm hover:scale-[1.03] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+            <div className="p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="bg-red-50 text-red-850 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">CẢNH BÁO khẩn</span>
+                <span className="text-[10px] text-on-surface-variant font-bold">18/06/2026</span>
+              </div>
+              <h3 className="text-base font-extrabold text-on-surface mb-2 line-clamp-2 hover:text-primary transition-colors">
+                Thủ đoạn dán đè mã QR lừa đảo tại các điểm quét thanh toán
+              </h3>
+              <p className="text-xs sm:text-sm text-on-surface-variant line-clamp-3 leading-relaxed">
+                Cảnh giác chiêu trò các đối tượng lợi dụng sơ hở d dán đè mã QR nhận tiền tại quầy, khiến tiền của khách hàng bị chuyển nhầm vào tài khoản kẻ gian.
+              </p>
+            </div>
+            <div className="p-5 pt-0">
+              <span className="text-xs font-bold text-primary hover:underline cursor-pointer flex items-center gap-1">
+                Đọc bài viết <span className="text-sm">→</span>
+              </span>
+            </div>
+          </article>
+
+          {/* Article Card 2 */}
+          <article className="bg-white border border-outline-variant rounded-2xl overflow-hidden shadow-sm hover:scale-[1.03] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+            <div className="p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="bg-emerald-50 text-emerald-850 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">HƯỚNG DẪN</span>
+                <span className="text-[10px] text-on-surface-variant font-bold">15/06/2026</span>
+              </div>
+              <h3 className="text-base font-extrabold text-on-surface mb-2 line-clamp-2 hover:text-primary transition-colors">
+                Quy trình 3 bước chuyển trung gian an toàn tránh bùng cọc
+              </h3>
+              <p className="text-xs sm:text-sm text-on-surface-variant line-clamp-3 leading-relaxed">
+                Chi tiết về cơ chế giao dịch có đặt cọc có ký quỹ bảo lãnh, giúp cả người mua và người bán an tâm tuyệt đối khi lần đầu giao dịch trực tuyến.
+              </p>
+            </div>
+            <div className="p-5 pt-0">
+              <span className="text-xs font-bold text-primary hover:underline cursor-pointer flex items-center gap-1">
+                Đọc bài viết <span className="text-sm">→</span>
+              </span>
+            </div>
+          </article>
+
+          {/* Article Card 3 */}
+          <article className="bg-white border border-outline-variant rounded-2xl overflow-hidden shadow-sm hover:scale-[1.03] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+            <div className="p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="bg-amber-50 text-amber-850 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">CHIÊU TRÒ MỚI</span>
+                <span className="text-[10px] text-on-surface-variant font-bold">12/06/2026</span>
+              </div>
+              <h3 className="text-base font-extrabold text-on-surface mb-2 line-clamp-2 hover:text-primary transition-colors">
+                Giả mạo nhân viên shipper gọi điện đòi tiền thu hộ COD
+              </h3>
+              <p className="text-xs sm:text-sm text-on-surface-variant line-clamp-3 leading-relaxed">
+                Hình thức kẻ gian tìm thông tin đơn hàng rò rỉ rồi gọi điện giả dạng shipper, bắt chuyển khoản thanh toán khi nạn nhân không trực tiếp nhận hàng.
+              </p>
+            </div>
+            <div className="p-5 pt-0">
+              <span className="text-xs font-bold text-primary hover:underline cursor-pointer flex items-center gap-1">
+                Đọc bài viết <span className="text-sm">→</span>
+              </span>
+            </div>
+          </article>
         </div>
       </section>
     </div>

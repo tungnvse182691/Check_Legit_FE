@@ -1,6 +1,6 @@
 {
   "name": "Check Legit",
-  "description": "",
+  "description": "CHECK ZONE - Hệ thống tra cứu tố cáo lừa đảo trực tuyến và thẩm định hồ sơ uy tín, bảo đảm an toàn giao dịch.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

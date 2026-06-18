@@ -4,97 +4,136 @@ import { useApp } from "../context/AppContext";
 export function AdminScamManagement() {
   const { scams, approveScamReport, deleteScamReport } = useApp();
   const [selectedId, setSelectedId] = useState<string | null>(scams.length > 0 ? scams[0].id : null);
+  const [successNotif, setSuccessNotif] = useState("");
 
   const selectedScam = scams.find((s) => s.id === selectedId) || (scams.length > 0 ? scams[0] : null);
 
-  const handleApprove = () => {
-    if (selectedScam) {
-      approveScamReport(selectedScam.id);
-      alert(`Đã duyệt báo cáo của ${selectedScam.name} thành công!`);
-    }
+  const showNotification = (msg: string) => {
+    setSuccessNotif(msg);
+    setTimeout(() => {
+      setSuccessNotif("");
+    }, 3500);
   };
 
-  const handleReject = () => {
-    if (selectedScam) {
-      if (confirm(`Bạn có chắc chắn muốn xoá báo cáo của ${selectedScam.name}?`)) {
-        deleteScamReport(selectedScam.id);
-        setSelectedId(scams.length > 1 ? scams.filter(s => s.id !== selectedScam.id)[0].id : null);
-        alert(`Đã xoá báo cáo thành công!`);
+  const handleApprove = (id: string, name: string) => {
+    approveScamReport(id);
+    showNotification(`Đã duyệt báo cáo đối tượng "${name}" lên hệ thống cảnh báo công khai thành công.`);
+  };
+
+  const handleReject = (id: string, name: string) => {
+    if (confirm(`Bạn có chắc chắn muốn bác bỏ và gỡ hoàn toàn tố cáo của đối tượng: "${name}"?`)) {
+      deleteScamReport(id);
+      if (selectedId === id) {
+        const remaining = scams.filter(s => s.id !== id);
+        setSelectedId(remaining.length > 0 ? remaining[0].id : null);
       }
+      showNotification(`Đã bác bỏ & hoàn toàn xoá bỏ báo cáo của đối tượng "${name}".`);
     }
   };
 
   return (
-    <div className="flex flex-col overflow-hidden h-full">
-      <header className="h-20 flex items-center justify-between px-6 bg-surface dark:bg-surface-container-lowest border-b border-outline-variant shrink-0">
-        <div className="flex items-center gap-4">
-          <h2 className="text-headline-md font-bold text-primary">Quản lý báo cáo lừa đảo</h2>
-          <span className="bg-primary-container text-on-primary-container px-3 py-1 rounded font-label-numeric text-xs font-bold uppercase">
-            {scams.length} Bản ghi lừa đảo
+    <div className="flex flex-col min-h-screen bg-slate-50/50">
+      {/* Page Header */}
+      <header className="bg-white border-b border-outline-variant px-6 py-6 md:px-margin-desktop sticky top-0 z-10 shadow-sm shrink-0">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <span className="text-[#2e7d32] text-xs font-black uppercase tracking-widest bg-emerald-50 border border-emerald-100 px-3.5 py-1 rounded-full inline-block mb-1.5">
+              Hệ thống thẩm định tối cao
+            </span>
+            <h1 className="text-2xl md:text-3.5xl font-black text-on-surface tracking-tight">
+              Quản lý báo cáo lừa đảo
+            </h1>
+          </div>
+          <span className="bg-[#2e7d32] text-white px-4 py-2 rounded-2xl font-mono text-xs font-bold shadow-sm inline-flex items-center gap-1.5 self-start sm:self-auto uppercase">
+            <span className="material-symbols-outlined text-xs">database</span>
+            {scams.length} Hồ sơ tố cáo
           </span>
         </div>
       </header>
-      
-      <div className="flex flex-1 overflow-hidden flex-col lg:flex-row">
-        {/* Main List Table */}
-        <section className="flex-1 overflow-y-auto p-6">
+
+      {/* Main Panel Content */}
+      <div className="max-w-6xl mx-auto w-full px-6 md:px-margin-desktop py-8 pb-20 flex-1 flex flex-col lg:flex-row gap-8">
+        
+        {/* Main List Section (2/3 width on desktop) */}
+        <section className="flex-1 space-y-6">
+          {successNotif && (
+            <div className="bg-emerald-50 border-2 border-emerald-200 text-emerald-900 p-4 rounded-2xl flex items-center gap-3 animate-fade-in shadow-sm">
+              <span className="material-symbols-outlined text-[#2e7d32] font-bold">check_circle</span>
+              <p className="text-xs sm:text-sm font-bold leading-relaxed">{successNotif}</p>
+            </div>
+          )}
+
           {scams.length === 0 ? (
-            <div className="text-center py-20 bg-surface-container-low rounded-xl border border-outline-variant">
-              <span className="material-symbols-outlined text-4xl text-outline-variant mb-2">info</span>
-              <p className="font-bold text-headline-sm text-on-surface">Không có tin báo cáo nào trong hệ thống</p>
+            <div className="text-center py-24 bg-white border border-outline-variant rounded-2xl p-8 shadow-sm">
+              <span className="material-symbols-outlined text-5xl text-emerald-600 mb-4 font-bold" style={{ fontVariationSettings: "'FILL' 1" }}>gpp_good</span>
+              <h3 className="font-extrabold text-xl text-on-surface mb-2">Hộp thư báo cáo trống</h3>
+              <p className="text-sm text-on-surface-variant max-w-sm mx-auto leading-relaxed">
+                Check Zone tạm thời chưa ghi nhận bất kỳ đơn nộp tố cáo lừa đảo nào cần phê duyệt từ cộng đồng.
+              </p>
             </div>
           ) : (
-            <div className="bg-white rounded-xl border border-outline-variant overflow-hidden shadow-sm">
+            <div className="bg-white rounded-2xl border border-outline-variant overflow-hidden shadow-sm animate-fade-in">
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse min-w-[600px]">
+                <table className="w-full text-left border-collapse min-w-[650px] text-xs">
                   <thead>
-                    <tr className="bg-slate-100 border-b border-outline-variant text-slate-800 text-xs font-bold uppercase">
-                      <th className="p-4">STT / Mã số</th>
-                      <th className="p-4">Họ tên & Ngân hàng</th>
+                    <tr className="bg-slate-50 border-b border-outline-variant text-slate-700 text-[10px] font-bold uppercase tracking-widest opacity-80">
+                      <th className="p-4 pl-6">Mã tố cáo</th>
+                      <th className="p-4">Đối tượng bị tố</th>
                       <th className="p-4">Số tài khoản / SĐT</th>
                       <th className="p-4">Trạng thái</th>
-                      <th className="p-4">Hành động</th>
+                      <th className="p-4 pr-6 text-right">Thẩm duyệt</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-outline-variant text-xs">
-                    {scams.map((scam, i) => (
-                      <tr 
-                        key={scam.id} 
+                  <tbody className="divide-y divide-outline-variant">
+                    {scams.map((scam, idx) => (
+                      <tr
+                        key={scam.id}
                         onClick={() => setSelectedId(scam.id)}
-                        className={`hover:bg-slate-50 transition-colors cursor-pointer ${selectedId === scam.id ? "bg-slate-150 font-semibold border-l-4 border-l-primary" : ""}`}
+                        className={`hover:bg-slate-50/70 transition-colors cursor-pointer ${selectedId === scam.id ? "bg-emerald-50/50 font-medium" : ""}`}
                       >
-                        <td className="p-4 text-slate-500 font-mono font-bold">#{scam.id.slice(0, 6) || i + 1}</td>
-                        <td className="p-4">
-                          <p className="font-bold text-slate-900 text-sm">{scam.name}</p>
-                          <p className="text-[11px] text-slate-500">{scam.bankName || "Tài khoản khác"}</p>
+                        <td className="p-4 pl-6 font-mono font-black text-slate-500">
+                          {scam.id}
                         </td>
                         <td className="p-4">
-                          <p className="font-mono text-xs text-slate-800 font-bold">{scam.accountNumber}</p>
-                          <p className="text-[11px] text-slate-500">{scam.phone || "Telegram/Mạng xã hội"}</p>
+                          <p className="font-bold text-slate-900 text-sm capitalize">{scam.name}</p>
+                          <span className="text-[10px] text-slate-500 capitalize bg-slate-100 px-2 py-0.5 rounded border border-slate-200 mt-1 inline-block">
+                            {scam.type}
+                          </span>
+                        </td>
+                        <td className="p-4">
+                          <p className="font-mono text-xs text-red-600 font-bold">{scam.accountNumber || "N/A"}</p>
+                          <p className="text-[10px] text-slate-500 mt-0.5">{scam.bankName || "Zalo/Mạng xã hội"}</p>
                         </td>
                         <td className="p-4">
                           {scam.status === "Đã phê duyệt" ? (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 uppercase">
-                              Đã phê duyệt
+                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 uppercase tracking-wide">
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#2e7d32]"></span>
+                              Đã duyệt
                             </span>
                           ) : (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200 uppercase">
-                              Đang chờ duyệt
+                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 uppercase tracking-wide animate-pulse">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
+                              Chờ duyệt
                             </span>
                           )}
                         </td>
-                        <td className="p-4">
-                          <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedId(scam.id);
-                              // Simple fast approve triggering
-                              approveScamReport(scam.id);
-                            }}
-                            className="bg-primary text-white font-bold px-3 py-1 rounded text-[10px] uppercase hover:bg-opacity-90 mr-2 cursor-pointer"
-                          >
-                            Duyệt nhanh
-                          </button>
+                        <td className="p-4 pr-6 text-right">
+                          <div className="flex gap-2 justify-end items-center" onClick={(e) => e.stopPropagation()}>
+                            {scam.status !== "Đã phê duyệt" && (
+                              <button
+                                onClick={() => handleApprove(scam.id, scam.name)}
+                                className="bg-[#2e7d32] hover:bg-[#205c22] text-white font-bold px-3 py-1.5 rounded-lg text-[10px] uppercase transition-colors shrink-0 shadow-sm cursor-pointer"
+                              >
+                                Duyệt
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleReject(scam.id, scam.name)}
+                              className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 hover:text-red-700 font-bold px-3 py-1.5 rounded-lg text-[10px] uppercase transition-colors shrink-0 cursor-pointer"
+                            >
+                              Xoá
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -105,104 +144,118 @@ export function AdminScamManagement() {
           )}
         </section>
 
-        {/* Quick View Sidebar Panel */}
-        <aside className="w-full lg:w-[450px] bg-slate-50 flex flex-col border-t lg:border-t-0 lg:border-l border-outline-variant shrink-0">
+        {/* Sidebar Information View (1/3 width on desktop) */}
+        <aside className="w-full lg:w-[400px] shrink-0">
           {selectedScam ? (
-            <>
-              <div className="p-6 border-b border-outline-variant flex justify-between items-center bg-white">
-                <div>
-                  <h3 className="text-headline-sm font-bold text-on-surface">Chi tiết tố cáo #{selectedScam.id.slice(0, 6)}</h3>
-                  <p className="text-xs text-on-surface-variant font-mono">ID: {selectedScam.id}</p>
-                </div>
+            <div className="bg-white border border-outline-variant rounded-2xl p-6 shadow-sm sticky top-28 space-y-6 max-h-[calc(100vh-120px)] overflow-y-auto animate-fade-in">
+              <div className="border-b border-outline-variant pb-4">
+                <span className="text-[10px] font-bold bg-red-50 text-red-700 border border-red-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider mb-2 inline-block">
+                  Hồ sơ chờ phê chuẩn
+                </span>
+                <h3 className="text-lg font-black text-on-surface uppercase tracking-tight">Chi tiết hồ sơ nộp</h3>
+                <p className="text-xs text-on-surface-variant font-mono mt-0.5">ID: {selectedScam.id}</p>
               </div>
-              <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                <div className="space-y-4">
-                  <div className="p-4 bg-white rounded-lg border border-outline-variant">
-                    <p className="text-[10px] text-on-surface-variant uppercase tracking-widest mb-1">Đối tượng bị tố cáo</p>
-                    <p className="font-bold text-sm text-red-600 uppercase">{selectedScam.name}</p>
+
+              <div className="space-y-4 text-xs">
+                {/* Visual Identity */}
+                <div className="bg-red-50/30 border border-red-100 p-4 rounded-xl">
+                  <span className="text-[10px] text-red-800 uppercase tracking-widest font-extrabold block mb-1">Đối tượng bị tố cáo</span>
+                  <span className="font-black text-sm text-red-600 uppercase tracking-tight">{selectedScam.name}</span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl">
+                    <span className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold block mb-0.5">Ngân hàng</span>
+                    <span className="font-extrabold text-on-surface">{selectedScam.bankName || "Không rõ"}</span>
                   </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-white rounded-lg border border-outline-variant">
-                      <p className="text-[10px] text-on-surface-variant uppercase tracking-widest mb-1">Ngân hàng</p>
-                      <p className="font-bold text-xs text-on-surface">{selectedScam.bankName || "Khác"}</p>
-                    </div>
-                    <div className="p-4 bg-white rounded-lg border border-outline-variant">
-                      <p className="text-[10px] text-on-surface-variant uppercase tracking-widest mb-1">Số tài khoản</p>
-                      <p className="font-mono font-bold text-xs text-red-600">{selectedScam.accountNumber}</p>
-                    </div>
+                  <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl">
+                    <span className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold block mb-0.5">Số tài khoản</span>
+                    <span className="font-mono font-black text-red-600">{selectedScam.accountNumber || "N/A"}</span>
                   </div>
+                </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-white rounded-lg border border-outline-variant">
-                      <p className="text-[10px] text-on-surface-variant uppercase tracking-widest mb-1">Số điện thoại</p>
-                      <p className="font-bold text-xs text-on-surface">{selectedScam.phone || "Không có"}</p>
-                    </div>
-                    <div className="p-4 bg-white rounded-lg border border-outline-variant">
-                      <p className="text-[10px] text-on-surface-variant uppercase tracking-widest mb-1">Telegram</p>
-                      <p className="font-bold text-xs text-on-surface">{selectedScam.telegram || "Không có"}</p>
-                    </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl">
+                    <span className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold block mb-0.5">Số điện thoại</span>
+                    <span className="font-mono font-bold text-on-surface">{selectedScam.phone || "Không có"}</span>
                   </div>
-
-                  {selectedScam.website && (
-                    <div className="p-4 bg-white rounded-lg border border-outline-variant">
-                      <p className="text-[10px] text-on-surface-variant uppercase tracking-widest mb-1">Website lừa đảo</p>
-                      <p className="font-mono text-xs text-blue-600 underline truncate">{selectedScam.website}</p>
-                    </div>
-                  )}
-
-                  <div className="p-4 bg-white rounded-lg border border-outline-variant">
-                    <p className="text-[10px] text-on-surface-variant uppercase tracking-widest mb-1">Số tiền chiếm đoạt ước tính</p>
-                    <p className="font-bold text-sm text-red-600">
-                      {selectedScam.scamAmount ? `${Number(selectedScam.scamAmount).toLocaleString("vi-VN")}đ` : "Không khai báo"}
-                    </p>
+                  <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl">
+                    <span className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold block mb-0.5">Thời gian tố</span>
+                    <span className="font-bold text-on-surface">{selectedScam.time || "Vừa xong"}</span>
                   </div>
+                </div>
 
+                <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl">
+                  <span className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold block mb-1">Thiệt hại ước tính</span>
+                  <span className="font-mono font-black text-sm text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-100">
+                    {selectedScam.amount ? `${Number(selectedScam.amount).toLocaleString("vi-VN")}đ` : "Không khai báo"}
+                  </span>
+                </div>
+
+                {selectedScam.facebook && (
+                  <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl">
+                    <span className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold block mb-1">Đường dẫn MXH</span>
+                    <a href={selectedScam.facebook} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-bold break-all flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-xs">link</span> {selectedScam.facebook}
+                    </a>
+                  </div>
+                )}
+
+                <div>
+                  <span className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold block mb-1">Nhật trình cáo giác</span>
+                  <div className="p-4 bg-slate-50 border border-slate-100 rounded-xl leading-relaxed text-slate-700 font-medium whitespace-pre-line max-h-32 overflow-y-auto mb-1">
+                    {selectedScam.desc}
+                  </div>
+                </div>
+
+                {selectedScam.images && selectedScam.images.length > 0 && (
                   <div>
-                    <p className="text-[10px] text-on-surface-variant uppercase tracking-widest mb-1">Mô tả hành vi gian lận</p>
-                    <div className="p-4 bg-white border border-outline-variant rounded-lg text-xs leading-relaxed text-on-surface whitespace-pre-line max-h-40 overflow-y-auto">
-                      {selectedScam.desc}
-                    </div>
-                  </div>
-
-                  {selectedScam.images && selectedScam.images.length > 0 && (
-                    <div>
-                      <p className="text-[10px] text-on-surface-variant uppercase tracking-widest mb-1">Ảnh bằng chứng ({selectedScam.images.length})</p>
-                      <div className="grid grid-cols-3 gap-2 mt-1">
-                        {selectedScam.images.map((imgUrl, idx) => (
-                          <img 
-                            key={idx} 
-                            src={imgUrl} 
-                            className="w-full h-16 object-cover rounded border" 
-                            alt="bằng chứng"
+                    <span className="text-[10px] text-on-surface-variant uppercase tracking-wider font-bold block mb-1.5">Ảnh bằng chứng ({selectedScam.images.length})</span>
+                    <div className="grid grid-cols-3 gap-2">
+                      {selectedScam.images.map((imgUrl, imgIdx) => (
+                        <div key={imgIdx} className="aspect-square bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
+                          <img
+                            src={imgUrl}
+                            alt="minh chứng tố cáo"
+                            className="w-full h-full object-cover hover:scale-110 transition-transform"
                             referrerPolicy="no-referrer"
                           />
-                        ))}
-                      </div>
+                        </div>
+                      ))}
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
-              <div className="p-6 bg-white border-t border-outline-variant space-y-3">
-                 <button 
-                  onClick={handleApprove}
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs uppercase py-3.5 rounded-lg flex items-center justify-center gap-3 transition-all font-bold cursor-pointer"
-                 >
-                  <span className="material-symbols-outlined text-[18px]">verified</span>
-                  Phê duyệt tố cáo lên Danh sách Đen
-                </button>
-                <button 
-                  onClick={handleReject}
-                  className="w-full py-3 border border-red-300 text-red-600 text-xs uppercase rounded-lg hover:bg-red-50 transition-colors flex items-center justify-center gap-2 font-bold cursor-pointer"
+
+              {/* Approval & reject controls inside sidebar */}
+              <div className="pt-4 border-t border-slate-150 space-y-2.5">
+                {selectedScam.status !== "Đã phê duyệt" ? (
+                  <button
+                    onClick={() => handleApprove(selectedScam.id, selectedScam.name)}
+                    className="w-full bg-[#2e7d32] hover:bg-[#205c22] text-white text-xs uppercase py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all font-black shadow-sm tracking-wider cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-sm font-bold">verified</span>
+                    Phê duyệt lên Danh Sách Đen
+                  </button>
+                ) : (
+                  <div className="w-full bg-emerald-50 text-[#2e7d32] text-xs font-bold py-3 px-4 rounded-xl border border-emerald-100 flex items-center justify-center gap-1.5">
+                    <span className="material-symbols-outlined text-sm">check_circle</span>
+                    Hồ sơ này đã hiển thị trên web
+                  </div>
+                )}
+
+                <button
+                  onClick={() => handleReject(selectedScam.id, selectedScam.name)}
+                  className="w-full py-3.5 border border-red-200 text-red-650 hover:bg-red-50 text-xs uppercase rounded-xl flex items-center justify-center gap-1.5 transition-colors font-extrabold text-red-600 hover:text-red-700 cursor-pointer"
                 >
-                  <span className="material-symbols-outlined text-[18px]">delete</span>
-                  Bác bỏ & Hoàn toàn Gỡ bỏ tố cáo này
+                  <span className="material-symbols-outlined text-sm">gpp_bad</span>
+                  Bác bỏ & Gỡ hoàn toàn tố cáo
                 </button>
               </div>
-            </>
+            </div>
           ) : (
-            <div className="flex-grow flex items-center justify-center p-6 text-center text-slate-400 text-xs">
-              Vui lòng chọn một báo cáo từ danh sách bên trái để kiểm duyệt.
+            <div className="bg-slate-50 border border-outline-variant rounded-2xl p-6 text-center text-on-surface-variant text-xs">
+              Vui lòng chọn một báo cáo lừa đảo ở bảng bên cạnh để nghiên cứu và thẩm định hồ sơ nộp.
             </div>
           )}
         </aside>

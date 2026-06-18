@@ -5,48 +5,78 @@ export function AdminLegitManagement() {
   const { legitList, addLegitProfile, deleteLegitProfile } = useApp();
 
   const [name, setName] = useState("");
-  const [role, setRole] = useState("Công nghệ & Điện tử");
+  const [role, setRole] = useState("Thương mại điện tử & Đồ công nghệ");
   const [insurance, setInsurance] = useState("50000000");
   const [desc, setDesc] = useState("");
   const [telegram, setTelegram] = useState("");
   const [phone, setPhone] = useState("");
   const [imgUrl, setImgUrl] = useState("");
+  const [successNotif, setSuccessNotif] = useState("");
   const [alertMsg, setAlertMsg] = useState("");
+
+  const insuranceValue = Number(insurance) || 0;
+
+  // Realtime tier detection for UX
+  function getLiveTier(val: number) {
+    if (val >= 500000000) {
+      return {
+        label: "Hạng Kim Cương (Bảo chứng cao nhất)",
+        className: "bg-cyan-50 text-cyan-800 border border-cyan-200",
+        icon: "diamond"
+      };
+    } else if (val >= 100000000) {
+      return {
+        label: "Hạng Bạch Kim (Bảo chứng trung cấp)",
+        className: "bg-slate-50 text-slate-705 border border-slate-300 text-slate-700",
+        icon: "shield_lock"
+      };
+    } else {
+      return {
+        label: "Hạng Vàng (Bảo chứng phổ thông)",
+        className: "bg-amber-50 text-amber-800 border border-amber-200",
+        icon: "workspace_premium"
+      };
+    }
+  }
+
+  const liveTier = getLiveTier(insuranceValue);
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
     setAlertMsg("");
+    setSuccessNotif("");
 
     if (!name.trim()) {
-      setAlertMsg("Vui lòng nhập tên tiểu thương.");
+      setAlertMsg("Vui lòng nhập tên thương hiệu / tiểu thương.");
       return;
     }
 
     if (!desc.trim()) {
-      setAlertMsg("Vui lòng nhập mô tả tóm tắt.");
+      setAlertMsg("Vui lòng bổ sung phần mô tả tóm tắt năng lực kinh doanh.");
       return;
     }
 
-    const insuranceValue = Number(insurance);
     if (isNaN(insuranceValue) || insuranceValue <= 0) {
-      setAlertMsg("Số tiền ký quỹ bảo hiểm phải là số và lớn hơn 0.");
+      setAlertMsg("Số tiền ký quỹ quỹ bảo hiểm phải là số dương hợp lệ.");
       return;
     }
 
-    // Default image if empty
-    const finalImg = imgUrl.trim() || "https://lh3.googleusercontent.com/aida-public/AB6AXuDKJ968Ro0Hzvi8zHp06GmLG63LozZe4NRvKhYCn5yYkPBsnsqfkGxNSYIVzs4lS-POI9dJ6jAkQf6sD-vfdHIDtRjTZt5qxga6QElHZZi8hh14MMbRsMjcPQ6I8mJBxflquF_-Day2hvABActcMHynjkDfrGLqrV2kTspaYVY23YkiaipC_0TeFQOxHxl9LM4TE-dbgwMegvZlElmVN3pqZPFObemSNzfEp9wu0_tgVPRuCXFTUY4UCprdbpksNSqX8bEQ7xrBNGdH";
+    // Default high-quality placeholder image if none is provided
+    const defaultPlaceholder = "https://lh3.googleusercontent.com/aida-public/AB6AXuDKJ968Ro0Hzvi8zHp06GmLG63LozZe4NRvKhYCn5yYkPBsnsqfkGxNSYIVzs4lS-POI9dJ6jAkQf6sD-vfdHIDtRjTZt5qxga6QElHZZi8hh14MMbRsMjcPQ6I8mJBxflquF_-Day2hvABActcMHynjkDfrGLqrV2kTspaYVY23YkiaipC_0TeFQOxHxl9LM4TE-dbgwMegvZlElmVN3pqZPFObemSNzfEp9wu0_tgVPRuCXFTUY4UCprdbpksNSqX8bEQ7xrBNGdH";
+    const finalImg = imgUrl.trim() || defaultPlaceholder;
 
     addLegitProfile({
       name: name.trim(),
-      role: role + " đã xác minh",
+      role: role.trim(),
       desc: desc.trim(),
       insurance: insuranceValue,
-      score: "100",
+      score: 100,
       successTrans: 1,
-      telegram: telegram.trim() || "@verified_merchant",
+      telegram: telegram.trim() ? (telegram.startsWith("@") ? telegram.trim() : `@${telegram.trim()}`) : "@verified_merchant",
       phone: phone.trim() || "09x xxx xxxx",
       img: finalImg,
-      date: new Date().toLocaleDateString("vi-VN")
+      joinDate: new Date().toLocaleDateString("vi-VN").substring(3),
+      businessType: role.trim()
     });
 
     setName("");
@@ -55,189 +85,234 @@ export function AdminLegitManagement() {
     setPhone("");
     setImgUrl("");
     setInsurance("50000000");
-    alert("Đã tạo hồ sơ uy tín thành công!");
+    setSuccessNotif(`Đã cấp hồ sơ ký quỹ uy tín thành công cho đơn vị: "${name.trim()}".`);
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm("Bạn có chắc muốn thu hồi hồ sơ uy tín này không?")) {
+  const handleDelete = (id: string | number, merchantName: string) => {
+    if (confirm(`Bạn có chắc chắn muốn THU HỒI hồ sơ & GỠ BỎ mọi chứng nhận uy tín của tiểu thương: "${merchantName}" khỏi hệ thống?`)) {
       deleteLegitProfile(id);
-      alert("Đã thu hồi thành công!");
+      setSuccessNotif(`Đã gỡ bỏ chứng chỉ ký quỹ của "${merchantName}".`);
     }
   };
 
   return (
-    <div className="flex-grow flex flex-col h-full overflow-hidden">
-      <header className="h-20 bg-surface border-b border-outline-variant flex items-center justify-between px-6 shrink-0 sticky top-0 z-10">
-        <div className="flex items-center gap-4">
-          <h2 className="text-headline-md font-bold text-on-surface">Ký duyệt cấp hồ sơ uy tín</h2>
-          <span className="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-xs font-bold font-mono">
-            {legitList.length} Thương nhân đã kiểm duyệt
+    <div className="flex-grow flex flex-col min-h-screen bg-slate-50/50">
+      {/* Page Header */}
+      <header className="bg-white border-b border-outline-variant px-6 py-6 md:px-margin-desktop sticky top-0 z-10 shadow-sm shrink-0">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <span className="text-[#2e7d32] text-xs font-black uppercase tracking-widest bg-emerald-50 border border-emerald-100 px-3.5 py-1 rounded-full inline-block mb-1.5">
+              Chứng thực chất lượng giao dịch
+            </span>
+            <h1 className="text-2xl md:text-3.5xl font-black text-on-surface tracking-tight">
+              Quản lý danh khánh uy tín
+            </h1>
+          </div>
+          <span className="bg-[#2e7d32] text-white px-4 py-2 rounded-2xl font-mono text-xs font-bold shadow-sm inline-flex items-center gap-1.5 self-start sm:self-auto uppercase">
+            <span className="material-symbols-outlined text-xs">verified_user</span>
+            {legitList.length} Thương nhân hợp tác
           </span>
         </div>
       </header>
 
-      <div className="p-6 max-w-max-width mx-auto w-full grid grid-cols-12 gap-gutter overflow-y-auto flex-1">
-        {/* Registration Form */}
-        <section className="col-span-12 lg:col-span-4 space-y-6">
-          <div className="bg-white border border-outline-variant rounded-xl p-6 shadow-sm">
-            <h3 className="text-headline-sm font-bold text-on-surface mb-2">Tạo hồ sơ mới</h3>
-            <p className="text-on-surface-variant text-xs mb-6">Đăng ký một người bán uy tín mới vào hệ thống công bố.</p>
-            
+      {/* Main Grid View */}
+      <div className="max-w-6xl mx-auto w-full px-6 md:px-margin-desktop py-8 pb-20 grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1">
+        
+        {/* Creation Form Column (5/12 width) */}
+        <section className="col-span-12 lg:col-span-5">
+          <div className="bg-white border border-outline-variant rounded-2xl p-6 md:p-8 shadow-sm space-y-6 sticky top-28 animate-fade-in">
+            <div>
+              <h2 className="text-xl font-black text-[#2e7d32] flex items-center gap-2">
+                <span className="material-symbols-outlined font-bold text-xl">add_circle</span>
+                Cấp hồ sơ Legit mới
+              </h2>
+              <p className="text-xs text-on-surface-variant mt-1">Đăng ký mới một thương nhân đã được bộ phận rà soát thực tế ký quỹ giao dịch.</p>
+            </div>
+
             {alertMsg && (
-              <div className="p-3 bg-red-100 text-red-700 text-xs font-semibold mb-4 rounded border-l-4 border-red-500">
-                ⚠️ {alertMsg}
+              <div className="p-4 bg-red-50 border border-red-200 text-red-900 rounded-xl text-xs font-semibold flex items-center gap-2.5 animate-pulse">
+                <span className="material-symbols-outlined text-red-650 font-bold text-sm">warning</span>
+                <span>{alertMsg}</span>
+              </div>
+            )}
+
+            {successNotif && (
+              <div className="p-4 bg-emerald-54 bg-emerald-50 border border-emerald-200 text-emerald-950 rounded-xl text-xs font-semibold flex items-center gap-2.5">
+                <span className="material-symbols-outlined text-[#2e7d32] font-bold text-sm">check_circle</span>
+                <span>{successNotif}</span>
               </div>
             )}
 
             <form onSubmit={handleCreate} className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-on-surface mb-1">Tên thương hiệu / Người bán</label>
-                <input 
-                  className="w-full border border-outline rounded-lg px-3 py-2 text-sm focus:border-secondary outline-none" 
-                  placeholder="Ví dụ: Tech Global Store" 
-                  type="text" 
+                <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">Tên thương hiệu / Người bán *</label>
+                <input
+                  className="w-full border-2 border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-[#2e7d32] outline-none shadow-sm transition-all focus:ring-4 focus:ring-emerald-50"
+                  placeholder="Ví dụ: Tech Global Store"
+                  type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-on-surface mb-1">Lĩnh vực hoạt động</label>
-                <select 
-                  className="w-full border border-outline rounded-lg px-3 py-2 text-sm focus:border-secondary outline-none bg-white"
+                <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">Lĩnh vực hoạt động *</label>
+                <select
+                  className="w-full border-2 border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-[#2e7d32] outline-none bg-white shadow-sm transition-all text-slate-800"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
                 >
-                  <option value="Thương mại điện tử">Thương mại điện tử & Order</option>
-                  <option value="Công nghệ & Thiết bị">Công nghệ & Đồ điện tử</option>
-                  <option value="Freelancer & Thiết kế">Freelancer & Creative Agency</option>
+                  <option value="Thương mại điện tử & Đồ công nghệ">Thương mại điện tử & Đồ công nghệ</option>
+                  <option value="Freelancer & Sáng tạo nội dung">Freelancer & Sáng tạo nội dung</option>
                   <option value="Dịch vụ & Tư vấn chuyên nghiệp">Dịch vụ & Tư vấn chuyên nghiệp</option>
                 </select>
               </div>
 
               <div>
-                <label className="block font-bold text-primary mb-1">Quỹ nộp bảo hiểm (VNĐ)</label>
+                <label className="block font-bold text-[#2e7d32] uppercase tracking-wider text-[10px] mb-1.5">Ký quỹ tiền bảo lãnh thương mại (VNĐ) *</label>
                 <div className="relative">
-                  <span className="absolute inset-y-0 left-3 flex items-center text-primary font-bold">đ</span>
-                  <input 
-                    className="w-full border border-primary/30 rounded-lg pl-8 pr-3 py-2 font-mono font-bold text-primary focus:border-primary outline-none" 
-                    placeholder="e.g. 50000000" 
-                    type="number" 
+                  <span className="absolute inset-y-0 left-4 flex items-center text-[#2e7d32] font-bold">đ</span>
+                  <input
+                    className="w-full border-2 border-[#2e7d32]/30 rounded-xl pl-9 pr-4 py-3 font-mono font-black text-sm text-[#2e7d32] focus:border-[#2e7d32] outline-none shadow-sm transition-all focus:ring-4 focus:ring-emerald-50"
+                    placeholder="e.g. 100000000"
+                    type="number"
                     value={insurance}
                     onChange={(e) => setInsurance(e.target.value)}
+                  />
+                </div>
+
+                {/* Real-time calculated Tier badge info preview for UX! */}
+                <div className="mt-2.5 p-3 rounded-xl flex items-center justify-between text-[11px] font-bold shadow-sm transition-all duration-300 bg-slate-50/50 border border-slate-100">
+                  <span className="text-slate-650 text-slate-500 font-semibold">Bậc ký duyệt tự động:</span>
+                  <div className={`px-2.5 py-1 rounded-full flex items-center gap-1 uppercase tracking-wide text-[10px] ${liveTier.className}`}>
+                    <span className="material-symbols-outlined text-xs align-middle">{liveTier.icon}</span>
+                    {liveTier.label}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">Telegram liên hệ</label>
+                  <input
+                    className="w-full border-2 border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-[#2e7d32] outline-none shadow-sm transition-all focus:ring-4 focus:ring-emerald-50"
+                    placeholder="Ví dụ: @techglobal"
+                    type="text"
+                    value={telegram}
+                    onChange={(e) => setTelegram(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">Hotline / Zalo *</label>
+                  <input
+                    className="w-full border-2 border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-[#2e7d32] outline-none shadow-sm transition-all focus:ring-4 focus:ring-emerald-50"
+                    placeholder="Ví dụ: 0912345678"
+                    type="text"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-on-surface mb-1">Liên hệ Telegram</label>
-                <input 
-                  className="w-full border border-outline rounded-lg px-3 py-2 text-sm focus:border-secondary outline-none" 
-                  placeholder="Ví dụ: @official_admin" 
-                  type="text" 
-                  value={telegram}
-                  onChange={(e) => setTelegram(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-on-surface mb-1">Liên hệ Zalo / SĐT</label>
-                <input 
-                  className="w-full border border-outline rounded-lg px-3 py-2 text-sm focus:border-secondary outline-none" 
-                  placeholder="Ví dụ: 0901234567" 
-                  type="text" 
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-on-surface mb-1">Ảnh Logo URL (Tùy chọn)</label>
-                <input 
-                  className="w-full border border-outline rounded-lg px-3 py-2 text-sm focus:border-secondary outline-none" 
-                  placeholder="https://..." 
-                  type="text" 
+                <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">Ảnh logo thương nhân URL (Tuyển Chọn)</label>
+                <input
+                  className="w-full border-2 border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-[#2e7d32] outline-none shadow-sm transition-all focus:ring-4 focus:ring-emerald-50"
+                  placeholder="https://images.unsplash.com/photo-..."
+                  type="text"
                   value={imgUrl}
                   onChange={(e) => setImgUrl(e.target.value)}
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-on-surface mb-1">Mô tả ngắn hoạt động</label>
-                <textarea 
-                  className="w-full border border-outline rounded-lg px-3 py-2 text-sm focus:border-secondary outline-none resize-none" 
-                  placeholder="Mô tả tóm tắt kinh nghiệm kinh doanh..." 
+                <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">Giới thiệu ngắn & năng lực giao dịch *</label>
+                <textarea
+                  className="w-full border-2 border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-[#2e7d32] outline-none resize-none shadow-sm transition-all focus:ring-4 focus:ring-emerald-50 text-slate-800"
+                  placeholder="Mô tả các sản phẩm kinh doanh chính và cam kết bảo hành..."
                   rows={3}
                   value={desc}
                   onChange={(e) => setDesc(e.target.value)}
                 />
               </div>
 
-              <button 
+              <button
                 type="submit"
-                className="w-full bg-emerald-600 text-white text-xs py-3 rounded-lg mt-4 hover:bg-emerald-700 transition-colors font-bold uppercase tracking-widest cursor-pointer"
+                className="w-full bg-[#2e7d32] hover:bg-[#205c22] text-white text-xs py-3.5 rounded-xl mt-4 transition-all duration-300 font-extrabold uppercase tracking-widest shadow-md cursor-pointer active:scale-95 text-center flex items-center justify-center gap-1.5"
               >
-                Ký duyệt cấp hồ sơ
+                <span className="material-symbols-outlined text-sm">verified_user</span>
+                Ký duyệt cấp bảo hộ uy tín
               </button>
             </form>
           </div>
         </section>
 
-        {/* Verified Sellers List */}
-        <section className="col-span-12 lg:col-span-8">
-          <div className="bg-white border border-outline-variant rounded-xl overflow-hidden shadow-sm">
-            <div className="p-6 border-b border-outline-variant flex items-center justify-between bg-slate-50">
-              <h3 className="text-headline-sm font-bold text-on-surface">Người bán có ký quỹ đã xác minh</h3>
+        {/* Verified Businesses Dashboard List (7/12 width) */}
+        <section className="col-span-12 lg:col-span-7">
+          <div className="bg-white border border-outline-variant rounded-2xl overflow-hidden shadow-sm animate-fade-in flex flex-col h-full">
+            <div className="p-6 border-b border-outline-variant bg-slate-50/50">
+              <h3 className="text-base font-black text-on-surface uppercase tracking-tight flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-xl text-[#2e7d32] fill-1">verified_user</span>
+                Cơ sở thương nhân ký quỹ vận hành
+              </h3>
+              <p className="text-xs text-on-surface-variant mt-0.5">Danh sách các hồ sơ an toàn đã đóng gói quỹ bảo hộ rủi ro giao dịch của bạn.</p>
             </div>
-            <div className="overflow-x-auto text-xs">
-              <table className="w-full text-left border-collapse min-w-[600px]">
+            
+            <div className="overflow-x-auto text-xs flex-1">
+              <table className="w-full text-left border-collapse min-w-[550px]">
                 <thead>
-                  <tr className="bg-slate-100 text-slate-700 uppercase font-bold">
-                    <th className="px-6 py-4">Tên tiểu thương</th>
-                    <th className="px-6 py-4 text-right">Quỹ bảo hiểm đã nộp</th>
-                    <th className="px-6 py-4 text-center">Liên hệ</th>
-                    <th className="px-6 py-4 text-right">Quản lý</th>
+                  <tr className="bg-slate-50 text-slate-700 border-b border-outline-variant uppercase font-bold text-[10px] tracking-widest opacity-80">
+                    <th className="px-6 py-4">Nhãn thương nhân</th>
+                    <th className="px-6 py-4 text-center">Xếp hạng bảo chứng</th>
+                    <th className="px-6 py-4 text-right">Phí gửi quỹ</th>
+                    <th className="px-6 py-4 text-right pr-6">Tuỳ chọn</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-outline-variant">
-                  {legitList.map((item) => (
-                    <tr key={item.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-6 py-5">
-                        <div className="flex items-center gap-3">
-                          <img 
-                            src={item.img} 
-                            alt={item.name} 
-                            className="w-10 h-10 rounded-full object-cover border border-outline-variant shrink-0" 
-                            referrerPolicy="no-referrer"
-                          />
-                          <div>
-                            <p className="font-bold text-[14px] text-slate-900">{item.name}</p>
-                            <p className="text-[11px] text-slate-500">{item.role}</p>
+                  {legitList.map((item) => {
+                    const profileTier = getLiveTier(item.insurance);
+                    return (
+                      <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={item.img}
+                              alt={item.name}
+                              className="w-10 h-10 rounded-full object-cover border border-outline-variant shrink-0 shadow-sm"
+                              referrerPolicy="no-referrer"
+                            />
+                            <div>
+                              <p className="font-extrabold text-[13px] text-slate-900 leading-tight">{item.name}</p>
+                              <p className="text-[10px] text-slate-500 mt-0.5">{item.role}</p>
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-5 text-right font-mono font-bold text-emerald-600 text-sm">
-                        {(item.insurance).toLocaleString("vi-VN")}đ
-                      </td>
-                      <td className="px-6 py-5 text-center text-slate-600">
-                        <p>{item.telegram}</p>
-                        <p className="text-[10px]">{item.phone}</p>
-                      </td>
-                      <td className="px-6 py-5 text-right">
-                        <button
-                          onClick={() => handleDelete(item.id)}
-                          className="bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 px-3 py-1.5 rounded text-[11px] font-bold cursor-pointer"
-                        >
-                          Thu hồi hồ sơ
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <span className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wide ${profileTier.className}`}>
+                            <span className="material-symbols-outlined text-[10px] align-middle">{profileTier.icon}</span>
+                            {profileTier.label.split(" (")[0]}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right font-mono font-black text-slate-700">
+                          {item.insurance.toLocaleString("vi-VN")}đ
+                        </td>
+                        <td className="px-6 py-4 text-right pr-6">
+                          <button
+                            onClick={() => handleDelete(item.id, item.name)}
+                            className="bg-red-50 hover:bg-red-100 text-red-650 border border-red-200 text-red-600 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-colors shrink-0 cursor-pointer"
+                          >
+                            Thu hồi
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
           </div>
         </section>
+
       </div>
     </div>
   );

@@ -33,8 +33,8 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   const navItemClass = (path: string) => {
     const isActive = location.pathname === path || (path !== "/admin" && location.pathname.startsWith(path));
     return isActive 
-      ? "bg-secondary-container text-on-secondary-container rounded-xl flex items-center gap-4 px-4 py-3 transition-all"
-      : "text-surface-variant hover:text-white flex items-center gap-4 px-4 py-3 transition-all hover:bg-surface-variant/10";
+      ? "bg-emerald-50 text-[#2e7d32] font-black rounded-xl flex items-center gap-4 px-4 py-3 transition-all border-l-4 border-l-[#2e7d32]"
+      : "text-slate-600 hover:text-[#2e7d32] flex items-center gap-4 px-4 py-3 transition-all rounded-xl hover:bg-slate-50";
   };
 
   const handleScamSubmit = (e: React.FormEvent) => {
@@ -115,84 +115,84 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div className="bg-inverse-surface text-on-surface-variant selection:bg-primary selection:text-white overflow-hidden h-screen flex dark">
+    <div className="bg-[#f8fafc] text-slate-800 selection:bg-[#2e7d32] selection:text-white overflow-hidden h-screen flex font-sans">
       {/* SideNavBar Component */}
-      <aside className="hidden md:flex flex-col h-full w-64 bg-inverse-surface border-r border-outline/20 py-8 shadow-md shrink-0">
+      <aside className="hidden md:flex flex-col h-full w-64 bg-white border-r border-outline-variant py-8 shadow-sm shrink-0">
         <div className="px-6 mb-10">
           <Link to="/admin">
-            <h1 className="text-headline-md font-black text-secondary-fixed">Check Legit</h1>
-            <p className="text-surface-variant text-label-sm mt-1">Trang quản trị • Kiểm soát cảnh giác</p>
+            <h1 className="text-2xl font-black text-[#2e7d32] tracking-tight uppercase">CHECK ZONE</h1>
+            <p className="text-slate-550 text-slate-500 text-xs mt-1">Hệ thống quản trị và kiểm duyệt</p>
           </Link>
         </div>
-        <nav className="flex-1 px-4 space-y-2">
+        <nav className="flex-1 px-4 space-y-1.5">
           <Link to="/admin" className={navItemClass("/admin")}>
             <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>dashboard</span>
-            <span className="text-label-sm uppercase tracking-wider">Tổng quan</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Tổng quan</span>
           </Link>
           <Link to="/admin/scams" className={navItemClass("/admin/scams")}>
             <span className="material-symbols-outlined">gpp_bad</span>
-            <span className="text-label-sm uppercase tracking-wider">Quản lý tố cáo</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Quản lý tố cáo</span>
           </Link>
           <Link to="/admin/legit" className={navItemClass("/admin/legit")}>
             <span className="material-symbols-outlined">verified_user</span>
-            <span className="text-label-sm uppercase tracking-wider">Quản lý uy tín</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Quản lý uy tín</span>
           </Link>
         </nav>
-        <div className="px-4 mt-auto space-y-2">
+        <div className="px-4 mt-auto space-y-1.5">
           <button 
             type="button"
             onClick={() => setIsModalOpen(true)}
-            className="w-full bg-primary text-white text-label-sm py-3 rounded-xl hover:bg-primary-container transition-colors mb-6 flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full bg-[#2e7d32] hover:bg-[#205c22] text-white text-xs font-extrabold uppercase tracking-wide py-3.5 rounded-xl transition-all duration-300 mb-4 flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-95"
           >
             <span className="material-symbols-outlined text-[18px]">add</span>
             Thêm mới
           </button>
           <Link to="/admin/settings" className={navItemClass("/admin/settings")}>
             <span className="material-symbols-outlined">settings</span>
-            <span className="text-label-sm uppercase tracking-wider">Cài đặt</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Cài đặt</span>
           </Link>
-          <Link to="/" className="text-surface-variant hover:text-white flex items-center gap-4 px-4 py-2 transition-all hover:bg-surface-variant/10">
+          <Link to="/" className="text-slate-600 hover:text-[#2e7d32] flex items-center gap-4 px-4 py-3 transition-all rounded-xl hover:bg-slate-50">
             <span className="material-symbols-outlined">logout</span>
-            <span className="text-label-sm uppercase tracking-wider">Quay lại trang</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Quay lại trang chính</span>
           </Link>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col overflow-hidden bg-background text-on-surface">
+      <main className="flex-1 h-screen overflow-y-auto bg-slate-50 relative text-slate-800">
         {children}
       </main>
 
       {/* Mobile Navigation (Responsive Pivot) */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-surface border-t border-outline-variant px-margin-mobile py-3 flex justify-around items-center z-50">
-        <Link to="/admin" className={`flex flex-col items-center gap-1 ${location.pathname === '/admin' ? 'text-primary' : 'text-on-surface-variant'}`}>
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-outline-variant px-4 py-3 flex justify-around items-center z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.03)] text-xs font-semibold">
+        <Link to="/admin" className={`flex flex-col items-center gap-1 ${location.pathname === '/admin' ? 'text-[#2e7d32]' : 'text-slate-500'}`}>
           <span className="material-symbols-outlined">dashboard</span>
-          <span className="text-[10px] text-label-sm uppercase">Tổng quan</span>
+          <span className="text-[9px] uppercase font-bold">Tổng quan</span>
         </Link>
-        <Link to="/admin/scams" className={`flex flex-col items-center gap-1 ${location.pathname === '/admin/scams' ? 'text-primary' : 'text-on-surface-variant'}`}>
+        <Link to="/admin/scams" className={`flex flex-col items-center gap-1 ${location.pathname === '/admin/scams' ? 'text-[#2e7d32]' : 'text-slate-500'}`}>
           <span className="material-symbols-outlined">gpp_bad</span>
-          <span className="text-[10px] text-label-sm uppercase">Tố cáo</span>
+          <span className="text-[9px] uppercase font-bold">Tố cáo</span>
         </Link>
-        <Link to="/admin/legit" className={`flex flex-col items-center gap-1 ${location.pathname === '/admin/legit' ? 'text-primary' : 'text-on-surface-variant'}`}>
+        <Link to="/admin/legit" className={`flex flex-col items-center gap-1 ${location.pathname === '/admin/legit' ? 'text-[#2e7d32]' : 'text-slate-500'}`}>
           <span className="material-symbols-outlined">verified_user</span>
-          <span className="text-[10px] text-label-sm uppercase">Uy tín</span>
+          <span className="text-[9px] uppercase font-bold">Uy tín</span>
         </Link>
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="flex flex-col items-center gap-1 text-primary animate-pulse"
+          className="flex flex-col items-center gap-1 text-[#2e7d32] animate-pulse"
         >
-          <span className="material-symbols-outlined text-red-600">add_circle</span>
-          <span className="text-[10px] text-label-sm uppercase text-red-600 font-bold">Thêm mới</span>
+          <span className="material-symbols-outlined font-bold">add_circle</span>
+          <span className="text-[9px] uppercase font-extrabold text-[#2e7d32]">Thêm mới</span>
         </button>
-        <Link to="/admin/settings" className={`flex flex-col items-center gap-1 ${location.pathname === '/admin/settings' ? 'text-primary' : 'text-on-surface-variant'}`}>
+        <Link to="/admin/settings" className={`flex flex-col items-center gap-1 ${location.pathname === '/admin/settings' ? 'text-[#2e7d32]' : 'text-slate-500'}`}>
           <span className="material-symbols-outlined">settings</span>
-          <span className="text-[10px] text-label-sm uppercase">Cài đặt</span>
+          <span className="text-[9px] uppercase font-bold">Cài đặt</span>
         </Link>
       </nav>
 
       {/* Quick Add Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100] text-on-surface font-sans">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100] text-slate-800 font-sans">
           <div className="bg-white rounded-2xl w-full max-w-xl shadow-2xl flex flex-col overflow-hidden max-h-[90vh] animate-fade-in text-slate-900 border border-slate-200">
             {/* Header */}
             <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
@@ -202,7 +202,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
               </div>
               <button 
                 onClick={() => setIsModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-250 p-1.5 rounded-full"
+                className="text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 p-1.5 rounded-full"
               >
                 <span className="material-symbols-outlined">close</span>
               </button>
@@ -213,14 +213,14 @@ export function AdminLayout({ children }: { children: ReactNode }) {
               <button 
                 type="button"
                 onClick={() => setActiveTab("scam")}
-                className={`flex-1 py-2.5 text-xs font-bold uppercase rounded-lg transition-all ${activeTab === 'scam' ? 'bg-red-600 text-white shadow-sm' : 'text-slate-650 hover:bg-slate-100'}`}
+                className={`flex-1 py-2.5 text-xs font-bold uppercase rounded-lg transition-all ${activeTab === 'scam' ? 'bg-red-650 bg-red-600 text-white shadow-sm' : 'text-slate-500 hover:bg-slate-100'}`}
               >
                 🚨 Tố cáo lừa đảo mới
               </button>
               <button 
                 type="button"
                 onClick={() => setActiveTab("legit")}
-                className={`flex-1 py-2.5 text-xs font-bold uppercase rounded-lg transition-all ${activeTab === 'legit' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-650 hover:bg-slate-100'}`}
+                className={`flex-1 py-2.5 text-xs font-bold uppercase rounded-lg transition-all ${activeTab === 'legit' ? 'bg-[#2e7d32] text-white shadow-sm' : 'text-slate-500 hover:bg-slate-100'}`}
               >
                 🛡️ Tiểu thương uy tín mới
               </button>
@@ -345,7 +345,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
                     <label className="block font-bold text-slate-700 mb-1">Tên thương hiệu / Người bán uy tín *</label>
                     <input 
                       type="text"
-                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-emerald-600 outline-none"
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-[#2e7d32] outline-none"
                       placeholder="Ví dụ: Tech Global Store"
                       value={legitName}
                       onChange={(e) => setLegitName(e.target.value)}
@@ -356,7 +356,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
                   <div>
                     <label className="block font-bold text-slate-700 mb-1">Lĩnh vực hoạt động</label>
                     <select 
-                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-emerald-600 outline-none bg-white"
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-[#2e7d32] outline-none bg-white"
                       value={legitRole}
                       onChange={(e) => setLegitRole(e.target.value)}
                     >
@@ -368,10 +368,10 @@ export function AdminLayout({ children }: { children: ReactNode }) {
                   </div>
 
                   <div>
-                    <label className="block font-bold text-emerald-600 mb-1">Quỹ nộp bảo lãnh bảo hiểm (VNĐ)</label>
+                    <label className="block font-bold text-[#2e7d32] mb-1">Quỹ nộp bảo lãnh bảo hiểm (VNĐ)</label>
                     <input 
                       type="number"
-                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-emerald-600 outline-none font-bold"
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-[#2e7d32] outline-none font-bold"
                       placeholder="Ví dụ: 50000000"
                       value={legitInsurance}
                       onChange={(e) => setLegitInsurance(e.target.value)}
@@ -383,7 +383,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
                       <label className="block font-bold text-slate-700 mb-1">Liên hệ Telegram</label>
                       <input 
                         type="text"
-                        className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-emerald-600 outline-none"
+                        className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-[#2e7d32] outline-none"
                         placeholder="Ví dụ: @merchant_official"
                         value={legitTelegram}
                         onChange={(e) => setLegitTelegram(e.target.value)}
@@ -393,7 +393,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
                       <label className="block font-bold text-slate-700 mb-1">Zalo / SĐT liên hệ</label>
                       <input 
                         type="text"
-                        className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-emerald-600 outline-none"
+                        className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-[#2e7d32] outline-none"
                         placeholder="Ví dụ: 0901234567"
                         value={legitPhone}
                         onChange={(e) => setLegitPhone(e.target.value)}
@@ -404,7 +404,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
                   <div>
                     <label className="block font-bold text-slate-700 mb-1">Mô tả ngắn hoạt động *</label>
                     <textarea 
-                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-emerald-600 outline-none resize-none"
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-[#2e7d32] outline-none resize-none"
                       placeholder="Tóm tắt về dịch vụ và cam kết bảo hành của cửa hàng..."
                       rows={3}
                       value={legitDesc}
@@ -429,7 +429,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
                 <button 
                   type="submit"
                   form="quick-scam-form"
-                  className="px-6 py-2 bg-red-650 hover:bg-red-700 text-white rounded-lg transition-colors font-bold uppercase tracking-wide cursor-pointer"
+                  className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-bold uppercase tracking-wide cursor-pointer text-xs"
                 >
                   Tạo tố cáo lừa đảo
                 </button>
@@ -437,7 +437,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
                 <button 
                   type="submit"
                   form="quick-legit-form"
-                  className="px-6 py-2 bg-emerald-650 hover:bg-emerald-750 text-white rounded-lg transition-colors font-bold uppercase tracking-wide cursor-pointer"
+                  className="px-6 py-2 bg-[#2e7d32] hover:bg-[#205c22] text-white rounded-lg transition-colors font-bold uppercase tracking-wide cursor-pointer text-xs"
                 >
                   Cấp duyệt hồ sơ uy tín
                 </button>

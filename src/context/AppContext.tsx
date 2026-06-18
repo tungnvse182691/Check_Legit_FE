@@ -41,6 +41,7 @@ interface AppContextType {
   approveScamReport: (id: string) => void;
   rejectScamReport: (id: string) => void;
   deleteScamReport: (id: string) => void;
+  deleteLegitProfile: (id: string | number) => void;
 }
 
 const defaultScams: ScamReport[] = [
@@ -340,6 +341,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setScams((prev) => prev.filter((s) => s.id !== id));
   };
 
+  const deleteLegitProfile = (id: string | number) => {
+    setLegitList((prev) => prev.filter((l) => String(l.id) !== String(id)));
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -349,7 +354,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         addLegitProfile,
         approveScamReport,
         rejectScamReport,
-        deleteScamReport
+        deleteScamReport,
+        deleteLegitProfile
       }}
     >
       {children}
