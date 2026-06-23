@@ -1,13 +1,26 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 
 export function ReportScam() {
   const { addScamReport } = useApp();
   const navigate = useNavigate();
+  const location = useLocation();
+  const defaultCategory = location.state?.defaultCategory;
 
   // Form Inputs
-  const [category, setCategory] = useState<"Lừa đảo tài chính" | "Cảnh báo hành vi">("Lừa đảo tài chính");
+  const [category, setCategory] = useState<"Lừa đảo tài chính" | "Cảnh báo hành vi">(() => {
+    if (defaultCategory === "Cảnh báo hành vi" || defaultCategory === "Lừa đảo tài chính") {
+      return defaultCategory;
+    }
+    return "Lừa đảo tài chính";
+  });
+
+  useEffect(() => {
+    if (defaultCategory === "Cảnh báo hành vi" || defaultCategory === "Lừa đảo tài chính") {
+      setCategory(defaultCategory);
+    }
+  }, [defaultCategory]);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
@@ -18,7 +31,7 @@ export function ReportScam() {
   const [desc, setDesc] = useState("");
 
   // Feedback States
-  const [isCaptchaChecked, setIsCaptchaChecked] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -27,6 +40,38 @@ export function ReportScam() {
   const [isDragging, setIsDragging] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const turnstileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Wait until window.turnstile is ready to render programmatically
+    const interval = setInterval(() => {
+      const turnstile = (window as any).turnstile;
+      if (turnstile && turnstileRef.current) {
+        clearInterval(interval);
+        try {
+          turnstile.render(turnstileRef.current, {
+            sitekey: import.meta.env.VITE_TURNSTILE_SITEKEY || "1x00000000000000000000AA",
+            callback: (token: string) => {
+              setCaptchaToken(token);
+              setErrorMsg("");
+            },
+            "expired-callback": () => {
+              setCaptchaToken("");
+            },
+            "error-callback": () => {
+              setCaptchaToken("");
+            }
+          });
+        } catch (e) {
+          console.error("Turnstile render error:", e);
+        }
+      }
+    }, 100);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   useEffect(() => {
     if (category === "Cảnh báo hành vi") {
@@ -147,8 +192,8 @@ export function ReportScam() {
       showError("Vui lòng mô tả chi tiết diễn biến sự việc (Tối thiểu 10 ký tự).");
       return;
     }
-    if (!isCaptchaChecked) {
-      showError("Vui lòng xác minh bạn không phải là người máy.");
+    if (!captchaToken) {
+      showError("Vui lòng hoàn thành xác minh CAPTCHA người máy.");
       return;
     }
 
@@ -174,7 +219,8 @@ export function ReportScam() {
         victim: "Ẩn danh",
         facebook,
         images: imageUrls,
-        category
+        category,
+        captchaToken
       });
 
       // Show Success Modal
@@ -191,7 +237,14 @@ export function ReportScam() {
       setType("");
       setDesc("");
       setSelectedFiles([]);
-      setIsCaptchaChecked(false);
+      setCaptchaToken("");
+      if ((window as any).turnstile) {
+        try {
+          ((window as any).turnstile).reset();
+        } catch (e) {
+          console.error("Turnstile reset error:", e);
+        }
+      }
     } catch (err: any) {
       console.error("Error uploading images or submitting report:", err);
       setErrorMsg(err.message || "Đã xảy ra lỗi trong quá trình gửi báo cáo.");
@@ -500,17 +553,10 @@ export function ReportScam() {
 
           {/* Security & CTA */}
           <div className="bg-surface-container-lowest p-8 border border-outline-variant rounded-xl flex flex-col items-center gap-6">
-            <button
-              type="button"
-              onClick={() => setIsCaptchaChecked(!isCaptchaChecked)}
-              className="w-full max-w-sm py-4 bg-surface border border-outline-variant rounded flex items-center justify-start gap-4 hover:bg-slate-50 cursor-pointer px-4 select-none"
-            >
-              <div className={`w-6 h-6 border-2 rounded-sm flex items-center justify-center transition-all ${isCaptchaChecked ? "bg-emerald-500 border-emerald-500 text-white animate-scale-up" : "border-primary"}`}>
-                {isCaptchaChecked && <span className="material-symbols-outlined text-[16px] font-bold">check</span>}
-              </div>
-              <span className="text-label-sm text-on-surface">Tôi không phải là người máy</span>
-              <img alt="reCAPTCHA" className="w-6 h-6 ml-auto opacity-50" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOPi49Q7wSHb5tlZ-cNrKywqf9_9Evb5743OOgOXhIsS2DsJZFxqnweB8It8wi1T94hfMUoAj1tQpumN0503dd4DhR8_BqWhWKfhbZPyaOlNjiV6Mto1aPJkHBsHxQMSeCTQiA7VzME0gWCF_h3A4xQd8qbP1pKWjqNfFMqehuPGe-PWzzmOu-xQVrPg48h9Y6Ufc85IF_7zpqTn_9zXAESZkzLzCu4gIuJRHExdH_JJm9EQKDefc-zeSLItMIGFMFeX1QKIn6ukSX" />
-            </button>
+            {/* Cloudflare Turnstile CAPTCHA */}
+            <div className="w-full max-w-sm flex justify-center py-2">
+              <div ref={turnstileRef}></div>
+            </div>
             <button
               disabled={submitting}
               className={`w-full text-headline-md py-5 rounded-xl font-bold shadow-lg transition-all flex items-center justify-center gap-3 cursor-pointer ${submitting

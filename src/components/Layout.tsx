@@ -95,6 +95,7 @@ export function Header() {
         <div className="flex items-center gap-4">
           <Link 
             to="/report" 
+            state={{ defaultCategory: "Lừa đảo tài chính" }}
             className="hidden lg:flex bg-primary text-on-primary px-6 py-2.5 rounded-xl text-label-sm font-bold hover:scale-[1.05] hover:shadow-md active:scale-95 transition-all duration-300"
           >
             TỐ CÁO NGAY
@@ -184,6 +185,7 @@ export function Header() {
 
             <Link 
               to="/report" 
+              state={{ defaultCategory: "Lừa đảo tài chính" }}
               onClick={() => setIsMenuOpen(false)}
               className="bg-primary text-on-primary text-center py-3.5 rounded-xl text-label-sm font-bold shadow-md hover:opacity-90 active:scale-95 transition-all block mt-4"
             >

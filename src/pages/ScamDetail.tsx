@@ -264,6 +264,7 @@ export function ScamDetail() {
             </p>
             <Link
               to="/report"
+              state={{ defaultCategory: isWarning ? "Cảnh báo hành vi" : "Lừa đảo tài chính" }}
               className="w-full text-center block bg-white text-emerald-900 font-extrabold text-xs py-3 rounded-xl hover:bg-emerald-50 active:scale-95 transition-all shadow-sm"
             >
               {isWarning ? "Gửi Cảnh Báo Ngay" : "Gửi Tố Cáo Ngay"}

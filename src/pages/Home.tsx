@@ -129,6 +129,7 @@ export function Home() {
             </Link>
             <Link 
               to="/report" 
+              state={{ defaultCategory: "Lừa đảo tài chính" }}
               className="w-full sm:w-1/2 flex items-center justify-center gap-3 bg-red-600 text-white hover:bg-red-700 py-4.5 px-6 rounded-2xl font-bold hover:scale-[1.02] hover:shadow-lg transition-all duration-300 text-center shadow-sm cursor-pointer"
             >
               <span className="material-symbols-outlined text-2xl">gpp_bad</span>

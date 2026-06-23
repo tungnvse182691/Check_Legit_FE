@@ -40,7 +40,7 @@ interface AppContextType {
   legitList: LegitProfile[];
   token: string | null;
   isAuthenticated: boolean;
-  addScamReport: (report: Omit<ScamReport, "id" | "status" | "time" | "date" | "tags">) => void;
+  addScamReport: (report: Omit<ScamReport, "id" | "status" | "time" | "date" | "tags"> & { captchaToken: string }) => void;
   addLegitProfile: (profile: Omit<LegitProfile, "id" | "score" | "img" | "successTrans" | "joinDate">) => void;
   approveScamReport: (id: string) => void;
   rejectScamReport: (id: string) => void;
@@ -185,7 +185,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     fetchAllData();
   }, [token]);
 
-  const addScamReport = async (report: Omit<ScamReport, "id" | "status" | "time" | "date" | "tags">) => {
+  const addScamReport = async (report: Omit<ScamReport, "id" | "status" | "time" | "date" | "tags"> & { captchaToken: string }) => {
     const categoryEnum = report.category === "Cảnh báo hành vi" ? 1 : 0;
     const payload = {
       name: report.name,
@@ -199,7 +199,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       tags: [report.type || "Chưa phân loại"],
       facebook: report.facebook || "",
       images: report.images || [],
-      category: categoryEnum
+      category: categoryEnum,
+      captchaToken: report.captchaToken
     };
 
     try {
