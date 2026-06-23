@@ -1,9 +1,11 @@
 import { Link, useParams } from "react-router-dom";
+import { useState } from "react";
 import { useApp } from "../context/AppContext";
 
 export function ScamDetail() {
   const { id } = useParams();
   const { scams } = useApp();
+  const [brokenImages, setBrokenImages] = useState<Record<number, boolean>>({});
 
   // Find matching scam report, default to first approved scam if ID cannot be found
   const matchedScam = scams.find((s) => s.id === id) || scams.find((s) => s.status === "Đã phê duyệt") || scams[0];
@@ -21,6 +23,8 @@ export function ScamDetail() {
     );
   }
 
+  const isWarning = matchedScam.category === "Cảnh báo hành vi";
+
   return (
     <div className="max-w-6xl mx-auto px-6 md:px-margin-desktop py-8 min-h-screen">
       {/* Breadcrumbs */}
@@ -31,28 +35,39 @@ export function ScamDetail() {
           </li>
           <li><span className="mx-2 text-slate-300">/</span></li>
           <li>
-            <Link to="/" className="hover:text-emerald-700 transition-colors">Danh sách đen</Link>
+            <Link 
+              to={isWarning ? "/warnings" : "/reports"} 
+              className="hover:text-emerald-700 transition-colors"
+            >
+              {isWarning ? "Cảnh báo giao dịch" : "Danh sách đen"}
+            </Link>
           </li>
           <li><span className="mx-2 text-slate-300">/</span></li>
-          <li className="text-red-600 font-extrabold">Chi tiết tố cáo {matchedScam.id}</li>
+          <li className={`${isWarning ? "text-amber-600" : "text-red-600"} font-extrabold`}>
+            {isWarning ? `Chi tiết cảnh báo ${matchedScam.id}` : `Chi tiết tố cáo ${matchedScam.id}`}
+          </li>
         </ol>
       </nav>
 
-      {/* Prominent WARNING Banner - "Cảnh báo: Đối tượng lừa đảo" */}
-      <div className="mb-8 bg-gradient-to-r from-red-600 to-amber-600 p-0.5 rounded-2xl shadow-md overflow-hidden animate-fade-in">
-        <div className="bg-red-50/95 md:bg-red-50/90 backdrop-blur px-6 py-6 sm:py-7 flex flex-col md:flex-row items-center gap-5">
-          <div className="bg-red-600 text-white p-3.5 rounded-full flex items-center justify-center shadow-lg animate-pulse">
-            <span className="material-symbols-outlined text-3xl font-bold" style={{ fontVariationSettings: "'FILL' 1" }}>gpp_maybe</span>
+      {/* Prominent WARNING Banner - "Cảnh báo: Đối tượng lừa đảo" or "Cảnh báo: Hành vi giao dịch xấu" */}
+      <div className={`mb-8 bg-gradient-to-r ${isWarning ? "from-amber-650 from-amber-600 to-orange-600" : "from-red-600 to-amber-600"} p-0.5 rounded-2xl shadow-md overflow-hidden animate-fade-in`}>
+        <div className={`${isWarning ? "bg-amber-50/95 md:bg-amber-50/90" : "bg-red-50/95 md:bg-red-50/90"} backdrop-blur px-6 py-6 sm:py-7 flex flex-col md:flex-row items-center gap-5`}>
+          <div className={`${isWarning ? "bg-amber-650 bg-amber-600" : "bg-red-600"} text-white p-3.5 rounded-full flex items-center justify-center shadow-lg animate-pulse`}>
+            <span className="material-symbols-outlined text-3xl font-bold" style={{ fontVariationSettings: "'FILL' 1" }}>
+              {isWarning ? "warning" : "gpp_maybe"}
+            </span>
           </div>
           <div className="text-center md:text-left flex-1">
-            <h1 className="text-2xl sm:text-3xl font-black text-red-600 uppercase tracking-tight">
-              Cảnh báo: Đối tượng lừa đảo
+            <h1 className={`text-2xl sm:text-3xl font-black ${isWarning ? "text-amber-700" : "text-red-600"} uppercase tracking-tight`}>
+              {isWarning ? "Cảnh báo: Hành vi giao dịch xấu" : "Cảnh báo: Đối tượng lừa đảo"}
             </h1>
-            <p className="text-sm sm:text-base text-red-950 font-medium mt-1 leading-relaxed">
-              Hồ sơ này đã được kiểm duyệt và ghi nhận trong hệ thống phòng chống gian lận. Vui lòng dừng mọi giao dịch chuyển khoản đến cá nhân này.
+            <p className={`text-sm sm:text-base ${isWarning ? "text-amber-950" : "text-red-955 text-red-950"} font-medium mt-1 leading-relaxed`}>
+              {isWarning 
+                ? "Hồ sơ này ghi nhận đối tượng có hành vi không lành mạnh khi giao dịch (bùng hàng, thái độ không chuẩn mực, bán hàng lỗi). Vui lòng cẩn trọng."
+                : "Hồ sơ này đã được kiểm duyệt và ghi nhận trong hệ thống phòng chống gian lận. Vui lòng dừng mọi giao dịch chuyển khoản đến cá nhân này."}
             </p>
           </div>
-          <div className="shrink-0 font-mono text-[11px] font-extrabold uppercase bg-red-600 text-white px-3 py-1.5 rounded-full tracking-widest border border-red-500 shadow-sm">
+          <div className={`shrink-0 font-mono text-[11px] font-extrabold uppercase ${isWarning ? "bg-amber-600 border-amber-500" : "bg-red-600 border-red-500"} text-white px-3 py-1.5 rounded-full tracking-widest border shadow-sm`}>
             Trạng thái: {matchedScam.status}
           </div>
         </div>
@@ -64,9 +79,9 @@ export function ScamDetail() {
           
           {/* Box 1: Thông tin đối tượng */}
           <section className="bg-white border border-outline-variant p-6 sm:p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-            <h2 className="text-xl font-extrabold text-red-600 mb-6 flex items-center gap-2.5">
-              <span className="material-symbols-outlined text-red-600 font-bold">person</span>
-              Thông tin đối tượng
+            <h2 className={`text-xl font-extrabold ${isWarning ? "text-amber-600" : "text-red-600"} mb-6 flex items-center gap-2.5`}>
+              <span className={`material-symbols-outlined ${isWarning ? "text-amber-600" : "text-red-600"} font-bold`}>person</span>
+              {isWarning ? "Thông tin đối tượng cảnh báo" : "Thông tin đối tượng"}
             </h2>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -75,13 +90,17 @@ export function ScamDetail() {
                 <span className="text-lg font-black text-on-surface uppercase tracking-tight">{matchedScam.name}</span>
               </div>
               
-              <div className="bg-red-50/30 border border-red-100/60 p-4 rounded-xl">
-                <span className="block text-xs font-bold text-red-700 uppercase tracking-wider mb-1">Số tài khoản</span>
-                <span className="font-mono text-lg font-black text-red-600 selection:bg-red-200">{matchedScam.accountNumber}</span>
+              <div className={`${isWarning ? "bg-amber-50/30 border-amber-100/60" : "bg-red-50/30 border-red-100/60"} border p-4 rounded-xl`}>
+                <span className={`block text-xs font-bold ${isWarning ? "text-amber-700" : "text-red-700"} uppercase tracking-wider mb-1`}>
+                  {isWarning ? "Kênh nhận diện / Tài khoản" : "Số tài khoản"}
+                </span>
+                <span className={`font-mono text-lg font-black ${isWarning ? "text-amber-700" : "text-red-650 text-red-600"} selection:bg-red-200`}>
+                  {matchedScam.accountNumber}
+                </span>
               </div>
 
               <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl">
-                <span className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">Ngân hàng</span>
+                <span className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">Ngân hàng / Nền tảng</span>
                 <span className="text-base font-extrabold text-on-surface">{matchedScam.bankName}</span>
               </div>
 
@@ -111,9 +130,9 @@ export function ScamDetail() {
 
           {/* Box 2: Chi tiết vụ việc */}
           <section className="bg-white border border-outline-variant p-6 sm:p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-            <h2 className="text-xl font-extrabold text-red-600 mb-6 flex items-center gap-2.5">
-              <span className="material-symbols-outlined text-red-600 font-bold">assignment_late</span>
-              Chi tiết vụ việc
+            <h2 className={`text-xl font-extrabold ${isWarning ? "text-amber-600" : "text-red-600"} mb-6 flex items-center gap-2.5`}>
+              <span className={`material-symbols-outlined ${isWarning ? "text-amber-600" : "text-red-650 text-red-600"} font-bold`}>assignment_late</span>
+              Chi tiết sự việc
             </h2>
             
             <div className="text-on-surface-variant text-sm sm:text-base leading-relaxed bg-slate-50/50 p-5 rounded-2xl border border-slate-100 mb-6">
@@ -122,14 +141,22 @@ export function ScamDetail() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-4 border-t border-dashed border-outline-variant">
               <div>
-                <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-1">Tổng Số Tiễn Thiệt Hại</span>
-                <span className="font-mono text-red-600 font-black text-2xl sm:text-3xl bg-red-50 border border-red-100 px-4 py-2.5 rounded-2xl inline-block mt-1">
-                  {matchedScam.amount.toLocaleString("vi-VN")} VNĐ
+                <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-1">
+                  {isWarning ? "Tính chất ảnh hưởng" : "Tổng Số Tiền Thiệt Hại"}
                 </span>
+                {isWarning ? (
+                  <span className="font-mono text-amber-600 font-black text-lg sm:text-xl bg-amber-50 border border-amber-100 px-4 py-2.5 rounded-2xl inline-block mt-1">
+                    Phi tài sản (0đ)
+                  </span>
+                ) : (
+                  <span className="font-mono text-red-600 font-black text-2xl sm:text-3xl bg-red-50 border border-red-100 px-4 py-2.5 rounded-2xl inline-block mt-1">
+                    {matchedScam.amount.toLocaleString("vi-VN")} VNĐ
+                  </span>
+                )}
               </div>
               <div>
-                <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-1">Hình thức lừa đảo</span>
-                <span className="text-sm sm:text-base font-extrabold text-amber-700 bg-amber-50 border border-amber-100 px-4 py-2.5 rounded-2xl inline-block mt-1 capitalize">
+                <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-1">Hình thức vi phạm</span>
+                <span className={`text-sm sm:text-base font-extrabold ${isWarning ? "text-amber-700 bg-amber-50 border-amber-100" : "text-red-700 bg-red-50 border-red-100"} px-4 py-2.5 rounded-2xl inline-block mt-1 capitalize`}>
                   {matchedScam.type}
                 </span>
               </div>
@@ -138,8 +165,8 @@ export function ScamDetail() {
 
           {/* Box 3: Hình ảnh / Bằng chứng */}
           <section className="bg-white border border-outline-variant p-6 sm:p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-            <h2 className="text-xl font-extrabold text-red-600 mb-6 flex items-center gap-2.5">
-              <span className="material-symbols-outlined text-red-600 font-bold">photo_library</span>
+            <h2 className={`text-xl font-extrabold ${isWarning ? "text-amber-600" : "text-red-600"} mb-6 flex items-center gap-2.5`}>
+              <span className={`material-symbols-outlined ${isWarning ? "text-amber-600" : "text-red-650 text-red-600"} font-bold`}>photo_library</span>
               Hình ảnh / Bằng chứng xác thực
             </h2>
 
@@ -148,14 +175,25 @@ export function ScamDetail() {
                 {matchedScam.images.map((imgUrl, idx) => (
                   <div
                     key={idx}
-                    className="aspect-square bg-slate-50 rounded-2xl overflow-hidden border border-slate-200 relative group cursor-zoom-in hover:shadow-md transition-all duration-300"
+                    className="aspect-square bg-slate-50 rounded-2xl overflow-hidden border border-slate-200 relative group cursor-zoom-in hover:shadow-md transition-all duration-300 flex items-center justify-center"
                   >
-                    <img
-                      src={imgUrl}
-                      alt={`Minh chứng thiệt hại ${idx + 1}`}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-305"
-                      referrerPolicy="no-referrer"
-                    />
+                    {!brokenImages[idx] ? (
+                      <img
+                        src={imgUrl}
+                        alt={`Minh chứng thiệt hại ${idx + 1}`}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-305"
+                        referrerPolicy="no-referrer"
+                        onError={() => {
+                          setBrokenImages((prev) => ({ ...prev, [idx]: true }));
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center bg-slate-50 text-slate-400">
+                        <span className="material-symbols-outlined text-3xl mb-1 text-slate-400">broken_image</span>
+                        <span className="text-[10px] font-bold block leading-tight">Hình ảnh không khả dụng</span>
+                        <span className="text-[9px] text-slate-450 mt-0.5 block leading-tight">Đã bị gỡ khỏi máy chủ</span>
+                      </div>
+                    )}
                     <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur text-white text-[10px] font-bold px-2 rounded py-0.5 pointer-events-none">
                       Ảnh minh chứng {idx + 1}
                     </div>
@@ -177,11 +215,15 @@ export function ScamDetail() {
           <section className="bg-white border border-outline-variant p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
             <h3 className="text-lg font-black text-on-surface mb-4">Ghi chú xác thực</h3>
             
-            <div className="bg-red-50 border border-red-100 p-5 rounded-2xl text-center mb-5">
-              <span className="font-mono text-3xl font-black text-red-600 tracking-wider">SCAM</span>
-              <p className="text-xs text-red-800 font-bold uppercase tracking-wider mt-2">ĐÃ ĐƯỢC PHÊ DUYỆT</p>
+            <div className={`${isWarning ? "bg-amber-50 border-amber-100" : "bg-red-50 border-red-100"} border p-5 rounded-2xl text-center mb-5`}>
+              <span className={`font-mono text-3xl font-black ${isWarning ? "text-amber-600" : "text-red-600"} tracking-wider`}>
+                {isWarning ? "WARNING" : "SCAM"}
+              </span>
+              <p className={`text-xs ${isWarning ? "text-amber-800" : "text-red-800"} font-bold uppercase tracking-wider mt-2`}>
+                ĐÃ ĐƯỢC PHÊ DUYỆT
+              </p>
               
-              <div className="mt-4 pt-4 border-t border-red-200/50 text-left space-y-2 text-xs">
+              <div className={`mt-4 pt-4 border-t ${isWarning ? "border-amber-250 border-amber-200/50" : "border-red-200/50"} text-left space-y-2 text-xs`}>
                 <div className="flex justify-between text-slate-500">
                   <span>Mã hồ sơ:</span>
                   <span className="font-mono font-bold text-slate-700">{matchedScam.id}</span>
@@ -192,7 +234,7 @@ export function ScamDetail() {
                 </div>
                 <div className="flex justify-between text-slate-500">
                   <span>Thời gian duyệt:</span>
-                  <span className="font-bold text-slate-705 text-stone-700">{matchedScam.time || "Vừa xong"}</span>
+                  <span className="font-bold text-slate-700">{matchedScam.time || "Vừa xong"}</span>
                 </div>
               </div>
             </div>
@@ -207,22 +249,24 @@ export function ScamDetail() {
             </div>
           </section>
 
-          <div className="bg-gradient-to-br from-emerald-800 to-emerald-950 text-white p-6 rounded-2xl shadow-md space-y-4 relative overflow-hidden">
+          <div className={`bg-gradient-to-br ${isWarning ? "from-amber-800 to-amber-950" : "from-emerald-800 to-emerald-950"} text-white p-6 rounded-2xl shadow-md space-y-4 relative overflow-hidden`}>
             <span className="material-symbols-outlined text-[100px] text-white/5 absolute -right-4 -bottom-4 pointer-events-none">
-              gpp_good
+              {isWarning ? "warning" : "gpp_good"}
             </span>
             <h3 className="text-base font-black text-emerald-300 uppercase tracking-tight flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-lg">shield</span>
-              Bạn bị lừa đảo?
+              <span className="material-symbols-outlined text-lg">{isWarning ? "warning" : "shield"}</span>
+              {isWarning ? "Bạn gặp vi phạm?" : "Bạn bị lừa đảo?"}
             </h3>
             <p className="text-xs text-emerald-100/90 leading-relaxed">
-              Hãy gửi thông tin báo cáo tố giác kèm theo bằng chứng giao dịch chi tiết để hỗ trợ đội ngũ kiểm duyệt đưa đối tượng này vào danh sách đen của cộng đồng.
+              {isWarning 
+                ? "Hãy gửi thông tin báo cáo cảnh báo kèm theo bằng chứng chi tiết để hỗ trợ đội ngũ kiểm duyệt đưa đối tượng này vào danh sách cảnh báo của cộng đồng."
+                : "Hãy gửi thông tin báo cáo tố giác kèm theo bằng chứng giao dịch chi tiết để hỗ trợ đội ngũ kiểm duyệt đưa đối tượng này vào danh sách đen của cộng đồng."}
             </p>
             <Link
-              to="/report-scam"
+              to="/report"
               className="w-full text-center block bg-white text-emerald-900 font-extrabold text-xs py-3 rounded-xl hover:bg-emerald-50 active:scale-95 transition-all shadow-sm"
             >
-              Gửi Tố Cáo Ngay
+              {isWarning ? "Gửi Cảnh Báo Ngay" : "Gửi Tố Cáo Ngay"}
             </Link>
           </div>
         </aside>
@@ -230,3 +274,4 @@ export function ScamDetail() {
     </div>
   );
 }
+

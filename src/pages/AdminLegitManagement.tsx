@@ -1,6 +1,19 @@
 import React, { useState } from "react";
 import { useApp } from "../context/AppContext";
 
+const PREDEFINED_SECTORS = [
+  "Thương mại điện tử & Đồ công nghệ",
+  "Freelancer & Sáng tạo nội dung",
+  "Dịch vụ & Tư vấn chuyên nghiệp",
+  "Thời trang & Mỹ phẩm",
+  "Thực phẩm & F&B",
+  "Mẹ & Bé",
+  "Giáo dục & Khóa học",
+  "Du lịch & Vé máy bay",
+  "Tài chính & Bảo hiểm",
+  "Dịch vụ trung gian (Giao dịch trung gian)"
+];
+
 export function AdminLegitManagement() {
   const { legitList, addLegitProfile, deleteLegitProfile } = useApp();
 
@@ -105,7 +118,7 @@ export function AdminLegitManagement() {
               Chứng thực chất lượng giao dịch
             </span>
             <h1 className="text-2xl md:text-3.5xl font-black text-on-surface tracking-tight">
-              Quản lý danh khánh uy tín
+              Quản lý danh sách uy tín
             </h1>
           </div>
           <span className="bg-[#2e7d32] text-white px-4 py-2 rounded-2xl font-mono text-xs font-bold shadow-sm inline-flex items-center gap-1.5 self-start sm:self-auto uppercase">
@@ -157,15 +170,19 @@ export function AdminLegitManagement() {
 
               <div>
                 <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">Lĩnh vực hoạt động *</label>
-                <select
-                  className="w-full border-2 border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-[#2e7d32] outline-none bg-white shadow-sm transition-all text-slate-800"
+                <input
+                  type="text"
+                  list="business-types"
+                  className="w-full border-2 border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-[#2e7d32] outline-none bg-white shadow-sm transition-all text-slate-800 focus:ring-4 focus:ring-emerald-50"
+                  placeholder="Chọn từ gợi ý hoặc tự nhập lĩnh vực khác"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
-                >
-                  <option value="Thương mại điện tử & Đồ công nghệ">Thương mại điện tử & Đồ công nghệ</option>
-                  <option value="Freelancer & Sáng tạo nội dung">Freelancer & Sáng tạo nội dung</option>
-                  <option value="Dịch vụ & Tư vấn chuyên nghiệp">Dịch vụ & Tư vấn chuyên nghiệp</option>
-                </select>
+                />
+                <datalist id="business-types">
+                  {PREDEFINED_SECTORS.map((sector, index) => (
+                    <option key={index} value={sector} />
+                  ))}
+                </datalist>
               </div>
 
               <div>

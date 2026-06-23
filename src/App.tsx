@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { AdminLayout } from "./components/AdminLayout";
 import { Home } from "./pages/Home";
@@ -18,9 +19,10 @@ import { AdminOverview } from "./pages/AdminOverview";
 import { AdminScamManagement } from "./pages/AdminScamManagement";
 import { AdminLegitManagement } from "./pages/AdminLegitManagement";
 import { AdminSettings } from "./pages/AdminSettings";
+import { Login } from "./pages/Login";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { AppProvider } from "./context/AppContext";
+import { AppProvider, useApp } from "./context/AppContext";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -30,6 +32,11 @@ function ScrollToTop() {
   }, [pathname]);
 
   return null;
+}
+
+function ProtectedAdminRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useApp();
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
 export default function App() {
@@ -47,12 +54,13 @@ export default function App() {
           <Route path="/reports/:id" element={<Layout><ScamDetail /></Layout>} />
           <Route path="/warnings" element={<Layout><Warnings /></Layout>} />
           <Route path="/about" element={<Layout><About /></Layout>} />
+          <Route path="/login" element={<Login />} />
           
           {/* Admin Routes */}
-          <Route path="/admin" element={<AdminLayout><AdminOverview /></AdminLayout>} />
-          <Route path="/admin/scams" element={<AdminLayout><AdminScamManagement /></AdminLayout>} />
-          <Route path="/admin/legit" element={<AdminLayout><AdminLegitManagement /></AdminLayout>} />
-          <Route path="/admin/settings" element={<AdminLayout><AdminSettings /></AdminLayout>} />
+          <Route path="/admin" element={<ProtectedAdminRoute><AdminLayout><AdminOverview /></AdminLayout></ProtectedAdminRoute>} />
+          <Route path="/admin/scams" element={<ProtectedAdminRoute><AdminLayout><AdminScamManagement /></AdminLayout></ProtectedAdminRoute>} />
+          <Route path="/admin/legit" element={<ProtectedAdminRoute><AdminLayout><AdminLegitManagement /></AdminLayout></ProtectedAdminRoute>} />
+          <Route path="/admin/settings" element={<ProtectedAdminRoute><AdminLayout><AdminSettings /></AdminLayout></ProtectedAdminRoute>} />
         </Routes>
       </BrowserRouter>
     </AppProvider>

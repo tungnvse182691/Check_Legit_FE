@@ -1,14 +1,29 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState, ReactNode } from "react";
+import { useApp } from "../context/AppContext";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileInfoOpen, setIsMobileInfoOpen] = useState(false);
   const location = useLocation();
+  const { scams } = useApp();
+
+  const getActiveTab = () => {
+    if (location.pathname.startsWith("/reports/")) {
+      const id = location.pathname.split("/")[2];
+      const matched = scams.find((s) => s.id === id);
+      if (matched && matched.category === "Cảnh báo hành vi") {
+        return "/warnings";
+      }
+      return "/reports";
+    }
+    return location.pathname;
+  };
 
   const navItemClass = (path: string) => {
-    const isActive = location.pathname === path || (path !== "/" && location.pathname.startsWith(path));
+    const activeTab = getActiveTab();
+    const isActive = activeTab === path || (path !== "/" && activeTab.startsWith(path));
     return isActive 
       ? "text-primary border-b-2 border-primary font-extrabold pb-2 text-sm sm:text-base tracking-wider transition-all duration-300"
       : "text-on-surface-variant hover:text-primary transition-colors text-sm sm:text-base font-bold pb-2 tracking-wider";
@@ -109,14 +124,14 @@ export function Header() {
             <Link 
               to="/reports" 
               onClick={() => setIsMenuOpen(false)}
-              className={`text-body-md py-2 font-bold border-b border-slate-100 uppercase tracking-wider ${location.pathname.startsWith("/reports") ? "text-primary font-extrabold" : "text-on-surface-variant"}`}
+              className={`text-body-md py-2 font-bold border-b border-slate-100 uppercase tracking-wider ${getActiveTab() === "/reports" ? "text-primary font-extrabold" : "text-on-surface-variant"}`}
             >
               DANH SÁCH TỐ CÁO
             </Link>
             <Link 
               to="/warnings" 
               onClick={() => setIsMenuOpen(false)}
-              className={`text-body-md py-2 font-bold border-b border-slate-100 uppercase tracking-wider ${location.pathname.startsWith("/warnings") ? "text-primary font-extrabold" : "text-on-surface-variant"}`}
+              className={`text-body-md py-2 font-bold border-b border-slate-100 uppercase tracking-wider ${getActiveTab() === "/warnings" ? "text-primary font-extrabold" : "text-on-surface-variant"}`}
             >
               CẢNH BÁO GIAO DỊCH
             </Link>
@@ -154,7 +169,7 @@ export function Header() {
                     onClick={() => setIsMenuOpen(false)}
                     className="text-sm py-1.5 text-on-surface-variant hover:text-primary transition-colors"
                   >
-                    • Liên hệ
+                    • Contact
                   </Link>
                   <Link 
                     to="/about" 

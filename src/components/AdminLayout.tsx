@@ -5,7 +5,7 @@ import { useApp } from "../context/AppContext";
 
 export function AdminLayout({ children }: { children: ReactNode }) {
   const location = useLocation();
-  const { addScamReport, addLegitProfile } = useApp();
+  const { addScamReport, addLegitProfile, logout } = useApp();
 
   // Modal display states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -151,9 +151,9 @@ export function AdminLayout({ children }: { children: ReactNode }) {
             <span className="material-symbols-outlined">settings</span>
             <span className="text-xs font-bold uppercase tracking-wider">Cài đặt</span>
           </Link>
-          <Link to="/" className="text-slate-600 hover:text-[#2e7d32] flex items-center gap-4 px-4 py-3 transition-all rounded-xl hover:bg-slate-50">
+          <Link to="/" onClick={logout} className="text-slate-600 hover:text-[#2e7d32] flex items-center gap-4 px-4 py-3 transition-all rounded-xl hover:bg-slate-50">
             <span className="material-symbols-outlined">logout</span>
-            <span className="text-xs font-bold uppercase tracking-wider">Quay lại trang chính</span>
+            <span className="text-xs font-bold uppercase tracking-wider">Đăng xuất / Quay lại</span>
           </Link>
         </div>
       </aside>

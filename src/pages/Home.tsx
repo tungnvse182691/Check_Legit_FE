@@ -7,7 +7,7 @@ export function Home() {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [searchResult, setSearchResult] = useState<{
-    status: "scam" | "legit" | "not_found";
+    status: "scam" | "warning" | "legit" | "not_found";
     item?: any;
     searchedTerm: string;
   } | null>(null);
@@ -36,7 +36,7 @@ export function Home() {
 
     if (foundScam) {
       setSearchResult({
-        status: "scam",
+        status: foundScam.category === "Cảnh báo hành vi" ? "warning" : "scam",
         item: foundScam,
         searchedTerm: query,
       });
@@ -168,6 +168,33 @@ export function Home() {
             </div>
           )}
 
+          {searchResult.status === "warning" && (
+            <div className="bg-amber-50 border-4 border-amber-500 p-5 sm:p-6 rounded-3xl shadow-lg">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <span className="material-symbols-outlined text-amber-600 text-5xl shrink-0">warning</span>
+                <div className="flex-grow">
+                  <h3 className="text-lg sm:text-headline-md font-extrabold text-amber-700 uppercase">PHÁT HIỆN CẢNH BÁO HÀNH VI XẤU!</h3>
+                  <p className="text-xs sm:text-body-md text-amber-955 font-semibold mt-1">
+                    Thông tin "<span className="underline font-bold">{searchResult.searchedTerm}</span>" trùng khớp với hồ sơ cảnh báo hành vi vi phạm uy tín của <span className="font-extrabold text-amber-700">{searchResult.item.name}</span>!
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4 mt-4 bg-white/80 p-4 rounded-2xl text-xs sm:text-sm border border-amber-200 shadow-inner">
+                    <div><strong className="text-on-surface-variant">Kênh nhận diện / Tài khoản:</strong> {searchResult.item.accountNumber} ({searchResult.item.bankName})</div>
+                    <div><strong className="text-on-surface-variant">SĐT / Zalo:</strong> {searchResult.item.phone || "Không có"}</div>
+                    <div className="md:col-span-2"><strong className="text-on-surface-variant">Mô tả hành vi:</strong> {searchResult.item.desc}</div>
+                  </div>
+                </div>
+                <div className="w-full sm:w-auto mt-2 sm:mt-0">
+                  <Link 
+                    to={`/reports/${searchResult.item.id}`} 
+                    className="block text-center bg-amber-600 text-white font-bold px-6 py-3 rounded-xl text-xs sm:text-label-sm hover:scale-[1.05] hover:shadow-md transition-all uppercase whitespace-nowrap"
+                  >
+                    XEM CHI TIẾT
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
+
           {searchResult.status === "legit" && (
             <div className="bg-emerald-50 border-4 border-emerald-500 p-5 sm:p-6 rounded-3xl shadow-lg">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -239,42 +266,52 @@ export function Home() {
           <div>
             <div className="bg-red-100/60 p-6 flex items-center justify-between border-b border-red-200">
               <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-red-600 font-bold">gpp_bad</span>
-                <h2 className="text-xl sm:text-headline-md font-extrabold text-red-900">Tố cáo mới nhất</h2>
+                <span className="material-symbols-outlined text-red-650 text-red-600 font-bold">gpp_bad</span>
+                <h2 className="text-xl sm:text-headline-md font-extrabold text-red-900">Báo cáo & Cảnh báo mới nhất</h2>
               </div>
               <Link to="/reports" className="text-red-700 hover:text-red-900 underline text-label-sm font-bold">Xem tất cả</Link>
             </div>
             
             {/* List of reports with deep rounded cards, smooth hover scaling effects */}
             <div className="p-6 space-y-4">
-              {latestScams.map((report) => (
-                <div 
-                  key={report.id} 
-                  className="bg-white p-5 border-l-4 border-red-600 rounded-2xl shadow-sm hover:scale-[1.02] hover:shadow-md transition-all duration-300 flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
-                >
-                  <div className="flex-grow pr-2 w-full">
-                    <div className="font-extrabold text-body-md mb-1.5 flex flex-wrap items-center gap-2">
-                      <span className="text-on-surface text-base">{report.name}</span>
-                      <span className="bg-red-50 text-red-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase border border-red-100">
-                        {report.type}
-                      </span>
+              {latestScams.map((report) => {
+                const isReportWarning = report.category === "Cảnh báo hành vi";
+                return (
+                  <div 
+                    key={report.id} 
+                    className={`bg-white p-5 border-l-4 ${isReportWarning ? "border-amber-500" : "border-red-600"} rounded-2xl shadow-sm hover:scale-[1.02] hover:shadow-md transition-all duration-300 flex flex-col md:flex-row justify-between items-start md:items-center gap-4`}
+                  >
+                    <div className="flex-grow pr-2 w-full">
+                      <div className="font-extrabold text-body-md mb-1.5 flex flex-wrap items-center gap-2">
+                        <span className="text-on-surface text-base">{report.name}</span>
+                        <span className={`${isReportWarning ? "bg-amber-50 text-amber-800 border-amber-100" : "bg-red-50 text-red-800 border-red-100"} text-[10px] font-bold px-2 py-0.5 rounded-full uppercase border`}>
+                          {report.type}
+                        </span>
+                      </div>
+                      <div className="text-on-surface-variant text-xs font-mono mb-2 bg-slate-50 py-1.5 px-3 rounded-lg inline-block">
+                        SĐT: {report.phone || "---"} | {isReportWarning ? "Kênh nhận diện / Tài khoản" : "TK"}: {report.accountNumber} ({report.bankName})
+                      </div>
+                      <div className="text-on-surface-variant text-sm line-clamp-2 leading-relaxed">{report.desc}</div>
                     </div>
-                    <div className="text-on-surface-variant text-xs font-mono mb-2 bg-slate-50 py-1.5 px-3 rounded-lg inline-block">
-                      SĐT: {report.phone || "---"} | TK: {report.accountNumber} ({report.bankName})
+                    <div className="text-left md:text-right shrink-0 w-full md:w-auto pt-3 md:pt-0 border-t md:border-t-0 border-dashed border-slate-200 flex md:flex-col justify-between items-center md:items-end">
+                      <div>
+                        {isReportWarning ? (
+                          <div className="font-label-numeric text-amber-600 font-extrabold text-xs sm:text-sm">Phi tài sản (0đ)</div>
+                        ) : (
+                          <div className="font-label-numeric text-red-600 font-extrabold text-base sm:text-lg">{(report.amount).toLocaleString("vi-VN")}đ</div>
+                        )}
+                        <div className="text-[10px] text-on-surface-variant font-bold uppercase">{report.time}</div>
+                      </div>
+                      <Link 
+                        to={`/reports/${report.id}`} 
+                        className={`inline-block ${isReportWarning ? "bg-amber-50 hover:bg-amber-100 text-amber-800" : "bg-red-50 hover:bg-red-100 text-red-800"} px-3.5 py-1.5 rounded-xl text-xs font-bold transition-colors mt-2`}
+                      >
+                        Chi tiết →
+                      </Link>
                     </div>
-                    <div className="text-on-surface-variant text-sm line-clamp-2 leading-relaxed">{report.desc}</div>
                   </div>
-                  <div className="text-left md:text-right shrink-0 w-full md:w-auto pt-3 md:pt-0 border-t md:border-t-0 border-dashed border-slate-200 flex md:flex-col justify-between items-center md:items-end">
-                    <div>
-                      <div className="font-label-numeric text-red-600 font-extrabold text-base sm:text-lg">{(report.amount).toLocaleString("vi-VN")}đ</div>
-                      <div className="text-[10px] text-on-surface-variant font-bold uppercase">{report.time}</div>
-                    </div>
-                    <Link to={`/reports/${report.id}`} className="inline-block bg-red-50 hover:bg-red-100 text-red-800 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-colors mt-2">
-                      Chi tiết →
-                    </Link>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

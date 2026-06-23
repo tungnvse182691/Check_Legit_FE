@@ -6,7 +6,7 @@ export function ScamList() {
   const { scams } = useApp();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const approvedScams = scams.filter(s => s.status === "Đã phê duyệt");
+  const approvedScams = scams.filter(s => s.status === "Đã phê duyệt" && s.category === "Lừa đảo tài chính");
 
   const filteredScams = approvedScams.filter((scam) => {
     const term = searchTerm.toLowerCase().trim();

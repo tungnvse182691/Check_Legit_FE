@@ -6,3 +6,5 @@ coverage/
 *.log
 .env*
 !.env.example
+check_legit_BE/
+CURRENT_SYSTEM_STATE.md
