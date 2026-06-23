@@ -21,12 +21,35 @@ export function LegitList() {
     // Filter by tag
     const matchesTag =
       selectedTag === "all" ||
-      (selectedTag === "tmdt" && (item.role.toLowerCase().includes("iphone") || item.role.toLowerCase().includes("gaming") || item.role.toLowerCase().includes("order") || item.role.toLowerCase().includes("thiết bị"))) ||
-      (selectedTag === "agency" && (item.role.toLowerCase().includes("thiết kế") || item.role.toLowerCase().includes("agency") || item.role.toLowerCase().includes("mạng"))) ||
-      (selectedTag === "local" && (item.role.toLowerCase().includes("dịch vụ") || item.role.toLowerCase().includes("tư vấn")));
+      (selectedTag === "tmdt" && (
+        item.role.toLowerCase().includes("thương mại") ||
+        item.role.toLowerCase().includes("công nghệ") ||
+        item.role.toLowerCase().includes("iphone") ||
+        item.role.toLowerCase().includes("gaming") ||
+        item.role.toLowerCase().includes("order") ||
+        item.role.toLowerCase().includes("thiết bị") ||
+        item.role.toLowerCase().includes("thời trang") ||
+        item.role.toLowerCase().includes("mỹ phẩm") ||
+        item.role.toLowerCase().includes("f&b")
+      )) ||
+      (selectedTag === "agency" && (
+        item.role.toLowerCase().includes("freelancer") ||
+        item.role.toLowerCase().includes("sáng tạo") ||
+        item.role.toLowerCase().includes("thiết kế") ||
+        item.role.toLowerCase().includes("agency") ||
+        item.role.toLowerCase().includes("mạng") ||
+        item.role.toLowerCase().includes("nội dung")
+      )) ||
+      (selectedTag === "local" && (
+        item.role.toLowerCase().includes("dịch vụ") ||
+        item.role.toLowerCase().includes("tư vấn") ||
+        item.role.toLowerCase().includes("chuyên nghiệp") ||
+        item.role.toLowerCase().includes("trung gian")
+      ));
 
     return matchesSearch && matchesTag;
   });
+
 
   function getTierBadge(insurance: number) {
     if (insurance >= 500000000) {
