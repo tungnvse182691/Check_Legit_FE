@@ -35,7 +35,7 @@ export function AdminScamManagement() {
     <div className="flex flex-col min-h-screen bg-slate-50/50">
       {/* Page Header */}
       <header className="bg-white border-b border-outline-variant px-6 py-6 md:px-margin-desktop sticky top-0 z-10 shadow-sm shrink-0">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="max-w-[1300px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <span className="text-[#2e7d32] text-xs font-black uppercase tracking-widest bg-emerald-50 border border-emerald-100 px-3.5 py-1 rounded-full inline-block mb-1.5">
               Hệ thống thẩm định tối cao
@@ -52,7 +52,7 @@ export function AdminScamManagement() {
       </header>
 
       {/* Main Panel Content */}
-      <div className="max-w-6xl mx-auto w-full px-6 md:px-margin-desktop py-8 pb-20 flex-1 flex flex-col lg:flex-row gap-8">
+      <div className="max-w-[1300px] mx-auto w-full px-6 md:px-margin-desktop py-8 pb-20 flex-1 flex flex-col lg:flex-row gap-8">
         
         {/* Main List Section (2/3 width on desktop) */}
         <section className="flex-1 space-y-6">
@@ -76,12 +76,12 @@ export function AdminScamManagement() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse min-w-[650px] text-xs">
                   <thead>
-                    <tr className="bg-slate-50 border-b border-outline-variant text-slate-700 text-[10px] font-bold uppercase tracking-widest opacity-80">
-                      <th className="p-4 pl-6">Mã tố cáo</th>
-                      <th className="p-4">Đối tượng bị tố</th>
-                      <th className="p-4">Số tài khoản / SĐT</th>
-                      <th className="p-4">Trạng thái</th>
-                      <th className="p-4 pr-6 text-right">Thẩm duyệt</th>
+                    <tr className="bg-slate-50 border-b border-outline-variant text-slate-700 text-[10px] font-bold uppercase tracking-widest opacity-80 whitespace-nowrap">
+                      <th className="p-4 pl-6 whitespace-nowrap">Mã tố cáo</th>
+                      <th className="p-4 whitespace-nowrap">Đối tượng bị tố</th>
+                      <th className="p-4 whitespace-nowrap">Số tài khoản / SĐT</th>
+                      <th className="p-4 whitespace-nowrap">Trạng thái</th>
+                      <th className="p-4 pr-6 text-right whitespace-nowrap">Thẩm duyệt</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-outline-variant">
@@ -93,52 +93,52 @@ export function AdminScamManagement() {
                           onClick={() => setSelectedId(scam.id)}
                           className={`hover:bg-slate-50/70 transition-colors cursor-pointer ${selectedId === scam.id ? "bg-emerald-50/50 font-medium" : ""}`}
                         >
-                          <td className="p-4 pl-6 font-mono font-black text-slate-500">
+                          <td className="p-4 pl-6 font-mono font-black text-slate-500 whitespace-nowrap">
                             {scam.id}
                           </td>
-                          <td className="p-4">
+                          <td className="p-4 whitespace-nowrap">
                             <p className="font-bold text-slate-900 text-sm capitalize">{scam.name}</p>
-                            <span className={`text-[10px] ${isRowWarning ? "text-amber-800 bg-amber-50 border-amber-200" : "text-slate-500 bg-slate-100 border-slate-200"} capitalize px-2 py-0.5 rounded border mt-1 inline-block`}>
+                            <span className={`text-[10px] ${isRowWarning ? "text-amber-800 bg-amber-50 border-amber-200" : "text-slate-500 bg-slate-100 border-slate-200"} capitalize px-2 py-0.5 rounded border mt-1 inline-block whitespace-nowrap`}>
                               {scam.type}
                             </span>
                           </td>
-                          <td className="p-4">
-                            <p className={`font-mono text-xs font-bold ${isRowWarning ? "text-amber-600" : "text-red-600"}`}>{scam.accountNumber || "N/A"}</p>
-                            <p className="text-[10px] text-slate-500 mt-0.5">{scam.bankName || "Zalo/Mạng xã hội"}</p>
+                          <td className="p-4 whitespace-nowrap">
+                            <p className={`font-mono text-xs font-bold ${isRowWarning ? "text-amber-600" : "text-red-600"} whitespace-nowrap`}>{scam.accountNumber || "N/A"}</p>
+                            <p className="text-[10px] text-slate-500 mt-0.5 whitespace-nowrap">{scam.bankName || "Zalo/Mạng xã hội"}</p>
                           </td>
-                          <td className="p-4">
+                          <td className="p-4 whitespace-nowrap">
                             {scam.status === "Đã phê duyệt" ? (
                               isRowWarning ? (
-                                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-850 border border-amber-200 uppercase tracking-wide">
+                                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-850 border border-amber-200 uppercase tracking-wide whitespace-nowrap">
                                   <span className="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
                                   Cảnh báo
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 uppercase tracking-wide">
+                                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 uppercase tracking-wide whitespace-nowrap">
                                   <span className="w-1.5 h-1.5 rounded-full bg-[#2e7d32]"></span>
                                   Đã duyệt
                                 </span>
                               )
                             ) : (
-                              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-850 border border-amber-200 uppercase tracking-wide animate-pulse">
+                              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-850 border border-amber-200 uppercase tracking-wide animate-pulse whitespace-nowrap">
                                 <span className="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
                                 Chờ duyệt
                               </span>
                             )}
                           </td>
-                          <td className="p-4 pr-6 text-right">
-                            <div className="flex gap-2 justify-end items-center" onClick={(e) => e.stopPropagation()}>
+                          <td className="p-4 pr-6 text-right whitespace-nowrap">
+                            <div className="flex gap-2 justify-end items-center whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                               {scam.status !== "Đã phê duyệt" && (
                                 <button
                                   onClick={() => handleApprove(scam.id, scam.name)}
-                                  className={`hover:brightness-105 text-white font-bold px-3 py-1.5 rounded-lg text-[10px] uppercase transition-colors shrink-0 shadow-sm cursor-pointer ${isRowWarning ? "bg-amber-600 hover:bg-amber-700" : "bg-[#2e7d32] hover:bg-[#205c22]"}`}
+                                  className={`hover:brightness-105 text-white font-bold px-3 py-1.5 rounded-lg text-[10px] uppercase transition-colors shrink-0 shadow-sm cursor-pointer whitespace-nowrap ${isRowWarning ? "bg-amber-600 hover:bg-amber-700" : "bg-[#2e7d32] hover:bg-[#205c22]"}`}
                                 >
                                   Duyệt
                                 </button>
                               )}
                               <button
                                 onClick={() => handleReject(scam.id, scam.name)}
-                                className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 hover:text-red-700 font-bold px-3 py-1.5 rounded-lg text-[10px] uppercase transition-colors shrink-0 cursor-pointer"
+                                className="bg-red-50 hover:bg-red-100 text-red-650 border border-red-200 hover:text-red-700 font-bold px-3 py-1.5 rounded-lg text-[10px] uppercase transition-colors shrink-0 cursor-pointer whitespace-nowrap"
                               >
                                 Xoá
                               </button>
@@ -153,6 +153,7 @@ export function AdminScamManagement() {
             </div>
           )}
         </section>
+
 
         {/* Sidebar Information View (1/3 width on desktop) */}
         <aside className="w-full lg:w-[400px] shrink-0">

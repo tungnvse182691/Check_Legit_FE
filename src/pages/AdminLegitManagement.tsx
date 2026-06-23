@@ -112,7 +112,7 @@ export function AdminLegitManagement() {
     <div className="flex-grow flex flex-col min-h-screen bg-slate-50/50">
       {/* Page Header */}
       <header className="bg-white border-b border-outline-variant px-6 py-6 md:px-margin-desktop sticky top-0 z-10 shadow-sm shrink-0">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="max-w-[1300px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <span className="text-[#2e7d32] text-xs font-black uppercase tracking-widest bg-emerald-50 border border-emerald-100 px-3.5 py-1 rounded-full inline-block mb-1.5">
               Chứng thực chất lượng giao dịch
@@ -129,7 +129,7 @@ export function AdminLegitManagement() {
       </header>
 
       {/* Main Grid View */}
-      <div className="max-w-6xl mx-auto w-full px-6 md:px-margin-desktop py-8 pb-20 grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1">
+      <div className="max-w-[1300px] mx-auto w-full px-6 md:px-margin-desktop py-8 pb-20 grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1">
         
         {/* Creation Form Column (5/12 width) */}
         <section className="col-span-12 lg:col-span-5">
@@ -278,19 +278,19 @@ export function AdminLegitManagement() {
             <div className="overflow-x-auto text-xs flex-1">
               <table className="w-full text-left border-collapse min-w-[550px]">
                 <thead>
-                  <tr className="bg-slate-50 text-slate-700 border-b border-outline-variant uppercase font-bold text-[10px] tracking-widest opacity-80">
-                    <th className="px-6 py-4">Nhãn thương nhân</th>
-                    <th className="px-6 py-4 text-center">Xếp hạng bảo chứng</th>
-                    <th className="px-6 py-4 text-right">Phí gửi quỹ</th>
-                    <th className="px-6 py-4 text-right pr-6">Tuỳ chọn</th>
+                  <tr className="bg-slate-50 text-slate-700 border-b border-outline-variant uppercase font-bold text-[10px] tracking-widest opacity-80 whitespace-nowrap">
+                    <th className="px-6 py-4 whitespace-nowrap">Nhãn thương nhân</th>
+                    <th className="px-6 py-4 text-center whitespace-nowrap">Xếp hạng bảo chứng</th>
+                    <th className="px-6 py-4 text-right whitespace-nowrap">Phí gửi quỹ</th>
+                    <th className="px-6 py-4 text-right pr-6 whitespace-nowrap">Tuỳ chọn</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-outline-variant">
                   {legitList.map((item) => {
                     const profileTier = getLiveTier(item.insurance);
                     return (
-                      <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="px-6 py-4">
+                      <tr key={item.id} className="hover:bg-slate-50/50 transition-colors whitespace-nowrap">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-3">
                             <img
                               src={item.img}
@@ -299,24 +299,24 @@ export function AdminLegitManagement() {
                               referrerPolicy="no-referrer"
                             />
                             <div>
-                              <p className="font-extrabold text-[13px] text-slate-900 leading-tight">{item.name}</p>
-                              <p className="text-[10px] text-slate-500 mt-0.5">{item.role}</p>
+                              <p className="font-extrabold text-[13px] text-slate-900 leading-tight whitespace-nowrap">{item.name}</p>
+                              <p className="text-[10px] text-slate-500 mt-0.5 whitespace-nowrap">{item.role}</p>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wide ${profileTier.className}`}>
+                        <td className="px-6 py-4 text-center whitespace-nowrap">
+                          <span className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wide whitespace-nowrap ${profileTier.className}`}>
                             <span className="material-symbols-outlined text-[10px] align-middle">{profileTier.icon}</span>
                             {profileTier.label.split(" (")[0]}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-right font-mono font-black text-slate-700">
+                        <td className="px-6 py-4 text-right font-mono font-black text-slate-700 whitespace-nowrap">
                           {item.insurance.toLocaleString("vi-VN")}đ
                         </td>
-                        <td className="px-6 py-4 text-right pr-6">
+                        <td className="px-6 py-4 text-right pr-6 whitespace-nowrap">
                           <button
                             onClick={() => handleDelete(item.id, item.name)}
-                            className="bg-red-50 hover:bg-red-100 text-red-650 border border-red-200 text-red-600 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-colors shrink-0 cursor-pointer"
+                            className="bg-red-50 hover:bg-red-100 text-red-650 border border-red-200 text-red-600 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-colors shrink-0 cursor-pointer whitespace-nowrap"
                           >
                             Thu hồi
                           </button>
@@ -327,6 +327,7 @@ export function AdminLegitManagement() {
                 </tbody>
               </table>
             </div>
+
           </div>
         </section>
 

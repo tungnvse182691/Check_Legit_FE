@@ -10,7 +10,7 @@ export function AdminOverview() {
 
   return (
     <div className="flex-grow overflow-y-auto p-6 md:p-8 space-y-8 animate-fade-in">
-      <div className="max-w-6xl mx-auto space-y-8">
+      <div className="max-w-[1300px] mx-auto space-y-8">
         
         {/* Header section with Forest Green touchpoints */}
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -104,19 +104,19 @@ export function AdminOverview() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[650px] text-xs">
               <thead>
-                <tr className="bg-slate-50 border-b border-light border-slate-100 text-slate-600 uppercase font-bold text-[10px] tracking-widest opacity-80">
-                  <th className="px-6 py-4 pl-8">Đối tượng lừa đảo</th>
-                  <th className="px-6 py-4">Định vị thông tin giao dịch</th>
-                  <th className="px-6 py-4 text-center">Trạng thái duyệt</th>
-                  <th className="px-6 py-4 text-right pr-8">Thời gian</th>
+                <tr className="bg-slate-50 border-b border-light border-slate-100 text-slate-600 uppercase font-bold text-[10px] tracking-widest opacity-80 whitespace-nowrap">
+                  <th className="px-6 py-4 pl-8 whitespace-nowrap">Đối tượng lừa đảo</th>
+                  <th className="px-6 py-4 whitespace-nowrap">Định vị thông tin giao dịch</th>
+                  <th className="px-6 py-4 text-center whitespace-nowrap">Trạng thái duyệt</th>
+                  <th className="px-6 py-4 text-right pr-8 whitespace-nowrap">Thời gian</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-medium">
                 {scams.slice(0, 6).map((scam) => {
                   const isWarning = scam.category === "Cảnh báo hành vi";
                   return (
-                    <tr key={scam.id} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="px-6 py-4 pl-8">
+                    <tr key={scam.id} className="hover:bg-slate-50/50 transition-colors whitespace-nowrap">
+                      <td className="px-6 py-4 pl-8 whitespace-nowrap">
                         <div className="flex items-center gap-3">
                           <div className={`w-8 h-8 rounded-full ${isWarning ? "bg-amber-50 border-amber-100" : "bg-red-50 border-red-100"} flex items-center justify-center shrink-0 border`}>
                             <span className={`material-symbols-outlined text-sm font-bold ${isWarning ? "text-amber-600" : "text-red-600"}`}>
@@ -124,38 +124,38 @@ export function AdminOverview() {
                             </span>
                           </div>
                           <div>
-                            <p className="font-extrabold text-slate-950 text-sm uppercase tracking-tight">{scam.name}</p>
-                            <span className={`text-[10px] ${isWarning ? "text-amber-800 bg-amber-50 border-amber-200" : "text-slate-500 bg-slate-100"} capitalize px-1.5 py-0.5 rounded mt-0.5 inline-block`}>
+                            <p className="font-extrabold text-slate-950 text-sm uppercase tracking-tight whitespace-nowrap">{scam.name}</p>
+                            <span className={`text-[10px] ${isWarning ? "text-amber-800 bg-amber-50 border-amber-200" : "text-slate-500 bg-slate-100"} capitalize px-1.5 py-0.5 rounded mt-0.5 inline-block whitespace-nowrap`}>
                               {scam.type}
                             </span>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <p className="font-mono text-xs font-black text-slate-800">{scam.accountNumber || "N/A"}</p>
-                        <p className="text-[10px] text-slate-500 mt-0.5">{scam.bankName || "Zalo/Mạng xã hội"}</p>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <p className="font-mono text-xs font-black text-slate-800 whitespace-nowrap">{scam.accountNumber || "N/A"}</p>
+                        <p className="text-[10px] text-slate-500 mt-0.5 whitespace-nowrap">{scam.bankName || "Zalo/Mạng xã hội"}</p>
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-6 py-4 text-center whitespace-nowrap">
                         {scam.status === "Đã phê duyệt" ? (
                           isWarning ? (
-                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-850 border border-amber-200 uppercase tracking-wide">
+                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-850 border border-amber-200 uppercase tracking-wide whitespace-nowrap">
                               <span className="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
                               CẢNH BÁO Hành Vi
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold bg-red-50 text-red-800 border border-red-100 uppercase tracking-wide">
+                            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold bg-red-50 text-red-800 border border-red-100 uppercase tracking-wide whitespace-nowrap">
                               <span className="w-1.5 h-1.5 rounded-full bg-red-650 bg-red-600"></span>
                               ĐÃ BAN Blacklist
                             </span>
                           )
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 uppercase tracking-wide">
+                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200 uppercase tracking-wide whitespace-nowrap">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
                             YÊU CẦU Thẩm Định
                           </span>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-right pr-8 font-mono text-slate-400 text-[10px]">
+                      <td className="px-6 py-4 text-right pr-8 font-mono text-slate-400 text-[10px] whitespace-nowrap">
                         {scam.time || "Cách đây 5 phút"}
                       </td>
                     </tr>
