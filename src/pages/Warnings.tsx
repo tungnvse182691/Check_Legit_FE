@@ -28,9 +28,7 @@ export function Warnings() {
       {/* Header Info */}
       <section className="mb-12 animate-fade-in">
         <div className="max-w-3xl">
-          <span className="bg-amber-50 text-amber-800 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full inline-block mb-4 border border-amber-200">
-            Danh bạ cảnh báo hành vi giao dịch xấu
-          </span>
+
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 text-amber-600 tracking-tight leading-tight">
             Cảnh báo hành vi thương mại
           </h1>

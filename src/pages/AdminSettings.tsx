@@ -85,7 +85,7 @@ export function AdminSettings() {
       id: `ART-${Math.floor(10 + Math.random() * 90)}`,
       title: newBlogTitle,
       category: newBlogCategory,
-      date: new Date().toLocaleDateString("vi-VN"),
+      date: new Date().toLocaleDateString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }),
       slug: slug,
       status: "Đã đăng",
     };
@@ -107,7 +107,7 @@ export function AdminSettings() {
       id: `POL-${Math.floor(10 + Math.random() * 90)}`,
       name: newPolName,
       type: newPolType,
-      lastUpdated: new Date().toLocaleDateString("vi-VN"),
+      lastUpdated: new Date().toLocaleDateString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }),
       active: true,
     };
     setPolicies([newPol, ...policies]);
@@ -387,10 +387,10 @@ export function AdminSettings() {
                 <div className="overflow-x-auto text-xs">
                   <table className="w-full text-left">
                     <thead>
-                      <tr className="bg-slate-50 border-b border-outline-variant text-[10px] uppercase font-bold text-slate-600 opacity-75">
-                        <th className="p-4">Bài viết</th>
-                        <th className="p-4 text-center">Trạng thái</th>
-                        <th className="p-4 text-right">Khởi tạo</th>
+                      <tr className="bg-slate-50 border-b border-outline-variant text-[10px] uppercase font-bold text-slate-600 opacity-75 whitespace-nowrap">
+                        <th className="p-4 whitespace-nowrap">Bài viết</th>
+                        <th className="p-4 text-center whitespace-nowrap">Trạng thái</th>
+                        <th className="p-4 text-right whitespace-nowrap">Khởi tạo</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-outline-variant font-medium">
@@ -400,14 +400,14 @@ export function AdminSettings() {
                             <p className="font-bold text-slate-800 line-clamp-2 leading-tight">{art.title}</p>
                             <span className="text-[10px] text-slate-500 font-mono mt-0.5 inline-block capitalize">{art.category}</span>
                           </td>
-                          <td className="p-4 text-center">
+                          <td className="p-4 text-center whitespace-nowrap">
                             <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border ${
                               art.status === "Đã đăng" ? "bg-emerald-50 text-[#2e7d32] border-emerald-200" : "bg-slate-100 text-slate-650 border-slate-3 * border-slate-200"
                             }`}>
                               {art.status}
                             </span>
                           </td>
-                          <td className="p-4 text-right font-mono text-slate-400 text-[10px]">
+                          <td className="p-4 text-right font-mono text-slate-400 text-[10px] whitespace-nowrap">
                             {art.date}
                           </td>
                         </tr>
@@ -481,10 +481,10 @@ export function AdminSettings() {
                 <div className="overflow-x-auto text-xs">
                   <table className="w-full text-left">
                     <thead>
-                      <tr className="bg-slate-50 border-b border-outline-variant text-[10px] uppercase font-bold text-slate-600 opacity-75">
-                        <th className="p-4">Chính sách</th>
-                        <th className="p-4 text-center">Áp dụng</th>
-                        <th className="p-4 text-right">Ngày cập nhật</th>
+                      <tr className="bg-slate-50 border-b border-outline-variant text-[10px] uppercase font-bold text-slate-600 opacity-75 whitespace-nowrap">
+                        <th className="p-4 whitespace-nowrap">Chính sách</th>
+                        <th className="p-4 text-center whitespace-nowrap">Áp dụng</th>
+                        <th className="p-4 text-right whitespace-nowrap">Ngày cập nhật</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-outline-variant font-medium">
@@ -494,7 +494,7 @@ export function AdminSettings() {
                             <p className="font-bold text-slate-800 leading-tight">{pol.name}</p>
                             <span className="text-[10px] text-slate-500 font-mono mt-0.5 inline-block bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 uppercase tracking-wide">{pol.type}</span>
                           </td>
-                          <td className="p-4 text-center">
+                          <td className="p-4 text-center whitespace-nowrap">
                             <button
                               onClick={() => handleTogglePolicy(pol.id)}
                               className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border transition-all cursor-pointer ${
@@ -504,7 +504,7 @@ export function AdminSettings() {
                               {pol.active ? "ON" : "OFF"}
                             </button>
                           </td>
-                          <td className="p-4 text-right font-mono text-slate-400 text-[10px]">
+                          <td className="p-4 text-right font-mono text-slate-400 text-[10px] whitespace-nowrap">
                             {pol.lastUpdated}
                           </td>
                         </tr>

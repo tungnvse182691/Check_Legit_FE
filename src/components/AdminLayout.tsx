@@ -274,7 +274,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
                         className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-red-600 outline-none"
                         placeholder="09xx..."
                         value={scamPhone}
-                        onChange={(e) => setScamPhone(e.target.value)}
+                        onChange={(e) => setScamPhone(e.target.value.replace(/[^0-9]/g, ""))}
                       />
                     </div>
                     <div>
@@ -396,7 +396,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
                         className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-[#2e7d32] outline-none"
                         placeholder="Ví dụ: 0901234567"
                         value={legitPhone}
-                        onChange={(e) => setLegitPhone(e.target.value)}
+                        onChange={(e) => setLegitPhone(e.target.value.replace(/[^0-9]/g, ""))}
                       />
                     </div>
                   </div>

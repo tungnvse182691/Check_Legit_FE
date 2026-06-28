@@ -81,31 +81,29 @@ export function Home() {
           <div className="absolute inset-0 bg-[radial-gradient(#2e7d32_1px,transparent_1px)] [background-size:20px_20px]"></div>
         </div>
         <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-          <span className="bg-emerald-50 text-emerald-800 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full inline-block mb-4">
-            HỆ THỐNG AN NINH CHỐNG SCAM 24/7
-          </span>
+
           <h1 className="text-3xl sm:text-4xl md:text-5xl mb-4 text-on-surface font-extrabold tracking-tight leading-tight">
             Tra cứu thông tin tin cậy & phòng chống lừa đảo
           </h1>
           <p className="text-sm sm:text-body-lg text-on-surface-variant mb-10 max-w-2xl mx-auto">
             Hệ thống xác minh danh tính hàng đầu, giúp bạn dễ dàng kiểm tra lịch sử uy tín hoặc tố cáo các hành vi gian lận trực tuyến.
           </p>
-          
+
           {/* Central Search Bar */}
           <div className="max-w-3xl mx-auto relative mb-4">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center bg-white border-2 border-primary/80 p-2 rounded-2xl shadow-md focus-within:ring-4 focus-within:ring-primary/15 gap-2 transition-all duration-300">
               <div className="flex items-center flex-grow py-1 sm:py-0">
                 <span className="material-symbols-outlined px-3 text-emerald-700">search</span>
-                <input 
-                  className="w-full border-none focus:ring-0 font-body-md py-2.5 outline-none text-sm sm:text-base text-on-surface" 
-                  placeholder="Nhập số điện thoại, zalo, số tài khoản hoặc tên để tra cứu..." 
+                <input
+                  className="w-full border-none focus:ring-0 font-body-md py-2.5 outline-none text-sm sm:text-base text-on-surface"
+                  placeholder="Nhập số điện thoại, zalo, số tài khoản hoặc tên để tra cứu..."
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
                 />
               </div>
-              <button 
+              <button
                 onClick={handleSearch}
                 className="bg-primary text-white cursor-pointer px-8 py-3.5 rounded-xl font-bold hover:brightness-110 hover:scale-[1.02] active:scale-95 transition-all text-sm sm:text-base shrink-0 uppercase tracking-wider"
               >
@@ -120,15 +118,15 @@ export function Home() {
       <section className="bg-white py-12 border-b border-outline-variant">
         <div className="max-w-4xl mx-auto px-6">
           <div className="bg-slate-50 p-6 sm:p-8 rounded-3xl border border-outline-variant flex flex-col sm:flex-row gap-6 justify-center items-stretch">
-            <Link 
-              to="/legit" 
+            <Link
+              to="/legit"
               className="w-full sm:w-1/2 flex items-center justify-center gap-3 bg-primary text-white hover:bg-emerald-800 py-4.5 px-6 rounded-2xl font-bold hover:scale-[1.02] hover:shadow-lg transition-all duration-300 text-center shadow-sm cursor-pointer"
             >
               <span className="material-symbols-outlined text-2xl">verified</span>
               <span>XEM DANH SÁCH LEGIT</span>
             </Link>
-            <Link 
-              to="/report" 
+            <Link
+              to="/report"
               state={{ defaultCategory: "Lừa đảo tài chính" }}
               className="w-full sm:w-1/2 flex items-center justify-center gap-3 bg-red-600 text-white hover:bg-red-700 py-4.5 px-6 rounded-2xl font-bold hover:scale-[1.02] hover:shadow-lg transition-all duration-300 text-center shadow-sm cursor-pointer"
             >
@@ -158,8 +156,8 @@ export function Home() {
                   </div>
                 </div>
                 <div className="w-full sm:w-auto mt-2 sm:mt-0">
-                  <Link 
-                    to={`/reports/${searchResult.item.id}`} 
+                  <Link
+                    to={`/reports/${searchResult.item.id}`}
                     className="block text-center bg-red-600 text-white font-bold px-6 py-3 rounded-xl text-xs sm:text-label-sm hover:scale-[1.05] hover:shadow-md transition-all uppercase whitespace-nowrap"
                   >
                     XEM BẰNG CHỨNG
@@ -185,8 +183,8 @@ export function Home() {
                   </div>
                 </div>
                 <div className="w-full sm:w-auto mt-2 sm:mt-0">
-                  <Link 
-                    to={`/reports/${searchResult.item.id}`} 
+                  <Link
+                    to={`/reports/${searchResult.item.id}`}
                     className="block text-center bg-amber-600 text-white font-bold px-6 py-3 rounded-xl text-xs sm:text-label-sm hover:scale-[1.05] hover:shadow-md transition-all uppercase whitespace-nowrap"
                   >
                     XEM CHI TIẾT
@@ -221,8 +219,8 @@ export function Home() {
                   </div>
                 </div>
                 <div className="w-full sm:w-auto mt-4 sm:mt-0">
-                  <Link 
-                    to={`/legit/${searchResult.item.id}`} 
+                  <Link
+                    to={`/legit/${searchResult.item.id}`}
                     className="block text-center bg-emerald-600 text-white font-bold px-6 py-3 rounded-xl text-label-sm hover:scale-[1.05] hover:shadow-md transition-all whitespace-nowrap"
                   >
                     XEM CỬA HÀNG
@@ -246,7 +244,7 @@ export function Home() {
                   </p>
                 </div>
                 <div className="w-full sm:w-auto mt-4 sm:mt-0">
-                  <button 
+                  <button
                     onClick={() => setSearchResult(null)}
                     className="block w-full text-center bg-slate-600 text-white font-bold px-6 py-3 rounded-xl text-label-sm hover:opacity-90 transition-all cursor-pointer"
                   >
@@ -260,60 +258,90 @@ export function Home() {
       )}
 
       {/* Main Content Area - Dropping recent reports and legit database into separate sequential full-width layout lines */}
-      <section className="max-w-4xl mx-auto px-6 py-12 space-y-16">
+      <section className="max-w-[1400px] mx-auto px-6 py-12 space-y-16">
         
-        {/* Recent Reports Block - Full Width on a layout line */}
-        <div className="bg-red-50/25 border border-red-200 rounded-3xl overflow-hidden flex flex-col justify-between shadow-sm">
-          <div>
-            <div className="bg-red-100/60 p-6 flex items-center justify-between border-b border-red-200">
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-red-650 text-red-600 font-bold">gpp_bad</span>
-                <h2 className="text-xl sm:text-headline-md font-extrabold text-red-900">Báo cáo & Cảnh báo mới nhất</h2>
-              </div>
-              <Link to="/reports" className="text-red-700 hover:text-red-900 underline text-label-sm font-bold">Xem tất cả</Link>
-            </div>
-            
-            {/* List of reports with deep rounded cards, smooth hover scaling effects */}
-            <div className="p-6 space-y-4">
-              {latestScams.map((report) => {
-                const isReportWarning = report.category === "Cảnh báo hành vi";
-                return (
-                  <div 
-                    key={report.id} 
-                    className={`bg-white p-5 border-l-4 ${isReportWarning ? "border-amber-500" : "border-red-600"} rounded-2xl shadow-sm hover:scale-[1.02] hover:shadow-md transition-all duration-300 flex flex-col md:flex-row justify-between items-start md:items-center gap-4`}
-                  >
-                    <div className="flex-grow pr-2 w-full">
-                      <div className="font-extrabold text-body-md mb-1.5 flex flex-wrap items-center gap-2">
-                        <span className="text-on-surface text-base">{report.name}</span>
-                        <span className={`${isReportWarning ? "bg-amber-50 text-amber-800 border-amber-100" : "bg-red-50 text-red-800 border-red-100"} text-[10px] font-bold px-2 py-0.5 rounded-full uppercase border`}>
+        {/* Recent Reports Block - Upgraded to match new mockup layout */}
+        <div className="bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.05)] p-6 border border-slate-200">
+          <div className="flex justify-between items-center border-b-2 border-red-50 pb-4 mb-5">
+            <h2 className="flex items-center gap-2.5 text-xl font-bold text-[#dc2626]">
+              <span className="material-symbols-outlined text-[24px]">gpp_bad</span> Báo cáo & Cảnh báo mới nhất
+            </h2>
+            <Link to="/reports" className="text-slate-550 text-slate-500 hover:text-[#dc2626] text-sm font-medium flex items-center gap-1 transition-colors duration-200">
+              Xem tất cả <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+            </Link>
+          </div>
+
+          <div className="flex flex-col gap-5">
+            {latestScams.map((report) => {
+              const isReportWarning = report.category === "Cảnh báo hành vi";
+              return (
+                <div 
+                  key={report.id} 
+                  className={`flex flex-col justify-between p-5 bg-white rounded-xl border border-slate-200 transition-all duration-300 relative overflow-hidden before:content-[''] before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1.5 ${
+                    isReportWarning 
+                      ? "before:bg-amber-500 hover:border-amber-300 hover:shadow-[0_6px_15px_rgba(245,158,11,0.08)]" 
+                      : "before:bg-[#dc2626] hover:border-red-300 hover:shadow-[0_6px_15px_rgba(220,38,38,0.08)]"
+                  } hover:-translate-y-0.5`}
+                >
+                  {/* Top content split: Split into Left and Right */}
+                  <div className="flex flex-col sm:flex-row justify-between items-start gap-4 border-b border-dashed border-slate-100 pb-4 pl-2">
+                    {/* Left: Target details */}
+                    <div className="flex flex-col gap-2.5 flex-grow min-w-0">
+                      <div className="flex items-center gap-2.5 flex-wrap">
+                        <h3 className="text-base font-bold text-slate-800 leading-tight">{report.name}</h3>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shrink-0 ${
+                          isReportWarning 
+                            ? "bg-amber-100 text-amber-800" 
+                            : "bg-red-100 text-red-800"
+                        }`}>
                           {report.type}
                         </span>
                       </div>
-                      <div className="text-on-surface-variant text-xs font-mono mb-2 bg-slate-50 py-1.5 px-3 rounded-lg inline-block">
-                        SĐT: {report.phone || "---"} | {isReportWarning ? "Kênh nhận diện / Tài khoản" : "TK"}: {report.accountNumber} ({report.bankName})
+                      
+                      {/* Box riêng biệt chứa SĐT & Số tài khoản */}
+                      <div className="text-[12px] text-slate-600 bg-slate-50 border border-slate-200/60 p-2.5 rounded-lg flex flex-col gap-1 w-full max-w-sm font-medium shadow-sm">
+                        <div className="flex items-center gap-1.5">
+                          <span className="material-symbols-outlined text-[15px] text-slate-400">phone_iphone</span>
+                          <span>SĐT: <strong className="text-slate-700 font-semibold">{report.phone || "---"}</strong></span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="material-symbols-outlined text-[15px] text-slate-400">account_balance_wallet</span>
+                          <span className="truncate">STK: <strong className="text-slate-700 font-semibold">{report.accountNumber} ({report.bankName})</strong></span>
+                        </div>
                       </div>
-                      <div className="text-on-surface-variant text-sm line-clamp-2 leading-relaxed">{report.desc}</div>
                     </div>
-                    <div className="text-left md:text-right shrink-0 w-full md:w-auto pt-3 md:pt-0 border-t md:border-t-0 border-dashed border-slate-200 flex md:flex-col justify-between items-center md:items-end">
-                      <div>
-                        {isReportWarning ? (
-                          <div className="font-label-numeric text-amber-600 font-extrabold text-xs sm:text-sm">Phi tài sản (0đ)</div>
-                        ) : (
-                          <div className="font-label-numeric text-red-600 font-extrabold text-base sm:text-lg">{(report.amount).toLocaleString("vi-VN")}đ</div>
-                        )}
-                        <div className="text-[10px] text-on-surface-variant font-bold uppercase">{report.time}</div>
-                      </div>
+
+                    {/* Right: Amount & Detail link */}
+                    <div className="flex flex-col items-start sm:items-end text-left sm:text-right shrink-0">
+                      {isReportWarning ? (
+                        <span className="text-sm font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-200/50">Phi tài sản (0đ)</span>
+                      ) : (
+                        <span className="text-lg sm:text-xl font-extrabold text-[#dc2626] tracking-tight">
+                          {Number(report.amount).toLocaleString("vi-VN")} đ
+                        </span>
+                      )}
+                      <span className="text-[11px] text-slate-400 font-medium mt-1">
+                        {report.time}
+                      </span>
                       <Link 
                         to={`/reports/${report.id}`} 
-                        className={`inline-block ${isReportWarning ? "bg-amber-50 hover:bg-amber-100 text-amber-800" : "bg-red-50 hover:bg-red-100 text-red-800"} px-3.5 py-1.5 rounded-xl text-xs font-bold transition-colors mt-2`}
+                        className="mt-3.5 inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-[11px] font-bold text-slate-700 hover:text-slate-900 rounded-lg transition-all border border-slate-200/60"
                       >
-                        Chi tiết →
+                        <span>Chi tiết</span>
+                        <span className="material-symbols-outlined text-[12px]">arrow_forward</span>
                       </Link>
                     </div>
                   </div>
-                );
-              })}
-            </div>
+
+                  {/* Bottom section: Short description */}
+                  <div className="pt-3 pl-2">
+                    <p className="text-xs sm:text-[13px] text-slate-500 leading-relaxed line-clamp-2 hover:line-clamp-none transition-all duration-300">
+                      {report.desc || "Không có mô tả chi tiết vụ việc."}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -327,26 +355,28 @@ export function Home() {
               </div>
               <span className="text-primary text-label-sm font-extrabold uppercase tracking-widest bg-white px-3 py-1 rounded-full border border-emerald-100">Uy tín</span>
             </div>
-            
-            {/* List with hover scaling */}
-            <div className="divide-y divide-outline-variant bg-white">
+
+            {/* Grid display for legit merchants */}
+            <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100 bg-white">
               {topLegit.map((legit) => (
                 <Link 
                   to={`/legit/${legit.id}`} 
                   key={legit.id} 
-                  className="p-6 flex items-center gap-4 hover:bg-emerald-50/40 hover:scale-[1.01] transition-all duration-300 block"
+                  className="p-6 flex items-center gap-4 hover:bg-emerald-50/40 hover:scale-[1.02] transition-all duration-300 block"
                 >
-                  <img src={legit.img} alt="Avatar" className="w-14 h-14 rounded-full object-cover shrink-0 border-2 border-emerald-100 shadow-sm"/>
-                  <div className="flex-grow">
-                    <div className="flex items-center gap-2">
-                      <span className="font-extrabold font-body-md text-on-surface text-base">{legit.name}</span>
-                      <span className="material-symbols-outlined text-primary text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                  <img src={legit.img} alt="Avatar" className="w-12 h-12 rounded-full object-cover shrink-0 border-2 border-emerald-100 shadow-sm" />
+                  <div className="flex-grow min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-extrabold text-slate-800 text-sm truncate">{legit.name}</span>
+                      <span className="material-symbols-outlined text-primary text-lg shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
                     </div>
-                    <div className="text-xs text-on-surface-variant mt-0.5 font-medium">{legit.role}</div>
+                    <div className="text-xs text-slate-500 mt-0.5 truncate">{legit.role}</div>
                   </div>
                   <div className="text-right shrink-0">
-                    <div className="text-primary font-extrabold font-label-numeric text-base">{legit.score}/100</div>
-                    <div className="text-[10px] text-on-surface-variant bg-slate-100 px-2 py-0.5 rounded-full mt-1 inline-block">{(legit.insurance).toLocaleString("vi-VN")}đ Quỹ</div>
+                    <div className="text-[#2e7d32] font-black text-sm">{legit.score}/100</div>
+                    <div className="text-[9px] text-[#2e7d32] font-bold bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full mt-1 inline-block">
+                      {(legit.insurance).toLocaleString("vi-VN")}đ Quỹ
+                    </div>
                   </div>
                 </Link>
               ))}
@@ -359,7 +389,7 @@ export function Home() {
       </section>
 
       {/* CTA Section - Replaced banner with new text and Forest Green scheme */}
-      <section className="max-w-4xl mx-auto px-6 mb-16">
+      <section className="max-w-[1400px] mx-auto px-6 mb-16">
         <div className="bg-primary hover:scale-[1.01] transition-all duration-300 text-on-primary rounded-3xl p-10 sm:p-12 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 shadow-md">
           <div className="relative z-10 text-center md:text-left">
             <span className="bg-white/20 text-white text-[10px] font-bold uppercase tracking-widest px-3.5 py-1 rounded-full inline-block mb-3 border border-white/10">Hồ sơ tín nhiệm</span>
@@ -370,8 +400,8 @@ export function Home() {
               Tích lũy quỹ bảo hiểm giao dịch, nâng cao điểm tín nhiệm, khẳng định uy tín thương hiệu số để phát triển kinh doanh vững vàng.
             </p>
           </div>
-          <Link 
-            to="/legit" 
+          <Link
+            to="/legit"
             className="relative z-10 bg-white text-primary px-8 py-4.5 rounded-2xl font-bold hover:scale-[1.05] hover:shadow-xl active:scale-95 transition-all duration-300 inline-block text-center whitespace-nowrap"
           >
             Tạo Hồ Sơ Legit Ngay
@@ -383,12 +413,12 @@ export function Home() {
       </section>
 
       {/* News/Blog Section Placeholder - Grid of 3 minimal card placeholders */}
-      <section className="max-w-4xl mx-auto px-6 mb-24">
+      <section className="max-w-[1400px] mx-auto px-6 mb-24">
         <div className="flex items-center gap-3 mb-8">
           <span className="material-symbols-outlined text-primary text-3xl font-bold">newspaper</span>
           <h2 className="text-2xl font-extrabold text-on-surface">Tin tức cảnh báo mới</h2>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Article Card 1 */}
           <article className="bg-white border border-outline-variant rounded-2xl overflow-hidden shadow-sm hover:scale-[1.03] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">

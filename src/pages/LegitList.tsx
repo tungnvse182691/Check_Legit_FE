@@ -79,9 +79,7 @@ export function LegitList() {
       <section className="mb-12">
         <div className="flex flex-col gap-8">
           <div className="max-w-3xl">
-            <span className="bg-emerald-50 text-emerald-800 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full inline-block mb-4 border border-emerald-200">
-              Đơn vị thương mại uy tín đã xác minh
-            </span>
+
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 tracking-tight text-on-surface leading-tight">
               Danh sách uy tín
             </h1>

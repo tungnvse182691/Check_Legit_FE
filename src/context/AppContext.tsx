@@ -46,6 +46,7 @@ interface AppContextType {
   rejectScamReport: (id: string) => void;
   deleteScamReport: (id: string) => void;
   deleteLegitProfile: (id: string | number) => void;
+  updateScamReport: (id: string, updatedReport: Partial<ScamReport>) => Promise<boolean>;
   login: (token: string) => void;
   logout: () => void;
 }
@@ -70,7 +71,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setToken(null);
   };
 
+  const parseUtcDate = (dateStr: string): Date => {
+    if (!dateStr) return new Date();
+    if (typeof dateStr === "string" && !dateStr.endsWith("Z") && !dateStr.includes("+") && !dateStr.includes("-", 10)) {
+      return new Date(dateStr + "Z");
+    }
+    return new Date(dateStr);
+  };
+
   const mapScamDto = (dto: any, category: "Lừa đảo tài chính" | "Cảnh báo hành vi"): ScamReport => {
+    const parsedDate = parseUtcDate(dto.createdAt);
     return {
       id: dto.id,
       name: dto.name,
@@ -80,8 +90,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       desc: dto.desc,
       type: dto.type,
       amount: dto.amount,
-      time: new Date(dto.createdAt).toLocaleTimeString("vi-VN"),
-      date: new Date(dto.createdAt).toLocaleDateString("vi-VN"),
+      time: parsedDate.toLocaleTimeString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh", hour12: false }),
+      date: parsedDate.toLocaleDateString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }),
       status: dto.status,
       victim: dto.victim,
       tags: dto.tags || [],
@@ -240,7 +250,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       telegram: profile.telegram,
       insurance: profile.insurance,
       successTrans: 1,
-      joinDate: new Date().toLocaleDateString("vi-VN").substring(3), // MM/YYYY
+      joinDate: new Date().toLocaleDateString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }).substring(3), // MM/YYYY
       businessType: profile.businessType
     };
 
@@ -358,6 +368,55 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  const updateScamReport = async (id: string, updatedReport: Partial<ScamReport>): Promise<boolean> => {
+    const categoryEnum = updatedReport.category === "Cảnh báo hành vi" ? 1 : 0;
+    const payload = {
+      name: updatedReport.name,
+      phone: updatedReport.phone || "",
+      bankName: updatedReport.bankName,
+      accountNumber: updatedReport.accountNumber,
+      desc: updatedReport.desc,
+      type: updatedReport.type,
+      amount: updatedReport.amount,
+      victim: updatedReport.victim || "Ẩn danh",
+      facebook: updatedReport.facebook || "",
+      tags: updatedReport.tags || [],
+      images: updatedReport.images || [],
+      category: categoryEnum
+    };
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/scams/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        await fetchAllData();
+        return true;
+      } else {
+        if (response.status === 401) {
+          alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.");
+          logout();
+        } else if (response.status === 500) {
+          alert("Lỗi hệ thống phía máy chủ (500). Vui lòng thử lại sau.");
+        } else {
+          const errorText = await response.text();
+          alert("Cập nhật báo cáo thất bại: " + errorText);
+        }
+        return false;
+      }
+    } catch (error) {
+      console.error("Error updating scam report:", error);
+      alert("Có lỗi xảy ra khi kết nối tới máy chủ.");
+      return false;
+    }
+  };
+
   const deleteLegitProfile = async (id: string | number) => {
     try {
       const response = await fetch(`${API_BASE_URL}/admin/legit/${id}`, {
@@ -399,6 +458,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         rejectScamReport,
         deleteScamReport,
         deleteLegitProfile,
+        updateScamReport,
         login,
         logout
       }}

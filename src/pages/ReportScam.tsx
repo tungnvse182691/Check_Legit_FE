@@ -364,7 +364,7 @@ export function ReportScam() {
                   placeholder="090x xxx xxx"
                   type="text"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ""))}
                 />
               </div>
               <div className="flex flex-col gap-2">
