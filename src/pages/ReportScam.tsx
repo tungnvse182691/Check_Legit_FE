@@ -43,13 +43,15 @@ export function ReportScam() {
   const turnstileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    let widgetId: string | null = null;
+
     // Wait until window.turnstile is ready to render programmatically
     const interval = setInterval(() => {
       const turnstile = (window as any).turnstile;
       if (turnstile && turnstileRef.current) {
         clearInterval(interval);
         try {
-          turnstile.render(turnstileRef.current, {
+          widgetId = turnstile.render(turnstileRef.current, {
             sitekey: import.meta.env.VITE_TURNSTILE_SITEKEY || "1x00000000000000000000AA",
             callback: (token: string) => {
               setCaptchaToken(token);
@@ -70,6 +72,13 @@ export function ReportScam() {
 
     return () => {
       clearInterval(interval);
+      if (widgetId) {
+        try {
+          (window as any).turnstile.remove(widgetId);
+        } catch (e) {
+          console.error("Turnstile remove/cleanup error:", e);
+        }
+      }
     };
   }, []);
 
@@ -220,7 +229,7 @@ export function ReportScam() {
         facebook,
         images: imageUrls,
         category,
-        captchaToken
+        turnstileToken: captchaToken
       });
 
       // Show Success Modal
