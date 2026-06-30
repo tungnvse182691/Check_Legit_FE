@@ -51,7 +51,7 @@ interface AppContextType {
   logout: () => void;
 }
 
-export const API_BASE_URL = "http://localhost:5174/api";
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://checkzonebe-production.up.railway.app/api";
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
