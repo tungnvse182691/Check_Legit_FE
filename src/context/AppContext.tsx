@@ -131,6 +131,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             return data.map((s: any) => mapScamDto(s, s.category === 1 ? "Cảnh báo hành vi" : "Lừa đảo tài chính"));
           } else {
             console.error(`Failed to fetch scams: ${res.status} ${res.statusText}`);
+            if (res.status === 401 && token) {
+              console.warn("Token is invalid/expired. Logging out and falling back to public view.");
+              logout();
+              const publicRes = await fetch(`${API_BASE_URL}/public/scams`);
+              if (publicRes.ok) {
+                const data = await publicRes.json();
+                return data.map((s: any) => mapScamDto(s, s.category === 1 ? "Cảnh báo hành vi" : "Lừa đảo tài chính"));
+              }
+            }
             if (res.status === 500) {
               alert("Lỗi máy chủ (500) khi tải danh sách lừa đảo. Vui lòng thử lại sau.");
             }

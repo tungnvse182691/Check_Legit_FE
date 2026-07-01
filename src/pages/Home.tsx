@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useApp } from "../context/AppContext";
+import { useApp, API_BASE_URL } from "../context/AppContext";
+import { useDebounce } from "../hooks/useDebounce";
 
 export function Home() {
   const { scams, legitList } = useApp();
   const navigate = useNavigate();
-  const [query, setQuery] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const [liveResults, setLiveResults] = useState<any[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
   const [searchResult, setSearchResult] = useState<{
     status: "scam" | "warning" | "legit" | "not_found";
     item?: any;
@@ -20,10 +24,58 @@ export function Home() {
   // Top 3 legit sellers
   const topLegit = legitList.slice(0, 3);
 
-  const handleSearch = () => {
-    if (!query.trim()) return;
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
 
-    const term = query.trim().replace(/\s+/g, "").toLowerCase();
+  useEffect(() => {
+    const fetchLiveResults = async () => {
+      if (debouncedSearchTerm.trim().length < 2) {
+        setLiveResults([]);
+        setShowDropdown(false);
+        return;
+      }
+
+      setIsSearching(true);
+      setShowDropdown(true);
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/public/reports/search?query=${encodeURIComponent(debouncedSearchTerm.trim())}`);
+        if (response.ok) {
+          const data = await response.json();
+          setLiveResults(data);
+        } else {
+          console.error("Failed to fetch live search results");
+          setLiveResults([]);
+        }
+      } catch (error) {
+        console.error("Error in live search:", error);
+        setLiveResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    fetchLiveResults();
+  }, [debouncedSearchTerm]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleSearch = () => {
+    if (!searchTerm.trim()) return;
+
+    setShowDropdown(false);
+    const term = searchTerm.trim().replace(/\s+/g, "").toLowerCase();
 
     // Check scam database
     const foundScam = scams.find((s) => {
@@ -38,7 +90,7 @@ export function Home() {
       setSearchResult({
         status: foundScam.category === "Cảnh báo hành vi" ? "warning" : "scam",
         item: foundScam,
-        searchedTerm: query,
+        searchedTerm: searchTerm,
       });
       return;
     }
@@ -55,7 +107,7 @@ export function Home() {
       setSearchResult({
         status: "legit",
         item: foundLegit,
-        searchedTerm: query,
+        searchedTerm: searchTerm,
       });
       return;
     }
@@ -63,7 +115,7 @@ export function Home() {
     // If nothing found
     setSearchResult({
       status: "not_found",
-      searchedTerm: query,
+      searchedTerm: searchTerm,
     });
   };
 
@@ -86,11 +138,11 @@ export function Home() {
             Tra cứu thông tin tin cậy & phòng chống lừa đảo
           </h1>
           <p className="text-sm sm:text-body-lg text-on-surface-variant mb-10 max-w-2xl mx-auto">
-            Hệ thống xác minh danh tính hàng đầu, giúp bạn dễ dàng kiểm tra lịch sử uy tín hoặc tố cáo các hành vi gian lận trực tuyến.
+            Hệ thống xác minh danh tính hàng đầu, giúp bạn dễ dàng kiểm tra lịch sử uy tín hoặc tố cáo các hành vi gian lận trực tuyển.
           </p>
 
           {/* Central Search Bar */}
-          <div className="max-w-3xl mx-auto relative mb-4">
+          <div ref={searchContainerRef} className="max-w-3xl mx-auto relative mb-4">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center bg-white border-2 border-primary/80 p-2 rounded-2xl shadow-md focus-within:ring-4 focus-within:ring-primary/15 gap-2 transition-all duration-300">
               <div className="flex items-center flex-grow py-1 sm:py-0">
                 <span className="material-symbols-outlined px-3 text-emerald-700">search</span>
@@ -98,8 +150,8 @@ export function Home() {
                   className="w-full border-none focus:ring-0 font-body-md py-2.5 outline-none text-sm sm:text-base text-on-surface"
                   placeholder="Nhập số điện thoại, zalo, số tài khoản hoặc tên để tra cứu..."
                   type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={handleKeyDown}
                 />
               </div>
@@ -110,6 +162,74 @@ export function Home() {
                 KIỂM TRA
               </button>
             </div>
+
+            {/* Dropdown gợi ý tìm kiếm (Live Search Suggestions) */}
+            {showDropdown && (
+              <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden z-50 animate-fade-in divide-y divide-slate-100 max-h-[380px] overflow-y-auto">
+                {isSearching ? (
+                  <div className="p-6 flex items-center justify-center gap-3 text-slate-500 font-medium">
+                    <svg className="animate-spin h-5 w-5 text-emerald-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span className="text-sm">Đang tìm kiếm dữ liệu...</span>
+                  </div>
+                ) : liveResults.length === 0 ? (
+                  <div className="p-6 text-center text-slate-400 font-bold text-sm">
+                    <span className="material-symbols-outlined text-4xl block mb-2 text-slate-300">search_off</span>
+                    Không tìm thấy kết quả phù hợp
+                  </div>
+                ) : (
+                  <div className="flex flex-col">
+                    <div className="bg-slate-50/80 px-4 py-2 text-[10px] font-black uppercase text-slate-400 tracking-wider text-left">
+                      Kết quả tìm kiếm ({liveResults.length})
+                    </div>
+                    {liveResults.map((item) => {
+                      const isWarning = item.category === 1 || item.category === "Cảnh báo hành vi";
+                      const statusText = item.status === "Đã phê duyệt" ? "Đã duyệt" : item.status;
+                      return (
+                        <div
+                          key={item.id}
+                          onClick={() => {
+                            navigate(`/reports/${item.id}`);
+                            setShowDropdown(false);
+                          }}
+                          className="px-4 py-3 hover:bg-slate-50 flex items-center justify-between gap-4 cursor-pointer transition-all duration-150 border-l-4 border-transparent hover:border-emerald-600"
+                        >
+                          <div className="flex flex-col text-left min-w-0">
+                            <span className="font-extrabold text-sm text-slate-800 truncate capitalize">
+                              {item.name}
+                            </span>
+                            <span className="text-xs text-slate-500 font-mono mt-0.5">
+                              {item.accountNumber ? `STK: ${item.accountNumber}` : ""}
+                              {item.accountNumber && item.phone ? " | " : ""}
+                              {item.phone ? `SĐT: ${item.phone}` : ""}
+                              {item.bankName ? ` (${item.bankName})` : ""}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full border ${
+                              isWarning
+                                ? "bg-amber-50 text-amber-800 border-amber-200"
+                                : "bg-red-50 text-red-800 border-red-200"
+                            }`}>
+                              {item.type || (isWarning ? "Cảnh báo" : "Lừa đảo")}
+                            </span>
+                            <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full border ${
+                              item.status === "Đã phê duyệt"
+                                ? "bg-emerald-50 text-emerald-800 border-emerald-250"
+                                : "bg-amber-50 text-amber-850 border-amber-200"
+                            }`}>
+                              {statusText}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </section>
