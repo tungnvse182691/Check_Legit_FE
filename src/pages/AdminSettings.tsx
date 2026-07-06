@@ -19,13 +19,32 @@ interface PolicyArticle {
 }
 
 export function AdminSettings() {
+  const { systemSettings, fetchSystemSettings, updateSystemSettings } = useApp();
+
   const [requireEvidence, setRequireEvidence] = useState(true);
   const [autoApprove, setAutoApprove] = useState(false);
   const [minInsurance, setMinInsurance] = useState("10000000");
   const [adminName, setAdminName] = useState("Ban điều hành Check Zone Việt Nam");
   const [adminEmail, setAdminEmail] = useState("support@checkzone.vn");
-  const [botToken, setBotToken] = useState("5394883:AAEeB8hFm3z...");
+  const [botToken, setBotToken] = useState("");
+  const [discordWebhookUrl, setDiscordWebhookUrl] = useState("");
   const [isSaved, setIsSaved] = useState(false);
+
+  React.useEffect(() => {
+    fetchSystemSettings();
+  }, []);
+
+  React.useEffect(() => {
+    if (systemSettings) {
+      setRequireEvidence(systemSettings.requireEvidence);
+      setAutoApprove(systemSettings.autoApprove);
+      setMinInsurance(systemSettings.minInsurance.toString());
+      setAdminName(systemSettings.adminName);
+      setAdminEmail(systemSettings.adminEmail);
+      setBotToken(systemSettings.telegramBotToken || "");
+      setDiscordWebhookUrl(systemSettings.discordWebhookUrl || "");
+    }
+  }, [systemSettings]);
 
   // Active Tab for Settings Sub-Modules
   const [activeTab, setActiveTab] = useState<"general" | "blog" | "policy">("general");
@@ -65,12 +84,23 @@ export function AdminSettings() {
     }
   };
 
-  const handleSaveConfig = (e: React.FormEvent) => {
+  const handleSaveConfig = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSaved(true);
-    setTimeout(() => {
-      setIsSaved(false);
-    }, 3000);
+    const success = await updateSystemSettings({
+      requireEvidence,
+      autoApprove,
+      minInsurance: parseFloat(minInsurance),
+      adminName,
+      adminEmail,
+      telegramBotToken: botToken || null,
+      discordWebhookUrl: discordWebhookUrl || null
+    });
+    if (success) {
+      setIsSaved(true);
+      setTimeout(() => {
+        setIsSaved(false);
+      }, 3000);
+    }
   };
 
   // Blog creation action
@@ -267,23 +297,24 @@ export function AdminSettings() {
                 </div>
               </div>
 
-              {/* Box 3: Telegram bot integration */}
+              {/* Box 3: Discord Webhook integration */}
               <div className="bg-white border border-outline-variant rounded-2xl p-6 sm:p-8 shadow-sm space-y-4">
                 <h3 className="font-bold text-base text-on-surface flex items-center gap-2 border-b border-slate-100 pb-3">
-                  <span className="material-symbols-outlined text-xl text-[#2e7d32]">robot_2</span>
-                  Liên thông ứng dụng (Telegram Webhook Bot)
+                  <span className="material-symbols-outlined text-xl text-[#2e7d32]">webhook</span>
+                  Discord Webhook (Thông báo đơn tố cáo mới)
                 </h3>
                 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">Telegram Bot API Token</label>
+                  <label className="block text-[10px] font-bold text-slate-700 uppercase tracking-wider mb-1.5">Discord Webhook URL</label>
                   <input
                     type="password"
                     className="w-full border-2 border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-[#2e7d32] outline-none font-mono"
-                    value={botToken}
-                    onChange={(e) => setBotToken(e.target.value)}
+                    value={discordWebhookUrl}
+                    onChange={(e) => setDiscordWebhookUrl(e.target.value)}
+                    placeholder="https://discord.com/api/webhooks/..."
                   />
                   <p className="text-[11px] text-on-surface-variant mt-1.5">
-                    Hỗ trợ đẩy thông báo ngay lập tức về nhóm chat chung hoặc kênh cảnh báo an ninh nội bộ khi có báo cáo lừa đảo mới từ Check Zone.
+                    Hỗ trợ đẩy thông báo dạng nhúng (embed) đẹp mắt ngay lập tức về kênh Discord khi có đơn tố cáo lừa đảo mới được tạo thành công trên hệ thống.
                   </p>
                 </div>
               </div>

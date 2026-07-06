@@ -35,11 +35,23 @@ export interface LegitProfile {
   tier?: string; // dynamic Tier badge from backend
 }
 
+export interface SystemSettings {
+  id: number;
+  requireEvidence: boolean;
+  autoApprove: boolean;
+  minInsurance: number;
+  adminName: string;
+  adminEmail: string;
+  telegramBotToken: string | null;
+  discordWebhookUrl: string | null;
+}
+
 interface AppContextType {
   scams: ScamReport[];
   legitList: LegitProfile[];
   token: string | null;
   isAuthenticated: boolean;
+  systemSettings: SystemSettings | null;
   addScamReport: (report: Omit<ScamReport, "id" | "status" | "time" | "date" | "tags"> & { turnstileToken: string }) => void;
   addLegitProfile: (profile: Omit<LegitProfile, "id" | "score" | "img" | "successTrans" | "joinDate">) => void;
   approveScamReport: (id: string) => void;
@@ -49,6 +61,8 @@ interface AppContextType {
   updateScamReport: (id: string, updatedReport: Partial<ScamReport>) => Promise<boolean>;
   login: (token: string) => void;
   logout: () => void;
+  fetchSystemSettings: () => Promise<void>;
+  updateSystemSettings: (data: Partial<SystemSettings>) => Promise<boolean>;
 }
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://checkzonebe-production.up.railway.app/api";
@@ -58,6 +72,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [scams, setScams] = useState<ScamReport[]>([]);
   const [legitList, setLegitList] = useState<LegitProfile[]>([]);
+  const [systemSettings, setSystemSettings] = useState<SystemSettings | null>(null);
   const [token, setToken] = useState<string | null>(() => localStorage.getItem("token"));
   const isAuthenticated = !!token;
 
@@ -202,6 +217,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   useEffect(() => {
     fetchAllData();
+    if (token) {
+      fetchSystemSettings();
+    } else {
+      setSystemSettings(null);
+    }
   }, [token]);
 
   const addScamReport = async (report: Omit<ScamReport, "id" | "status" | "time" | "date" | "tags"> & { turnstileToken: string }) => {
@@ -454,6 +474,58 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  const fetchSystemSettings = async () => {
+    if (!token) return;
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/settings`, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSystemSettings(data);
+      } else {
+        console.error("Failed to fetch system settings");
+      }
+    } catch (error) {
+      console.error("Error fetching system settings:", error);
+    }
+  };
+
+  const updateSystemSettings = async (data: Partial<SystemSettings>): Promise<boolean> => {
+    if (!token) return false;
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/settings`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        const updatedData = await response.json();
+        setSystemSettings(updatedData);
+        return true;
+      } else {
+        if (response.status === 401) {
+          alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.");
+          logout();
+        } else {
+          const errorText = await response.text();
+          alert("Cập nhật cấu hình thất bại: " + errorText);
+        }
+        return false;
+      }
+    } catch (error) {
+      console.error("Error updating system settings:", error);
+      alert("Có lỗi xảy ra khi kết nối tới máy chủ.");
+      return false;
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -461,6 +533,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         legitList,
         token,
         isAuthenticated,
+        systemSettings,
         addScamReport,
         addLegitProfile,
         approveScamReport,
@@ -469,7 +542,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         deleteLegitProfile,
         updateScamReport,
         login,
-        logout
+        logout,
+        fetchSystemSettings,
+        updateSystemSettings
       }}
     >
       {children}
