@@ -128,7 +128,7 @@ export function Home() {
   return (
     <div className="pt-4">
       {/* Hero Section - Shrunk to 70% width */}
-      <section className="relative py-20 bg-surface-container-lowest overflow-hidden border-b border-outline-variant">
+      <section className="relative py-20 bg-surface-container-lowest border-b border-outline-variant">
         <div className="absolute inset-0 opacity-5 pointer-events-none">
           <div className="absolute inset-0 bg-[radial-gradient(#2e7d32_1px,transparent_1px)] [background-size:20px_20px]"></div>
         </div>
@@ -165,7 +165,7 @@ export function Home() {
 
             {/* Dropdown gợi ý tìm kiếm (Live Search Suggestions) */}
             {showDropdown && (
-              <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden z-50 animate-fade-in divide-y divide-slate-100 max-h-[380px] overflow-y-auto">
+              <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl border border-slate-200 shadow-xl z-50 animate-fade-in divide-y divide-slate-100 max-h-80 overflow-y-auto">
                 {isSearching ? (
                   <div className="p-6 flex items-center justify-center gap-3 text-slate-500 font-medium">
                     <svg className="animate-spin h-5 w-5 text-emerald-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
