@@ -350,14 +350,10 @@ export function Home() {
                   <p className="text-body-md text-emerald-950 font-semibold mt-1">
                     Đối tượng "<span className="underline">{searchResult.searchedTerm}</span>" là <span className="font-extrabold">{searchResult.item.name}</span>, đối tác uy tín được ký quỹ bảo hiểm giao dịch thành công.
                   </p>
-                  <div className="grid grid-cols-3 gap-2 mt-4 bg-white/80 p-4 rounded-2xl text-xs text-emerald-900 text-center border border-emerald-200">
+                  <div className="grid grid-cols-2 gap-4 mt-4 bg-white/80 p-4 rounded-2xl text-xs text-emerald-900 text-center border border-emerald-200">
                     <div>
                       <p className="text-[10px] text-on-surface-variant uppercase">Quỹ Ký quỹ</p>
                       <p className="font-bold text-sm text-emerald-700">{(searchResult.item.insurance).toLocaleString("vi-VN")}đ</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-on-surface-variant uppercase">Điểm tín nhiệm</p>
-                      <p className="font-bold text-sm text-emerald-700">{searchResult.item.score}/100</p>
                     </div>
                     <div>
                       <p className="text-[10px] text-on-surface-variant uppercase">Giao dịch</p>
@@ -520,10 +516,9 @@ export function Home() {
                     <div className="text-xs text-slate-500 mt-0.5 truncate">{legit.role}</div>
                   </div>
                   <div className="text-right shrink-0">
-                    <div className="text-[#2e7d32] font-black text-sm">{legit.score}/100</div>
-                    <div className="text-[9px] text-[#2e7d32] font-bold bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full mt-1 inline-block">
+                    <span className="text-[10px] text-[#2e7d32] font-black bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full whitespace-nowrap inline-block">
                       {(legit.insurance).toLocaleString("vi-VN")}đ Quỹ
-                    </div>
+                    </span>
                   </div>
                 </Link>
               ))}
