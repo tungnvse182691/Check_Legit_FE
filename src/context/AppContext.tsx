@@ -19,6 +19,8 @@ export interface ScamReport {
   category: "Lừa đảo tài chính" | "Cảnh báo hành vi";
   verifierName?: string;
   verifierZalo?: string;
+  reportCount: number;
+  isDuplicate?: boolean;
 }
 
 export interface LegitProfile {
@@ -120,7 +122,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       images: dto.images || [],
       category: category,
       verifierName: dto.verifierName || "",
-      verifierZalo: dto.verifierZalo || ""
+      verifierZalo: dto.verifierZalo || "",
+      reportCount: dto.reportCount || 1,
+      isDuplicate: dto.isDuplicate || false
     };
   };
 
@@ -427,7 +431,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       images: updatedReport.images || [],
       category: categoryEnum,
       verifierName: updatedReport.verifierName || "",
-      verifierZalo: updatedReport.verifierZalo || ""
+      verifierZalo: updatedReport.verifierZalo || "",
+      reportCount: updatedReport.reportCount ?? 1
     };
 
     try {

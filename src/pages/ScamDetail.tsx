@@ -77,6 +77,17 @@ export function ScamDetail() {
         {/* Left Column - Main Details */}
         <div className="lg:col-span-8 space-y-8">
           
+          {/* Cảnh báo số lượt tố cáo (Mục 5) */}
+          {matchedScam.reportCount > 1 && (
+            <div className="bg-red-50 border border-red-200 text-red-900 px-6 py-4 rounded-2xl flex items-center gap-3 animate-fade-in shadow-sm">
+              <span className="material-symbols-outlined text-red-600 text-2xl font-bold">warning</span>
+              <div className="text-left">
+                <p className="text-sm font-black uppercase tracking-tight">Cảnh báo nghiêm trọng</p>
+                <p className="text-xs font-bold mt-0.5">Đã có <span className="font-mono font-black text-sm text-red-600">{matchedScam.reportCount}</span> lượt tố cáo được xác minh về đối tượng/tài khoản giao dịch này.</p>
+              </div>
+            </div>
+          )}
+
           {/* Box 1: Thông tin đối tượng */}
           <section className="bg-white border border-outline-variant p-6 sm:p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
             <h2 className={`text-xl font-extrabold ${isWarning ? "text-amber-600" : "text-red-600"} mb-6 flex items-center gap-2.5`}>

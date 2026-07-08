@@ -55,7 +55,8 @@ export function AdminScamManagement() {
       edited.victim !== scam.victim ||
       edited.facebook !== scam.facebook ||
       edited.verifierName !== scam.verifierName ||
-      edited.verifierZalo !== scam.verifierZalo
+      edited.verifierZalo !== scam.verifierZalo ||
+      edited.reportCount !== scam.reportCount
     );
   };
 
@@ -166,9 +167,16 @@ export function AdminScamManagement() {
       cell: (scam) => {
         const isRowWarning = scam.category === "Cảnh báo hành vi";
         return (
-          <div className="flex flex-col">
-            <p className="font-extrabold text-slate-900 capitalize text-xs whitespace-nowrap" title={scam.name}>{scam.name}</p>
-            <span className={`text-[9px] ${isRowWarning ? "text-amber-800 bg-amber-50 border-amber-200" : "text-slate-550 bg-slate-100 border-slate-200 text-slate-500"} capitalize px-1.5 py-0.5 rounded border mt-1 inline-block font-black`}>
+          <div className="flex flex-col items-start gap-1">
+            <div className="flex items-center gap-1.5 max-w-full">
+              <p className="font-extrabold text-slate-900 capitalize text-xs truncate" title={scam.name}>{scam.name}</p>
+              {scam.isDuplicate && (
+                <span className="text-red-650 text-red-600 text-[9px] font-black bg-red-50 border border-red-200 px-1.5 py-0.5 rounded-full select-none shrink-0">
+                  ⚠️ Trùng lặp
+                </span>
+              )}
+            </div>
+            <span className={`text-[9px] ${isRowWarning ? "text-amber-800 bg-amber-50 border-amber-200" : "text-slate-550 bg-slate-100 border-slate-200 text-slate-500"} capitalize px-1.5 py-0.5 rounded border inline-block font-black`}>
               {scam.type}
             </span>
           </div>
@@ -389,6 +397,17 @@ export function AdminScamManagement() {
                 placeholder="Ví dụ: 0987654321"
               />
             </div>
+          </div>
+
+          <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl text-left">
+            <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1">Số lượt bị tố cáo</label>
+            <input 
+              type="number"
+              min={1}
+              className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs font-mono font-black text-slate-800 outline-none"
+              value={editedScam.reportCount || 1}
+              onChange={(e) => updateField(scam.id, "reportCount", Number(e.target.value))}
+            />
           </div>
         </div>
 
