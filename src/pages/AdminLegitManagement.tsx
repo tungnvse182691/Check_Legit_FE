@@ -17,7 +17,7 @@ const PREDEFINED_SECTORS = [
 ];
 
 export function AdminLegitManagement() {
-  const { legitList, addLegitProfile, deleteLegitProfile } = useApp();
+  const { legitList, addLegitProfile, deleteLegitProfile, updateLegitProfile } = useApp();
 
   const [name, setName] = useState("");
   const [role, setRole] = useState("Thương mại điện tử & Đồ công nghệ");
@@ -26,8 +26,13 @@ export function AdminLegitManagement() {
   const [telegram, setTelegram] = useState("");
   const [phone, setPhone] = useState("");
   const [imgUrl, setImgUrl] = useState("");
+  const [facebook, setFacebook] = useState("");
+  const [address, setAddress] = useState("");
+  const [website, setWebsite] = useState("");
   const [successNotif, setSuccessNotif] = useState("");
   const [alertMsg, setAlertMsg] = useState("");
+
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   const insuranceValue = Number(insurance) || 0;
 
@@ -55,6 +60,34 @@ export function AdminLegitManagement() {
 
   const liveTier = getLiveTier(insuranceValue);
 
+  const resetForm = () => {
+    setName("");
+    setDesc("");
+    setTelegram("");
+    setPhone("");
+    setImgUrl("");
+    setInsurance("50000000");
+    setFacebook("");
+    setAddress("");
+    setWebsite("");
+    setEditingId(null);
+  };
+
+  const handleEditClick = (item: LegitProfile) => {
+    setEditingId(item.id);
+    setName(item.name);
+    setRole(item.role);
+    setInsurance(item.insurance.toString());
+    setDesc(item.desc);
+    setTelegram(item.telegram);
+    setPhone(item.phone);
+    setImgUrl(item.img);
+    setFacebook(item.facebook || "");
+    setAddress(item.address || "");
+    setWebsite(item.website || "");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setAlertMsg("");
@@ -78,27 +111,44 @@ export function AdminLegitManagement() {
     const defaultPlaceholder = "https://lh3.googleusercontent.com/aida-public/AB6AXuDKJ968Ro0Hzvi8zHp06GmLG63LozZe4NRvKhYCn5yYkPBsnsqfkGxNSYIVzs4lS-POI9dJ6jAkQf6sD-vfdHIDtRjTZt5qxga6QElHZZi8hh14MMbRsMjcPQ6I8mJBxflquF_-Day2hvABActcMHynjkDfrGLqrV2kTspaYVY23YkiaipC_0TeFQOxHxl9LM4TE-dbgwMegvZlElmVN3pqZPFObemSNzfEp9wu0_tgVPRuCXFTUY4UCprdbpksNSqX8bEQ7xrBNGdH";
     const finalImg = imgUrl.trim() || defaultPlaceholder;
 
-    await addLegitProfile({
-      name: name.trim(),
-      role: role.trim(),
-      desc: desc.trim(),
-      insurance: insuranceValue,
-      score: 100,
-      successTrans: 1,
-      telegram: telegram.trim() ? (telegram.startsWith("@") ? telegram.trim() : `@${telegram.trim()}`) : "@verified_merchant",
-      phone: phone.trim() || "09x xxx xxxx",
-      img: finalImg,
-      joinDate: new Date().toLocaleDateString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }).substring(3),
-      businessType: role.trim()
-    });
-
-    setName("");
-    setDesc("");
-    setTelegram("");
-    setPhone("");
-    setImgUrl("");
-    setInsurance("50000000");
-    setSuccessNotif(`Đã cấp hồ sơ ký quỹ uy tín thành công cho đơn vị: "${name.trim()}".`);
+    if (editingId !== null) {
+      const success = await updateLegitProfile(editingId, {
+        name: name.trim(),
+        role: role.trim(),
+        desc: desc.trim(),
+        insurance: insuranceValue,
+        telegram: telegram.trim() ? (telegram.startsWith("@") ? telegram.trim() : `@${telegram.trim()}`) : "@verified_merchant",
+        phone: phone.trim() || "09x xxx xxxx",
+        img: finalImg,
+        businessType: role.trim(),
+        facebook: facebook.trim(),
+        address: address.trim(),
+        website: website.trim()
+      });
+      if (success) {
+        setSuccessNotif(`Đã cập nhật thông tin thành công cho đơn vị: "${name.trim()}".`);
+        resetForm();
+      }
+    } else {
+      await addLegitProfile({
+        name: name.trim(),
+        role: role.trim(),
+        desc: desc.trim(),
+        insurance: insuranceValue,
+        score: 100,
+        successTrans: 1,
+        telegram: telegram.trim() ? (telegram.startsWith("@") ? telegram.trim() : `@${telegram.trim()}`) : "@verified_merchant",
+        phone: phone.trim() || "09x xxx xxxx",
+        img: finalImg,
+        joinDate: new Date().toLocaleDateString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }).substring(3),
+        businessType: role.trim(),
+        facebook: facebook.trim(),
+        address: address.trim(),
+        website: website.trim()
+      });
+      setSuccessNotif(`Đã cấp hồ sơ ký quỹ uy tín thành công cho đơn vị: "${name.trim()}".`);
+      resetForm();
+    }
   };
 
   const handleDelete = async (id: string | number, merchantName: string) => {
@@ -161,12 +211,19 @@ export function AdminLegitManagement() {
     {
       key: "actions",
       header: "Tuỳ chọn",
-      className: "w-24 min-w-[90px] text-right",
+      className: "w-40 min-w-[150px] text-right",
       cell: (item) => (
-        <div className="text-right" onClick={(e) => e.stopPropagation()}>
+        <div className="flex gap-2 justify-end items-center" onClick={(e) => e.stopPropagation()}>
+          <button
+            onClick={() => handleEditClick(item)}
+            className="bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-colors shrink-0 cursor-pointer whitespace-nowrap flex items-center gap-1"
+          >
+            <span className="material-symbols-outlined text-xs">edit</span>
+            <span>Sửa</span>
+          </button>
           <button
             onClick={() => handleDelete(item.id, item.name)}
-            className="bg-red-50 hover:bg-red-100 text-red-650 border border-red-200 text-red-600 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-colors shrink-0 cursor-pointer whitespace-nowrap flex items-center gap-1 ml-auto"
+            className="bg-red-50 hover:bg-red-100 text-red-650 border border-red-200 text-red-600 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-colors shrink-0 cursor-pointer whitespace-nowrap flex items-center gap-1"
           >
             <Trash2 className="w-3 h-3" />
             <span>Thu hồi</span>
@@ -217,6 +274,34 @@ export function AdminLegitManagement() {
               {profileTier.label}
             </span>
           </div>
+
+          {item.facebook && (
+            <div className="flex items-center gap-2.5 text-slate-650">
+              <span className="material-symbols-outlined text-base text-blue-600 font-bold">link</span>
+              <span className="font-bold text-slate-500">Facebook:</span>
+              <a href={item.facebook} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-bold" onClick={(e) => e.stopPropagation()}>
+                {item.facebook}
+              </a>
+            </div>
+          )}
+
+          {item.website && (
+            <div className="flex items-center gap-2.5 text-slate-650">
+              <span className="material-symbols-outlined text-base text-indigo-500 font-bold">language</span>
+              <span className="font-bold text-slate-500">Website:</span>
+              <a href={item.website.startsWith("http") ? item.website : `https://${item.website}`} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline font-bold" onClick={(e) => e.stopPropagation()}>
+                {item.website}
+              </a>
+            </div>
+          )}
+
+          {item.address && (
+            <div className="flex items-center gap-2.5 text-slate-650">
+              <span className="material-symbols-outlined text-base text-rose-500 font-bold">location_on</span>
+              <span className="font-bold text-slate-500">Địa chỉ:</span>
+              <span className="font-bold text-slate-800">{item.address}</span>
+            </div>
+          )}
         </div>
 
         {/* Right Info Column */}
@@ -288,10 +373,14 @@ export function AdminLegitManagement() {
           <div className="bg-white border border-outline-variant rounded-2xl p-6 md:p-8 shadow-sm space-y-6 sticky top-28 animate-fade-in">
             <div>
               <h2 className="text-xl font-black text-[#2e7d32] flex items-center gap-2">
-                <span className="material-symbols-outlined font-bold text-xl">add_circle</span>
-                Cấp hồ sơ Legit mới
+                <span className="material-symbols-outlined font-bold text-xl">
+                  {editingId !== null ? "edit_document" : "add_circle"}
+                </span>
+                {editingId !== null ? `Cập nhật hồ sơ Legit` : "Cấp hồ sơ Legit mới"}
               </h2>
-              <p className="text-xs text-on-surface-variant mt-1">Đăng ký mới một thương nhân đã được bộ phận rà soát thực tế ký quỹ giao dịch.</p>
+              <p className="text-xs text-on-surface-variant mt-1">
+                {editingId !== null ? "Chỉnh sửa thông tin chi tiết của thương nhân đã được cấp bảo chứng." : "Đăng ký mới một thương nhân đã được bộ phận rà soát thực tế ký quỹ giao dịch."}
+              </p>
             </div>
 
             {alertMsg && (
@@ -394,6 +483,40 @@ export function AdminLegitManagement() {
               </div>
 
               <div>
+                <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5 font-sans">Facebook URL</label>
+                <input
+                  className="w-full border-2 border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-[#2e7d32] outline-none shadow-sm transition-all focus:ring-4 focus:ring-emerald-50"
+                  placeholder="Ví dụ: https://facebook.com/techglobal"
+                  type="text"
+                  value={facebook}
+                  onChange={(e) => setFacebook(e.target.value)}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">Địa chỉ</label>
+                  <input
+                    className="w-full border-2 border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-[#2e7d32] outline-none shadow-sm transition-all focus:ring-4 focus:ring-emerald-50"
+                    placeholder="Ví dụ: Hà Nội, Việt Nam"
+                    type="text"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">Website</label>
+                  <input
+                    className="w-full border-2 border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-[#2e7d32] outline-none shadow-sm transition-all focus:ring-4 focus:ring-emerald-50"
+                    placeholder="Ví dụ: techglobal.com"
+                    type="text"
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div>
                 <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">Giới thiệu ngắn & năng lực giao dịch *</label>
                 <textarea
                   className="w-full border-2 border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-[#2e7d32] outline-none resize-none shadow-sm transition-all focus:ring-4 focus:ring-emerald-50 text-slate-800"
@@ -404,13 +527,26 @@ export function AdminLegitManagement() {
                 />
               </div>
 
-              <button
-                type="submit"
-                className="w-full bg-[#2e7d32] hover:bg-[#205c22] text-white text-xs py-3.5 rounded-xl mt-4 transition-all duration-300 font-extrabold uppercase tracking-widest shadow-md cursor-pointer active:scale-95 text-center flex items-center justify-center gap-1.5"
-              >
-                <span className="material-symbols-outlined text-sm">verified_user</span>
-                Ký duyệt cấp bảo hộ uy tín
-              </button>
+              <div className="flex gap-3">
+                <button
+                  type="submit"
+                  className="flex-grow bg-[#2e7d32] hover:bg-[#205c22] text-white text-xs py-3.5 rounded-xl mt-4 transition-all duration-300 font-extrabold uppercase tracking-widest shadow-md cursor-pointer active:scale-95 text-center flex items-center justify-center gap-1.5"
+                >
+                  <span className="material-symbols-outlined text-sm">
+                    {editingId !== null ? "save" : "verified_user"}
+                  </span>
+                  {editingId !== null ? "Lưu chỉnh sửa" : "Ký duyệt cấp bảo hộ uy tín"}
+                </button>
+                {editingId !== null && (
+                  <button
+                    type="button"
+                    onClick={resetForm}
+                    className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs py-3.5 px-5 rounded-xl mt-4 border border-slate-300 transition-all duration-300 font-extrabold uppercase tracking-widest cursor-pointer"
+                  >
+                    Hủy bỏ
+                  </button>
+                )}
+              </div>
             </form>
           </div>
         </section>

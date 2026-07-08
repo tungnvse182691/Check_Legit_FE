@@ -140,21 +140,17 @@ export function ScamDetail() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-4 border-t border-dashed border-outline-variant">
-              <div>
-                <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-1">
-                  {isWarning ? "Tính chất ảnh hưởng" : "Tổng Số Tiền Thiệt Hại"}
-                </span>
-                {isWarning ? (
+              {isWarning ? (
+                <div>
+                  <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-1">
+                    Tính chất ảnh hưởng
+                  </span>
                   <span className="font-mono text-amber-600 font-black text-lg sm:text-xl bg-amber-50 border border-amber-100 px-4 py-2.5 rounded-2xl inline-block mt-1">
                     Phi tài sản (0đ)
                   </span>
-                ) : (
-                  <span className="font-mono text-red-600 font-black text-2xl sm:text-3xl bg-red-50 border border-red-100 px-4 py-2.5 rounded-2xl inline-block mt-1">
-                    {matchedScam.amount.toLocaleString("vi-VN")} VNĐ
-                  </span>
-                )}
-              </div>
-              <div>
+                </div>
+              ) : null}
+              <div className={isWarning ? "" : "sm:col-span-2"}>
                 <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-1">Hình thức vi phạm</span>
                 <span className={`text-sm sm:text-base font-extrabold ${isWarning ? "text-amber-700 bg-amber-50 border-amber-100" : "text-red-700 bg-red-50 border-red-100"} px-4 py-2.5 rounded-2xl inline-block mt-1 capitalize`}>
                   {matchedScam.type}
@@ -208,6 +204,47 @@ export function ScamDetail() {
               </div>
             )}
           </section>
+
+          {/* Box 4: Người xác thực thông tin */}
+          {(matchedScam.verifierName || matchedScam.verifierZalo) && (
+            <section className="bg-white border border-outline-variant p-6 sm:p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+              <h2 className={`text-xl font-extrabold ${isWarning ? "text-amber-600" : "text-red-650 text-red-600"} mb-6 flex items-center gap-2.5`}>
+                <span className="material-symbols-outlined font-bold text-emerald-650">verified_user</span>
+                Người xác thực thông tin
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 bg-emerald-50/20 border border-emerald-100/60 p-5 rounded-2xl">
+                {matchedScam.verifierName && (
+                  <div className="bg-white border border-slate-100 p-4 rounded-xl shadow-sm flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center shadow-inner shrink-0 text-white">
+                      <span className="material-symbols-outlined text-lg font-bold">person</span>
+                    </div>
+                    <div className="text-left">
+                      <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Họ và tên</span>
+                      <span className="text-sm font-extrabold text-slate-800">{matchedScam.verifierName}</span>
+                    </div>
+                  </div>
+                )}
+                {matchedScam.verifierZalo && (
+                  <div className="bg-white border border-slate-100 p-4 rounded-xl shadow-sm flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-sky-500 flex items-center justify-center shadow-inner shrink-0 text-white">
+                      <span className="material-symbols-outlined text-lg font-bold">chat</span>
+                    </div>
+                    <div className="text-left">
+                      <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Zalo liên hệ</span>
+                      <a 
+                        href={`https://zalo.me/${matchedScam.verifierZalo.replace(/[^0-9]/g, "")}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-sm font-extrabold text-blue-600 hover:text-blue-800 hover:underline block"
+                      >
+                        {matchedScam.verifierZalo}
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
         </div>
 
         {/* Right Column - Verify Box & Advice */}

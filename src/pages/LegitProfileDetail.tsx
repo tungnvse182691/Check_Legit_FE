@@ -171,6 +171,55 @@ export function LegitProfileDetail() {
                     </div>
                   </div>
                 )}
+
+                {/* Facebook */}
+                {merchant.facebook && (
+                  <div className="bg-white/5 border border-white/10 p-4 rounded-2xl flex items-center justify-between hover:bg-white/10 transition-colors shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-inner">
+                        <span className="material-symbols-outlined text-white text-base font-bold">link</span>
+                      </div>
+                      <div>
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Facebook cá nhân / Fanpage</div>
+                        <a href={merchant.facebook} target="_blank" rel="noopener noreferrer" className="font-bold text-white text-sm tracking-wide hover:underline break-all block text-left" onClick={(e) => e.stopPropagation()}>
+                          {merchant.facebook}
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Website */}
+                {merchant.website && (
+                  <div className="bg-white/5 border border-white/10 p-4 rounded-2xl flex items-center justify-between hover:bg-white/10 transition-colors shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-inner">
+                        <span className="material-symbols-outlined text-white text-base font-bold">language</span>
+                      </div>
+                      <div>
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Website chính thức</div>
+                        <a href={merchant.website.startsWith("http") ? merchant.website : `https://${merchant.website}`} target="_blank" rel="noopener noreferrer" className="font-bold text-white text-sm tracking-wide hover:underline break-all block text-left" onClick={(e) => e.stopPropagation()}>
+                          {merchant.website}
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Address */}
+                {merchant.address && (
+                  <div className="bg-white/5 border border-white/10 p-4 rounded-2xl flex items-center justify-between hover:bg-white/10 transition-colors shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-rose-600 flex items-center justify-center shadow-inner">
+                        <span className="material-symbols-outlined text-white text-base font-bold">location_on</span>
+                      </div>
+                      <div>
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider text-left">Địa chỉ giao dịch</div>
+                        <div className="font-bold text-white text-sm tracking-wide break-all block text-left">{merchant.address}</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 

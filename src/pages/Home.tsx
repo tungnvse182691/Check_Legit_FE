@@ -3,6 +3,33 @@ import { Link, useNavigate } from "react-router-dom";
 import { useApp, API_BASE_URL } from "../context/AppContext";
 import { useDebounce } from "../hooks/useDebounce";
 
+const MOCK_ARTICLES = [
+  {
+    id: "1",
+    title: "Thủ đoạn dán đè mã QR lừa đảo tại các điểm quét thanh toán",
+    category: "CẢNH BÁO khẩn",
+    date: "18/06/2026",
+    desc: "Cảnh giác chiêu trò các đối tượng lợi dụng sơ hở d dán đè mã QR nhận tiền tại quầy, khiến tiền của khách hàng bị chuyển nhầm vào tài khoản kẻ gian.",
+    thumbnailUrl: "https://images.unsplash.com/photo-1601597111158-2fceff292cdc?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: "2",
+    title: "Quy trình 3 bước chuyển trung gian an toàn tránh bùng cọc",
+    category: "HƯỚNG DẪN",
+    date: "15/06/2026",
+    desc: "Chi tiết về cơ chế giao dịch có đặt cọc có ký quỹ bảo lãnh, giúp cả người mua và người bán an tâm tuyệt đối khi lần đầu giao dịch trực tuyến.",
+    thumbnailUrl: null
+  },
+  {
+    id: "3",
+    title: "Giả mạo nhân viên shipper gọi điện đòi tiền thu hộ COD",
+    category: "CHIÊU TRÒ MỚI",
+    date: "12/06/2026",
+    desc: "Hình thức kẻ gian tìm thông tin đơn hàng rò rỉ rồi gọi điện giả dạng shipper, bắt chuyển khoản thanh toán khi nạn nhân không trực tiếp nhận hàng.",
+    thumbnailUrl: "https://images.unsplash.com/photo-1566577134770-3d85bb3a9cc4?auto=format&fit=crop&w=600&q=80"
+  }
+];
+
 export function Home() {
   const { scams, legitList } = useApp();
   const navigate = useNavigate();
@@ -540,68 +567,48 @@ export function Home() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Article Card 1 */}
-          <article className="bg-white border border-outline-variant rounded-2xl overflow-hidden shadow-sm hover:scale-[1.03] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
-            <div className="p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="bg-red-50 text-red-850 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">CẢNH BÁO khẩn</span>
-                <span className="text-[10px] text-on-surface-variant font-bold">18/06/2026</span>
-              </div>
-              <h3 className="text-base font-extrabold text-on-surface mb-2 line-clamp-2 hover:text-primary transition-colors">
-                Thủ đoạn dán đè mã QR lừa đảo tại các điểm quét thanh toán
-              </h3>
-              <p className="text-xs sm:text-sm text-on-surface-variant line-clamp-3 leading-relaxed">
-                Cảnh giác chiêu trò các đối tượng lợi dụng sơ hở d dán đè mã QR nhận tiền tại quầy, khiến tiền của khách hàng bị chuyển nhầm vào tài khoản kẻ gian.
-              </p>
-            </div>
-            <div className="p-5 pt-0">
-              <span className="text-xs font-bold text-primary hover:underline cursor-pointer flex items-center gap-1">
-                Đọc bài viết <span className="text-sm">→</span>
-              </span>
-            </div>
-          </article>
-
-          {/* Article Card 2 */}
-          <article className="bg-white border border-outline-variant rounded-2xl overflow-hidden shadow-sm hover:scale-[1.03] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
-            <div className="p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="bg-emerald-50 text-emerald-850 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">HƯỚNG DẪN</span>
-                <span className="text-[10px] text-on-surface-variant font-bold">15/06/2026</span>
-              </div>
-              <h3 className="text-base font-extrabold text-on-surface mb-2 line-clamp-2 hover:text-primary transition-colors">
-                Quy trình 3 bước chuyển trung gian an toàn tránh bùng cọc
-              </h3>
-              <p className="text-xs sm:text-sm text-on-surface-variant line-clamp-3 leading-relaxed">
-                Chi tiết về cơ chế giao dịch có đặt cọc có ký quỹ bảo lãnh, giúp cả người mua và người bán an tâm tuyệt đối khi lần đầu giao dịch trực tuyến.
-              </p>
-            </div>
-            <div className="p-5 pt-0">
-              <span className="text-xs font-bold text-primary hover:underline cursor-pointer flex items-center gap-1">
-                Đọc bài viết <span className="text-sm">→</span>
-              </span>
-            </div>
-          </article>
-
-          {/* Article Card 3 */}
-          <article className="bg-white border border-outline-variant rounded-2xl overflow-hidden shadow-sm hover:scale-[1.03] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
-            <div className="p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="bg-amber-50 text-amber-850 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">CHIÊU TRÒ MỚI</span>
-                <span className="text-[10px] text-on-surface-variant font-bold">12/06/2026</span>
-              </div>
-              <h3 className="text-base font-extrabold text-on-surface mb-2 line-clamp-2 hover:text-primary transition-colors">
-                Giả mạo nhân viên shipper gọi điện đòi tiền thu hộ COD
-              </h3>
-              <p className="text-xs sm:text-sm text-on-surface-variant line-clamp-3 leading-relaxed">
-                Hình thức kẻ gian tìm thông tin đơn hàng rò rỉ rồi gọi điện giả dạng shipper, bắt chuyển khoản thanh toán khi nạn nhân không trực tiếp nhận hàng.
-              </p>
-            </div>
-            <div className="p-5 pt-0">
-              <span className="text-xs font-bold text-primary hover:underline cursor-pointer flex items-center gap-1">
-                Đọc bài viết <span className="text-sm">→</span>
-              </span>
-            </div>
-          </article>
+          {MOCK_ARTICLES.map((article) => {
+            const fallbackImage = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=600&q=80";
+            return (
+              <article key={article.id} className="bg-white border border-outline-variant rounded-2xl overflow-hidden shadow-sm hover:scale-[1.03] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+                <div className="aspect-video w-full bg-slate-100 border-b border-slate-100 overflow-hidden relative">
+                  <img
+                    src={article.thumbnailUrl || fallbackImage}
+                    alt={article.title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = fallbackImage;
+                    }}
+                  />
+                  <div className="absolute top-3 left-3">
+                    <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-md shadow-sm text-white ${
+                      article.category.includes("khẩn") ? "bg-red-600" :
+                      article.category.includes("HƯỚNG") ? "bg-emerald-600" : "bg-amber-600"
+                    }`}>
+                      {article.category}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="p-5 flex-grow flex flex-col justify-between">
+                  <div>
+                    <span className="text-[10px] text-on-surface-variant font-bold block mb-2">{article.date}</span>
+                    <h3 className="text-base font-extrabold text-on-surface mb-2 line-clamp-2 hover:text-primary transition-colors text-left">
+                      {article.title}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-on-surface-variant line-clamp-3 leading-relaxed text-left">
+                      {article.desc}
+                    </p>
+                  </div>
+                  <div className="pt-4 text-left">
+                    <span className="text-xs font-bold text-primary hover:underline cursor-pointer flex items-center gap-1">
+                      Đọc bài viết <span className="text-sm">→</span>
+                    </span>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
     </div>

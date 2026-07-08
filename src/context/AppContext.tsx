@@ -17,6 +17,8 @@ export interface ScamReport {
   facebook?: string;
   images: string[];
   category: "Lừa đảo tài chính" | "Cảnh báo hành vi";
+  verifierName?: string;
+  verifierZalo?: string;
 }
 
 export interface LegitProfile {
@@ -33,6 +35,9 @@ export interface LegitProfile {
   joinDate: string;
   businessType: string;
   tier?: string; // dynamic Tier badge from backend
+  facebook?: string;
+  address?: string;
+  website?: string;
 }
 
 export interface SystemSettings {
@@ -59,6 +64,7 @@ interface AppContextType {
   deleteScamReport: (id: string) => void;
   deleteLegitProfile: (id: string | number) => void;
   updateScamReport: (id: string, updatedReport: Partial<ScamReport>) => Promise<boolean>;
+  updateLegitProfile: (id: number, updatedProfile: Partial<LegitProfile>) => Promise<boolean>;
   login: (token: string) => void;
   logout: () => void;
   fetchSystemSettings: () => Promise<void>;
@@ -112,7 +118,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       tags: dto.tags || [],
       facebook: dto.facebook || "",
       images: dto.images || [],
-      category: category
+      category: category,
+      verifierName: dto.verifierName || "",
+      verifierZalo: dto.verifierZalo || ""
     };
   };
 
@@ -130,7 +138,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       successTrans: dto.successTrans,
       joinDate: dto.joinDate,
       businessType: dto.businessType,
-      tier: dto.tier
+      tier: dto.tier,
+      facebook: dto.facebook || "",
+      address: dto.address || "",
+      website: dto.website || ""
     };
   };
 
@@ -280,7 +291,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       insurance: profile.insurance,
       successTrans: 1,
       joinDate: new Date().toLocaleDateString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }).substring(3), // MM/YYYY
-      businessType: profile.businessType
+      businessType: profile.businessType,
+      facebook: profile.facebook || "",
+      address: profile.address || "",
+      website: profile.website || ""
     };
 
     try {
@@ -411,7 +425,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       facebook: updatedReport.facebook || "",
       tags: updatedReport.tags || [],
       images: updatedReport.images || [],
-      category: categoryEnum
+      category: categoryEnum,
+      verifierName: updatedReport.verifierName || "",
+      verifierZalo: updatedReport.verifierZalo || ""
     };
 
     try {
@@ -471,6 +487,56 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } catch (error) {
       console.error("Error deleting legit profile:", error);
       alert("Có lỗi xảy ra khi kết nối tới máy chủ.");
+    }
+  };
+
+  const updateLegitProfile = async (id: number, updatedProfile: Partial<LegitProfile>): Promise<boolean> => {
+    const payload = {
+      name: updatedProfile.name,
+      role: updatedProfile.role,
+      score: updatedProfile.score ?? 98,
+      img: updatedProfile.img || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=300&q=80",
+      desc: updatedProfile.desc,
+      phone: updatedProfile.phone,
+      telegram: updatedProfile.telegram,
+      insurance: updatedProfile.insurance,
+      successTrans: updatedProfile.successTrans ?? 1,
+      joinDate: updatedProfile.joinDate || new Date().toLocaleDateString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }).substring(3),
+      businessType: updatedProfile.businessType || updatedProfile.role,
+      facebook: updatedProfile.facebook || "",
+      address: updatedProfile.address || "",
+      website: updatedProfile.website || ""
+    };
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/admin/legit/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        await fetchAllData();
+        return true;
+      } else {
+        if (response.status === 401) {
+          alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.");
+          logout();
+        } else if (response.status === 500) {
+          alert("Lỗi hệ thống phía máy chủ (500). Vui lòng thử lại sau.");
+        } else {
+          const errorText = await response.text();
+          alert("Cập nhật hồ sơ thất bại: " + errorText);
+        }
+        return false;
+      }
+    } catch (error) {
+      console.error("Error updating legit profile:", error);
+      alert("Có lỗi xảy ra khi kết nối tới máy chủ.");
+      return false;
     }
   };
 
@@ -541,6 +607,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         deleteScamReport,
         deleteLegitProfile,
         updateScamReport,
+        updateLegitProfile,
         login,
         logout,
         fetchSystemSettings,

@@ -100,13 +100,7 @@ export function ScamList() {
                 {scam.desc}
               </p>
 
-              <div className="flex justify-between items-center pt-4 border-t border-dashed border-[#e5e7eb]">
-                <div>
-                  <span className="text-[#6b7280] text-xs uppercase">Thiệt hại</span>
-                  <span className="text-red-500 text-lg font-bold ml-2">
-                    {scam.amount.toLocaleString("vi-VN")} đ
-                  </span>
-                </div>
+              <div className="flex justify-end items-center pt-4 border-t border-dashed border-[#e5e7eb]">
                 <Link
                   to={`/reports/${scam.id}`}
                   className="flex items-center gap-1.5 bg-transparent border border-red-500 text-red-500 px-4 py-1.5 rounded-full text-sm font-medium hover:bg-red-550/5 hover:bg-red-50 transition-colors duration-200"

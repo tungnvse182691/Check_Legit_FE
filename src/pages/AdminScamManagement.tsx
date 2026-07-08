@@ -53,7 +53,9 @@ export function AdminScamManagement() {
       edited.accountNumber !== scam.accountNumber ||
       edited.desc !== scam.desc ||
       edited.victim !== scam.victim ||
-      edited.facebook !== scam.facebook
+      edited.facebook !== scam.facebook ||
+      edited.verifierName !== scam.verifierName ||
+      edited.verifierZalo !== scam.verifierZalo
     );
   };
 
@@ -282,80 +284,112 @@ export function AdminScamManagement() {
     return (
       <div 
         className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-slate-700 font-medium select-text"
-        onMouseUp={(e) => handleSelectionMouseUp(e, scam.id)}
+        onClick={(e) => e.stopPropagation()}
       >
         
         {/* Left Column - General Details */}
-        <div className="space-y-4">
-          <div className={`p-4 border rounded-xl ${isRowWarning ? "bg-amber-50/20 border-amber-100" : "bg-red-50/20 border-red-100"}`}>
-            <span className={`text-[10px] font-black uppercase tracking-widest block mb-1 ${isRowWarning ? "text-amber-800" : "text-red-700"}`}>
-              {isRowWarning ? "Đối tượng bị cảnh báo" : "Đối tượng bị tố cáo"}
-            </span>
-            <span 
-              data-redact-field="name"
-              className={`font-black text-sm uppercase tracking-tight ${isRowWarning ? "text-amber-700" : "text-red-650"}`}
-            >
-              {editedScam.name}
-            </span>
+        <div className="space-y-3">
+          <div className={`p-3 border rounded-xl ${isRowWarning ? "bg-amber-50/20 border-amber-100" : "bg-red-50/20 border-red-100"}`}>
+            <label className={`text-[10px] font-black uppercase tracking-widest block mb-1 ${isRowWarning ? "text-amber-800" : "text-red-700"}`}>
+              {isRowWarning ? "Đối tượng bị cảnh báo *" : "Đối tượng bị tố cáo *"}
+            </label>
+            <input 
+              type="text"
+              className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-black uppercase text-slate-800 outline-none focus:border-red-500"
+              value={editedScam.name}
+              onChange={(e) => updateField(scam.id, "name", e.target.value)}
+            />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl">
-              <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold block mb-0.5">Ngân hàng</span>
-              <span data-redact-field="bankName" className="font-extrabold text-slate-800">
-                {editedScam.bankName || "Không rõ"}
-              </span>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-slate-50 border border-slate-100 p-2.5 rounded-xl">
+              <label className="text-[10px] text-slate-500 uppercase tracking-wider font-bold block mb-1">Ngân hàng</label>
+              <input 
+                type="text"
+                className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-extrabold text-slate-800 outline-none"
+                value={editedScam.bankName}
+                onChange={(e) => updateField(scam.id, "bankName", e.target.value)}
+              />
             </div>
-            <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl">
-              <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold block mb-0.5">Số tài khoản</span>
-              <span 
-                data-redact-field="accountNumber"
-                className={`font-mono font-black ${isRowWarning ? "text-amber-600" : "text-red-650"}`}
-              >
-                {editedScam.accountNumber || "N/A"}
-              </span>
+            <div className="bg-slate-50 border border-slate-100 p-2.5 rounded-xl">
+              <label className="text-[10px] text-slate-500 uppercase tracking-wider font-bold block mb-1">Số tài khoản *</label>
+              <input 
+                type="text"
+                className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-mono font-black text-slate-800 outline-none"
+                value={editedScam.accountNumber}
+                onChange={(e) => updateField(scam.id, "accountNumber", e.target.value)}
+              />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl">
-              <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold block mb-0.5">Số điện thoại</span>
-              <span data-redact-field="phone" className="font-mono font-bold text-slate-800">
-                {editedScam.phone || "Không có"}
-              </span>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-slate-50 border border-slate-100 p-2.5 rounded-xl">
+              <label className="text-[10px] text-slate-500 uppercase tracking-wider font-bold block mb-1">Số điện thoại</label>
+              <input 
+                type="text"
+                className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-mono font-bold text-slate-800 outline-none"
+                value={editedScam.phone || ""}
+                onChange={(e) => updateField(scam.id, "phone", e.target.value)}
+              />
             </div>
-            <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl">
-              <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold block mb-0.5">Nạn nhân / Người tố</span>
-              <span data-redact-field="victim" className="font-bold text-slate-800">
-                {editedScam.victim || "Ẩn danh"}
-              </span>
+            <div className="bg-slate-50 border border-slate-100 p-2.5 rounded-xl">
+              <label className="text-[10px] text-slate-500 uppercase tracking-wider font-bold block mb-1">Nạn nhân / Người tố</label>
+              <input 
+                type="text"
+                className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800 outline-none"
+                value={editedScam.victim}
+                onChange={(e) => updateField(scam.id, "victim", e.target.value)}
+              />
             </div>
           </div>
         </div>
 
-        {/* Middle Column - Narrative & Social links */}
-        <div className="space-y-4">
-          <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl">
-            <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold block mb-1">Nhật trình cáo giác</span>
-            <div className="leading-relaxed text-slate-700 font-medium whitespace-pre-line max-h-36 overflow-y-auto">
-              <span data-redact-field="desc">{editedScam.desc}</span>
-            </div>
+        {/* Middle Column - Narrative & Social links & Verification Info */}
+        <div className="space-y-3">
+          <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl">
+            <label className="text-[10px] text-slate-500 uppercase tracking-wider font-bold block mb-1">Nhật trình cáo giác</label>
+            <textarea
+              className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-700 outline-none resize-none"
+              rows={2}
+              value={editedScam.desc}
+              onChange={(e) => updateField(scam.id, "desc", e.target.value)}
+            />
           </div>
 
-          {editedScam.facebook && (
-            <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl">
-              <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold block mb-1">Đường dẫn mạng xã hội</span>
-              <a 
-                href={editedScam.facebook} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="text-blue-600 hover:underline font-bold break-all flex items-center gap-1"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <span data-redact-field="facebook">{editedScam.facebook}</span>
-              </a>
+          <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl">
+            <label className="text-[10px] text-slate-500 uppercase tracking-wider font-bold block mb-1">Đường dẫn mạng xã hội</label>
+            <input 
+              type="text"
+              className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-blue-600 outline-none"
+              value={editedScam.facebook || ""}
+              onChange={(e) => updateField(scam.id, "facebook", e.target.value)}
+              placeholder="https://facebook.com/..."
+            />
+          </div>
+
+          {/* Người xác thực & Zalo Người xác thực (Mục 7) */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-emerald-50/50 border border-emerald-100 p-2.5 rounded-xl">
+              <label className="text-[10px] text-emerald-850 uppercase tracking-wider font-bold block mb-1">Người xác thực</label>
+              <input 
+                type="text"
+                className="w-full bg-white border border-emerald-250 rounded-lg px-2 py-1 text-xs font-bold text-emerald-800 outline-none"
+                value={editedScam.verifierName || ""}
+                onChange={(e) => updateField(scam.id, "verifierName", e.target.value)}
+                placeholder="Ví dụ: Nguyễn Văn A"
+              />
             </div>
-          )}
+            <div className="bg-emerald-50/50 border border-emerald-100 p-2.5 rounded-xl">
+              <label className="text-[10px] text-emerald-850 uppercase tracking-wider font-bold block mb-1">Zalo xác thực</label>
+              <input 
+                type="text"
+                className="w-full bg-white border border-emerald-250 rounded-lg px-2 py-1 text-xs font-mono font-bold text-emerald-800 outline-none"
+                value={editedScam.verifierZalo || ""}
+                onChange={(e) => updateField(scam.id, "verifierZalo", e.target.value)}
+                placeholder="Ví dụ: 0987654321"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Right Column - Images & Bottom Actions */}
