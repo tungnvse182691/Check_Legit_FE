@@ -77,6 +77,12 @@ export function Warnings() {
                     <h3 className="font-extrabold text-lg text-on-surface line-clamp-1">
                       {warning.name}
                     </h3>
+                    {warning.reportCount > 1 && (
+                      <div className="inline-flex items-center gap-1 bg-red-50 text-red-600 px-2.5 py-1 rounded-md text-xs font-bold border border-red-100 w-fit mt-2">
+                        <span>⚠️</span>
+                        <span>{warning.reportCount} lượt tố cáo</span>
+                      </div>
+                    )}
                   </div>
                   <span className="text-[10px] font-bold text-on-surface-variant bg-slate-100 px-2 py-0.5 rounded-full uppercase shrink-0">
                     {warning.time || "Vừa xong"}

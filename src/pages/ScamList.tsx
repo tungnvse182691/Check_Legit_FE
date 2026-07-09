@@ -78,6 +78,13 @@ export function ScamList() {
                 {scam.name}
               </h3>
 
+              {scam.reportCount > 1 && (
+                <div className="inline-flex items-center gap-1 bg-red-50 text-red-600 px-2.5 py-1 rounded-md text-xs font-bold border border-red-100 w-fit">
+                  <span>⚠️</span>
+                  <span>{scam.reportCount} lượt tố cáo</span>
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-4 bg-slate-50 p-3 px-4 rounded-lg">
                 <div className="flex flex-col">
                   <span className="text-[#6b7280] text-xs mb-1 block">SĐT / Zalo:</span>
