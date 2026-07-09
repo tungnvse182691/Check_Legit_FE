@@ -79,7 +79,7 @@ export function Warnings() {
                     </h3>
                     {warning.reportCount > 1 && (
                       <div className="inline-flex items-center gap-1 bg-red-50 text-red-600 px-2.5 py-1 rounded-md text-xs font-bold border border-red-100 w-fit mt-2">
-                        <span>⚠️</span>
+                        <span className="material-symbols-outlined text-[14px] text-red-600 font-bold shrink-0">warning</span>
                         <span>{warning.reportCount} lượt tố cáo</span>
                       </div>
                     )}
