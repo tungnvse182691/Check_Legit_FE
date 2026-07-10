@@ -25,6 +25,7 @@ export function ReportScam() {
   const [phone, setPhone] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [bankName, setBankName] = useState("");
+  const [customBankName, setCustomBankName] = useState("");
   const [facebook, setFacebook] = useState("");
   const [amount, setAmount] = useState<number>(0);
   const [type, setType] = useState("");
@@ -191,6 +192,10 @@ export function ReportScam() {
       showError("Vui lòng chọn ngân hàng giao dịch.");
       return;
     }
+    if (bankName === "Other" && !customBankName.trim()) {
+      showError("Vui lòng nhập tên ngân hàng/ví điện tử.");
+      return;
+    }
     if (category === "Lừa đảo tài chính" && amount <= 0) {
       showError("Vui lòng nhập đúng số tiền đã bị thiệt hại.");
       return;
@@ -218,7 +223,7 @@ export function ReportScam() {
       await addScamReport({
         name,
         phone,
-        bankName,
+        bankName: bankName === "Other" ? customBankName.trim() : bankName,
         accountNumber,
         desc,
         type,
@@ -239,6 +244,7 @@ export function ReportScam() {
       setPhone("");
       setAccountNumber("");
       setBankName("");
+      setCustomBankName("");
       setFacebook("");
       setAmount(0);
       setType("");
@@ -401,7 +407,17 @@ export function ReportScam() {
                   <option>Viettel Money</option>
                   <option>Vietinbank</option>
                   <option>BIDV</option>
+                  <option value="Other">Khác (Nhập thủ công)</option>
                 </select>
+                {bankName === "Other" && (
+                  <input
+                    type="text"
+                    className="border-outline border px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                    placeholder="Nhập tên ngân hàng/ví điện tử..."
+                    value={customBankName}
+                    onChange={(e) => setCustomBankName(e.target.value)}
+                  />
+                )}
               </div>
               <div className="md:col-span-2 flex flex-col gap-2">
                 <label className="text-label-sm text-on-surface-variant">Link Facebook / TikTok / Telegram</label>
