@@ -73,7 +73,10 @@ interface AppContextType {
   updateSystemSettings: (data: Partial<SystemSettings>) => Promise<boolean>;
 }
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://becheckzone-production.up.railway.app/api";
+if (!import.meta.env.VITE_API_BASE_URL) {
+  console.warn("⚠️ [Config] VITE_API_BASE_URL chưa được cấu hình. Vui lòng kiểm tra biến môi trường trên Vercel hoặc file .env.local.");
+}
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
