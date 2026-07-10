@@ -73,7 +73,7 @@ interface AppContextType {
   updateSystemSettings: (data: Partial<SystemSettings>) => Promise<boolean>;
 }
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://checkzonebe-production.up.railway.app/api";
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://becheckzone-production.up.railway.app/api";
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
