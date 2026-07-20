@@ -59,7 +59,7 @@ export function LegitProfileDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* Left Card: Main Merchant Information */}
-        <div className="lg:col-span-8 space-y-8">
+        <div className="lg:col-span-7 space-y-8">
           <section className="bg-white border border-outline-variant p-6 sm:p-8 rounded-3xl shadow-sm hover:shadow-md transition-shadow relative overflow-hidden animate-fade-in">
             {/* Ambient Background Badge Grid */}
             <div className="absolute top-0 right-0 w-40 h-40 opacity-5 pointer-events-none transform translate-x-8 -translate-y-8">
@@ -91,7 +91,7 @@ export function LegitProfileDetail() {
                 </div>
 
                 {/* Role / Business Type Display */}
-                <div className="flex items-center gap-1.5 text-emerald-805 text-emerald-800 font-extrabold text-sm uppercase tracking-widest bg-emerald-50 px-3.5 py-1.5 rounded-full inline-flex border border-emerald-100/60">
+                <div className="flex items-center gap-1.5 text-emerald-800 font-extrabold text-sm uppercase tracking-widest bg-emerald-50 px-3.5 py-1.5 rounded-full inline-flex border border-emerald-100/60">
                   <span className="material-symbols-outlined text-base">category</span>
                   Ngành: {merchant.role}
                 </div>
@@ -112,16 +112,43 @@ export function LegitProfileDetail() {
                 <span className="material-symbols-outlined text-sm">info</span>
                 Mô tả tiểu thương
               </h3>
-              <p className="text-on-surface-variant text-base leading-relaxed bg-slate-5( bg-slate-50 border border-slate-100 p-6 rounded-2xl whitespace-pre-line font-medium text-slate-700">
+              <p className="text-on-surface-variant text-base leading-relaxed bg-slate-50 border border-slate-100 p-6 rounded-2xl whitespace-pre-line font-medium text-slate-700">
                 {merchant.desc}
               </p>
+            </div>
+
+            {/* Verified Bank Accounts Section */}
+            <div className="pt-8 border-t border-dashed border-outline-variant mt-8">
+              <h3 className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-4 flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-base text-emerald-600">account_balance</span>
+                Số tài khoản đã xác thực
+              </h3>
+              <div className="bg-emerald-50/70 border border-emerald-200/80 p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-white border border-emerald-200 flex items-center justify-center text-emerald-700 shadow-sm shrink-0">
+                    <span className="material-symbols-outlined text-2xl font-bold">credit_card</span>
+                  </div>
+                  <div>
+                    <p className="text-xs font-black text-emerald-900 uppercase tracking-wide">
+                      {merchant.bankName || "MB Bank (Ngân hàng đã xác minh)"}
+                    </p>
+                    <p className="font-mono text-lg font-black text-slate-900 tracking-wider mt-0.5">
+                      {merchant.accountNumber || merchant.phone || "Chưa cập nhật STK"}
+                    </p>
+                  </div>
+                </div>
+                <span className="inline-flex items-center gap-1.5 bg-emerald-700 text-white text-xs font-extrabold px-3.5 py-1.5 rounded-full w-fit shadow-sm">
+                  <span className="material-symbols-outlined text-sm">verified</span>
+                  Đã xác minh chính chủ
+                </span>
+              </div>
             </div>
           </section>
         </div>
 
-        {/* Right Card: Verified Contact Channels (No score or insurance value shown!) */}
-        <aside className="lg:col-span-4">
-          <section className="bg-gradient-to-b from-stone-900 to-emerald-950 text-white p-6 sm:p-7 rounded-3xl shadow-lg relative overflow-hidden flex flex-col justify-between h-full min-h-[400px]">
+        {/* Right Card: Verified Contact Channels (Wider Panel) */}
+        <aside className="lg:col-span-5">
+          <section className="bg-gradient-to-b from-stone-900 to-emerald-950 text-white p-7 sm:p-8 rounded-3xl shadow-lg relative overflow-hidden flex flex-col justify-between h-full min-h-[440px]">
             <div className="absolute top-0 right-0 opacity-[0.03] pointer-events-none transform translate-x-12 -translate-y-12">
               <span className="material-symbols-outlined text-[200px] text-emerald-200">lock_open</span>
             </div>
@@ -145,13 +172,13 @@ export function LegitProfileDetail() {
                 {/* Telegram */}
                 {merchant.telegram && (
                   <div className="bg-white/5 border border-white/10 p-4 rounded-2xl flex items-center justify-between hover:bg-white/10 transition-colors shadow-sm">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-cyan-600 flex items-center justify-center shadow-inner">
-                        <span className="material-symbols-outlined text-white text-base font-bold">send</span>
+                    <div className="flex items-center gap-3.5 w-full">
+                      <div className="w-11 h-11 rounded-xl bg-cyan-600 flex items-center justify-center shadow-inner shrink-0">
+                        <span className="material-symbols-outlined text-white text-lg font-bold">send</span>
                       </div>
-                      <div>
+                      <div className="flex-1 min-w-0">
                         <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Telegram chính chủ</div>
-                        <div className="font-bold text-white text-sm tracking-wide">{merchant.telegram}</div>
+                        <div className="font-bold text-white text-sm sm:text-base tracking-wide truncate">{merchant.telegram}</div>
                       </div>
                     </div>
                   </div>
@@ -160,13 +187,13 @@ export function LegitProfileDetail() {
                 {/* Phone */}
                 {merchant.phone && (
                   <div className="bg-white/5 border border-white/10 p-4 rounded-2xl flex items-center justify-between hover:bg-white/10 transition-colors shadow-sm">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center shadow-inner">
-                        <span className="material-symbols-outlined text-white text-base font-bold">call</span>
+                    <div className="flex items-center gap-3.5 w-full">
+                      <div className="w-11 h-11 rounded-xl bg-emerald-600 flex items-center justify-center shadow-inner shrink-0">
+                        <span className="material-symbols-outlined text-white text-lg font-bold">call</span>
                       </div>
-                      <div>
+                      <div className="flex-1 min-w-0">
                         <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Hotline / Zalo</div>
-                        <div className="font-bold text-white text-sm tracking-wide">{merchant.phone}</div>
+                        <div className="font-mono font-black text-white text-sm sm:text-base tracking-wide">{merchant.phone}</div>
                       </div>
                     </div>
                   </div>
@@ -175,14 +202,20 @@ export function LegitProfileDetail() {
                 {/* Facebook */}
                 {merchant.facebook && (
                   <div className="bg-white/5 border border-white/10 p-4 rounded-2xl flex items-center justify-between hover:bg-white/10 transition-colors shadow-sm">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-inner">
-                        <span className="material-symbols-outlined text-white text-base font-bold">link</span>
+                    <div className="flex items-center gap-3.5 w-full">
+                      <div className="w-11 h-11 rounded-xl bg-blue-600 flex items-center justify-center shadow-inner shrink-0">
+                        <span className="material-symbols-outlined text-white text-lg font-bold">link</span>
                       </div>
-                      <div>
+                      <div className="flex-1 min-w-0">
                         <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Facebook cá nhân / Fanpage</div>
-                        <a href={merchant.facebook} target="_blank" rel="noopener noreferrer" className="font-bold text-white text-sm tracking-wide hover:underline break-all block text-left" onClick={(e) => e.stopPropagation()}>
-                          {merchant.facebook}
+                        <a
+                          href={merchant.facebook.startsWith("http") ? merchant.facebook : `https://${merchant.facebook}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-extrabold text-blue-300 text-sm sm:text-base tracking-wide hover:underline truncate block mt-0.5"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {merchant.name}
                         </a>
                       </div>
                     </div>
@@ -192,13 +225,13 @@ export function LegitProfileDetail() {
                 {/* Website */}
                 {merchant.website && (
                   <div className="bg-white/5 border border-white/10 p-4 rounded-2xl flex items-center justify-between hover:bg-white/10 transition-colors shadow-sm">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-inner">
-                        <span className="material-symbols-outlined text-white text-base font-bold">language</span>
+                    <div className="flex items-center gap-3.5 w-full">
+                      <div className="w-11 h-11 rounded-xl bg-indigo-600 flex items-center justify-center shadow-inner shrink-0">
+                        <span className="material-symbols-outlined text-white text-lg font-bold">language</span>
                       </div>
-                      <div>
+                      <div className="flex-1 min-w-0">
                         <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Website chính thức</div>
-                        <a href={merchant.website.startsWith("http") ? merchant.website : `https://${merchant.website}`} target="_blank" rel="noopener noreferrer" className="font-bold text-white text-sm tracking-wide hover:underline break-all block text-left" onClick={(e) => e.stopPropagation()}>
+                        <a href={merchant.website.startsWith("http") ? merchant.website : `https://${merchant.website}`} target="_blank" rel="noopener noreferrer" className="font-bold text-white text-sm tracking-wide hover:underline truncate block mt-0.5" onClick={(e) => e.stopPropagation()}>
                           {merchant.website}
                         </a>
                       </div>
@@ -209,13 +242,13 @@ export function LegitProfileDetail() {
                 {/* Address */}
                 {merchant.address && (
                   <div className="bg-white/5 border border-white/10 p-4 rounded-2xl flex items-center justify-between hover:bg-white/10 transition-colors shadow-sm">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-rose-600 flex items-center justify-center shadow-inner">
-                        <span className="material-symbols-outlined text-white text-base font-bold">location_on</span>
+                    <div className="flex items-center gap-3.5 w-full">
+                      <div className="w-11 h-11 rounded-xl bg-rose-600 flex items-center justify-center shadow-inner shrink-0">
+                        <span className="material-symbols-outlined text-white text-lg font-bold">location_on</span>
                       </div>
-                      <div>
-                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider text-left">Địa chỉ giao dịch</div>
-                        <div className="font-bold text-white text-sm tracking-wide break-all block text-left">{merchant.address}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Địa chỉ giao dịch</div>
+                        <div className="font-bold text-white text-sm tracking-wide break-words block mt-0.5">{merchant.address}</div>
                       </div>
                     </div>
                   </div>
@@ -226,10 +259,10 @@ export function LegitProfileDetail() {
             {/* CTA Secure Action Button */}
             <div className="pt-8">
               <a
-                href={merchant.telegram ? `https://t.me/${merchant.telegram.replace("@", "")}` : `tel:${merchant.phone}`}
+                href={merchant.phone ? `https://zalo.me/${merchant.phone.replace(/[^0-9]/g, "")}` : "#"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full bg-emerald-650 bg-emerald-600 hover:bg-emerald-700 text-white text-center block font-black text-xs sm:text-sm py-4 rounded-2xl shadow-md min-h-[44px] transition-all duration-300 active:scale-[0.98] select-none hover:scale-[1.01]"
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-center block font-black text-xs sm:text-sm py-4 rounded-2xl shadow-md min-h-[44px] transition-all duration-300 active:scale-[0.98] select-none hover:scale-[1.01]"
               >
                 Liên Hệ Giao Dịch Ngay
               </a>

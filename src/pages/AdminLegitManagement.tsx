@@ -34,6 +34,21 @@ export function AdminLegitManagement() {
 
   const [editingId, setEditingId] = useState<number | null>(null);
 
+  const handleAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setAlertMsg("Dung lượng ảnh không được vượt quá 5MB.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImgUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const insuranceValue = Number(insurance) || 0;
 
   function getLiveTier(val: number) {
@@ -472,14 +487,39 @@ export function AdminLegitManagement() {
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">Ảnh logo thương nhân URL (Tuyển Chọn)</label>
-                <input
-                  className="w-full border-2 border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-[#2e7d32] outline-none shadow-sm transition-all focus:ring-4 focus:ring-emerald-50"
-                  placeholder="https://images.unsplash.com/photo-..."
-                  type="text"
-                  value={imgUrl}
-                  onChange={(e) => setImgUrl(e.target.value)}
-                />
+                <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">
+                  Ảnh đại diện / Logo thương nhân *
+                </label>
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <img
+                      src={imgUrl || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=300&q=80"}
+                      alt="Avatar Preview"
+                      className="w-14 h-14 rounded-full object-cover border-2 border-emerald-500 shadow-sm shrink-0"
+                    />
+                    <div className="flex-1 space-y-1.5">
+                      <label className="bg-[#2e7d32] hover:bg-[#205c22] text-white font-bold text-xs py-2 px-3.5 rounded-xl cursor-pointer inline-flex items-center gap-1.5 shadow-sm transition-all">
+                        <span className="material-symbols-outlined text-sm">cloud_upload</span>
+                        Tải ảnh từ máy tính
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleAvatarFileChange}
+                        />
+                      </label>
+                      <p className="text-[10px] text-slate-400 font-semibold">Tự động chọn file từ máy tính (JPG, PNG, WEBP)</p>
+                    </div>
+                  </div>
+
+                  <input
+                    className="w-full border-2 border-outline-variant rounded-xl px-4 py-2.5 text-xs focus:border-[#2e7d32] outline-none shadow-sm transition-all text-slate-600"
+                    placeholder="Hoặc dán đường dẫn ảnh (URL) tại đây..."
+                    type="text"
+                    value={imgUrl}
+                    onChange={(e) => setImgUrl(e.target.value)}
+                  />
+                </div>
               </div>
 
               <div>
