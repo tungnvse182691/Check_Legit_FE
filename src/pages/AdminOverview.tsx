@@ -15,9 +15,6 @@ export function AdminOverview() {
         {/* Header section with Forest Green touchpoints */}
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <span className="text-[#2e7d32] text-xs font-black uppercase tracking-widest bg-emerald-50 border border-emerald-100 px-3.5 py-1 rounded-full inline-block mb-1.5">
-              Hệ thống cảnh giới tối cao
-            </span>
             <h2 className="text-2xl md:text-3.5xl font-black text-slate-900 tracking-tight">Tổng quan hệ thống</h2>
             <p className="text-xs text-slate-500 mt-0.5">Số liệu thống kê thời gian thực từ cơ sở dữ liệu quốc gia Check Zone.</p>
           </div>

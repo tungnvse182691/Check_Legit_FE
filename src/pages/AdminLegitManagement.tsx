@@ -393,9 +393,6 @@ export function AdminLegitManagement() {
       <header className="bg-white border-b border-outline-variant px-6 py-6 md:px-6 sticky top-0 z-10 shadow-sm shrink-0">
         <div className="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <span className="text-[#2e7d32] text-xs font-black uppercase tracking-widest bg-emerald-50 border border-emerald-100 px-3.5 py-1 rounded-full inline-block mb-1.5">
-              Chứng thực chất lượng giao dịch
-            </span>
             <h1 className="text-2xl md:text-3.5xl font-black text-on-surface tracking-tight">
               Quản lý danh sách uy tín
             </h1>
