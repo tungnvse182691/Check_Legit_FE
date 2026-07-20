@@ -124,8 +124,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       facebook: dto.facebook || "",
       images: dto.images || [],
       category: category,
-      verifierName: dto.verifierName || "",
-      verifierZalo: dto.verifierZalo || "",
+      verifierName: dto.verifierName || dto.verifier || dto.verifier_name || dto.verifierNameText || "",
+      verifierZalo: dto.verifierZalo || dto.verifier_zalo || dto.zaloVerifier || dto.verifierPhone || dto.verifierContact || "",
       reportCount: dto.reportCount || 1,
       isDuplicate: dto.isDuplicate || false
     };
@@ -257,7 +257,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       facebook: report.facebook || "",
       images: report.images || [],
       category: categoryEnum,
-      turnstileToken: report.turnstileToken
+      turnstileToken: report.turnstileToken,
+      verifierName: report.verifierName || "",
+      verifierZalo: report.verifierZalo || "",
+      verifier: report.verifierName || "",
+      verifierContact: report.verifierZalo || ""
     };
 
     try {
@@ -435,6 +439,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       category: categoryEnum,
       verifierName: updatedReport.verifierName || "",
       verifierZalo: updatedReport.verifierZalo || "",
+      verifier: updatedReport.verifierName || "",
+      verifierContact: updatedReport.verifierZalo || "",
       reportCount: updatedReport.reportCount ?? 1
     };
 
