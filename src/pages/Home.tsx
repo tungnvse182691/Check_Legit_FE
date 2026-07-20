@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useApp, API_BASE_URL } from "../context/AppContext";
 import { useDebounce } from "../hooks/useDebounce";
+import { HighlightedText } from "../components/HighlightedText";
 
 const MOCK_ARTICLES = [
   {
@@ -55,35 +56,72 @@ export function Home() {
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const fetchLiveResults = async () => {
-      if (debouncedSearchTerm.trim().length < 2) {
-        setLiveResults([]);
-        setShowDropdown(false);
-        return;
-      }
+    const query = debouncedSearchTerm.trim();
+    if (query.length < 2) {
+      setLiveResults([]);
+      setShowDropdown(false);
+      return;
+    }
 
-      setIsSearching(true);
-      setShowDropdown(true);
+    setIsSearching(true);
+    setShowDropdown(true);
 
-      try {
-        const response = await fetch(`${API_BASE_URL}/public/reports/search?query=${encodeURIComponent(debouncedSearchTerm.trim())}`);
-        if (response.ok) {
-          const data = await response.json();
-          setLiveResults(data);
-        } else {
-          console.error("Failed to fetch live search results");
-          setLiveResults([]);
-        }
-      } catch (error) {
-        console.error("Error in live search:", error);
-        setLiveResults([]);
-      } finally {
-        setIsSearching(false);
-      }
-    };
+    const cleanQ = query.toLowerCase();
+    const cleanQNoSpace = cleanQ.replace(/\s+/g, "");
 
-    fetchLiveResults();
-  }, [debouncedSearchTerm]);
+    // 1. Search in approved Scam & Warning reports
+    const matchedScams = scams
+      .filter((s) => s.status === "Đã phê duyệt")
+      .filter((s) => {
+        const matchName = s.name.toLowerCase().includes(cleanQ);
+        const matchPhone = s.phone ? s.phone.replace(/\s+/g, "").toLowerCase().includes(cleanQNoSpace) : false;
+        const matchAcc = s.accountNumber ? s.accountNumber.replace(/\s+/g, "").toLowerCase().includes(cleanQNoSpace) : false;
+        const matchBank = s.bankName ? s.bankName.toLowerCase().includes(cleanQ) : false;
+        const matchId = s.id ? s.id.toLowerCase().includes(cleanQ) : false;
+        return matchName || matchPhone || matchAcc || matchBank || matchId;
+      })
+      .map((s) => ({
+        id: s.id,
+        name: s.name,
+        phone: s.phone,
+        accountNumber: s.accountNumber,
+        bankName: s.bankName,
+        type: s.type,
+        category: s.category,
+        status: s.status,
+        itemType: (s.category === "Cảnh báo hành vi" ? "warning" : "scam") as "scam" | "warning" | "legit",
+        link: `/reports/${s.id}`
+      }));
+
+    // 2. Search in verified Legit merchant profiles
+    const matchedLegit = legitList
+      .filter((l) => {
+        const matchName = l.name.toLowerCase().includes(cleanQ);
+        const matchPhone = l.phone ? l.phone.replace(/\s+/g, "").toLowerCase().includes(cleanQNoSpace) : false;
+        const matchTelegram = l.telegram ? l.telegram.toLowerCase().includes(cleanQ) : false;
+        const matchBusiness = l.businessType ? l.businessType.toLowerCase().includes(cleanQ) : false;
+        const matchRole = l.role ? l.role.toLowerCase().includes(cleanQ) : false;
+        return matchName || matchPhone || matchTelegram || matchBusiness || matchRole;
+      })
+      .map((l) => ({
+        id: `legit-${l.id}`,
+        originalId: l.id,
+        name: l.name,
+        phone: l.phone,
+        accountNumber: l.telegram || "",
+        bankName: l.businessType || l.role || "Thương nhân uy tín",
+        type: l.role || "Thương nhân uy tín",
+        status: "UY TÍN",
+        insurance: l.insurance,
+        tier: l.tier,
+        itemType: "legit" as const,
+        link: `/legit/${l.id}`
+      }));
+
+    const combined = [...matchedScams, ...matchedLegit];
+    setLiveResults(combined);
+    setIsSearching(false);
+  }, [debouncedSearchTerm, scams, legitList]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -212,41 +250,69 @@ export function Home() {
                       Kết quả tìm kiếm ({liveResults.length})
                     </div>
                     {liveResults.map((item) => {
-                      const isWarning = item.category === 1 || item.category === "Cảnh báo hành vi";
-                      const statusText = item.status === "Đã phê duyệt" ? "Đã duyệt" : item.status;
+                      const isLegit = item.itemType === "legit";
+                      const isWarning = item.itemType === "warning" || item.category === 1 || item.category === "Cảnh báo hành vi";
+                      const statusText = isLegit ? "UY TÍN" : (item.status === "Đã phê duyệt" ? "Đã duyệt" : item.status);
+
                       return (
                         <div
                           key={item.id}
                           onClick={() => {
-                            navigate(`/reports/${item.id}`);
+                            navigate(item.link || (isLegit ? `/legit/${item.originalId || item.id}` : `/reports/${item.id}`));
                             setShowDropdown(false);
                           }}
-                          className="px-4 py-3 hover:bg-slate-50 flex items-center justify-between gap-4 cursor-pointer transition-all duration-150 border-l-4 border-transparent hover:border-emerald-600"
+                          className={`px-4 py-3 hover:bg-slate-50 flex items-center justify-between gap-4 cursor-pointer transition-all duration-150 border-l-4 ${
+                            isLegit
+                              ? "border-transparent hover:border-emerald-600 bg-emerald-50/20"
+                              : isWarning
+                              ? "border-transparent hover:border-amber-500 hover:bg-amber-50/10"
+                              : "border-transparent hover:border-red-500 hover:bg-red-50/10"
+                          }`}
                         >
                           <div className="flex flex-col text-left min-w-0">
-                            <span className="font-extrabold text-sm text-slate-800 truncate capitalize">
-                              {item.name}
-                            </span>
+                            <div className="flex items-center gap-1.5 font-extrabold text-sm text-slate-800 truncate capitalize">
+                              <HighlightedText text={item.name} highlight={searchTerm} className="truncate" />
+                              {isLegit && (
+                                <span className="material-symbols-outlined text-emerald-600 text-sm shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>
+                                  verified
+                                </span>
+                              )}
+                            </div>
                             <span className="text-xs text-slate-500 font-mono mt-0.5">
-                              {item.accountNumber ? `STK: ${item.accountNumber}` : ""}
+                              {item.accountNumber ? (
+                                <>
+                                  <span>{isLegit ? "Telegram/TK: " : "STK: "}</span>
+                                  <HighlightedText text={item.accountNumber} highlight={searchTerm} />
+                                </>
+                              ) : null}
                               {item.accountNumber && item.phone ? " | " : ""}
-                              {item.phone ? `SĐT: ${item.phone}` : ""}
+                              {item.phone ? (
+                                <>
+                                  <span>SĐT: </span>
+                                  <HighlightedText text={item.phone} highlight={searchTerm} />
+                                </>
+                              ) : null}
                               {item.bankName ? ` (${item.bankName})` : ""}
                             </span>
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
                             <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full border ${
-                              isWarning
+                              isLegit
+                                ? "bg-emerald-100 text-emerald-900 border-emerald-300"
+                                : isWarning
                                 ? "bg-amber-50 text-amber-800 border-amber-200"
                                 : "bg-red-50 text-red-800 border-red-200"
                             }`}>
-                              {item.type || (isWarning ? "Cảnh báo" : "Lừa đảo")}
+                              {isLegit ? (item.type || "Thương nhân") : (item.type || (isWarning ? "Cảnh báo" : "Lừa đảo"))}
                             </span>
-                            <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full border ${
-                              item.status === "Đã phê duyệt"
+                            <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full border flex items-center gap-1 ${
+                              isLegit
+                                ? "bg-emerald-600 text-white border-emerald-600 shadow-xs"
+                                : item.status === "Đã phê duyệt"
                                 ? "bg-emerald-50 text-emerald-800 border-emerald-250"
                                 : "bg-amber-50 text-amber-850 border-amber-200"
                             }`}>
+                              {isLegit && <span className="material-symbols-outlined text-[10px]">check_circle</span>}
                               {statusText}
                             </span>
                           </div>
