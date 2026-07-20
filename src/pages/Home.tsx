@@ -31,6 +31,20 @@ const MOCK_ARTICLES = [
   }
 ];
 
+const highlightText = (text: string | undefined | null, highlight: string) => {
+  if (!text) return "";
+  if (!highlight.trim()) return text;
+  const escaped = highlight.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const parts = text.split(new RegExp(`(${escaped})`, "gi"));
+  return parts.map((part, i) =>
+    part.toLowerCase() === highlight.trim().toLowerCase() ? (
+      <strong key={i} className="font-extrabold text-black bg-yellow-200/90 rounded-xs px-0.5">{part}</strong>
+    ) : (
+      part
+    )
+  );
+};
+
 export function Home() {
   const { scams, legitList } = useApp();
   const navigate = useNavigate();
@@ -271,7 +285,7 @@ export function Home() {
                         >
                           <div className="flex flex-col text-left min-w-0">
                             <div className="flex items-center gap-1.5 font-extrabold text-sm text-slate-800 truncate capitalize">
-                              <HighlightedText text={item.name} highlight={searchTerm} className="truncate" />
+                              <span className="truncate">{highlightText(item.name, searchTerm)}</span>
                               {isLegit && (
                                 <span className="material-symbols-outlined text-emerald-600 text-sm shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>
                                   verified
@@ -282,14 +296,14 @@ export function Home() {
                               {item.accountNumber ? (
                                 <>
                                   <span>{isLegit ? "Telegram/TK: " : "STK: "}</span>
-                                  <HighlightedText text={item.accountNumber} highlight={searchTerm} />
+                                  {highlightText(item.accountNumber, searchTerm)}
                                 </>
                               ) : null}
                               {item.accountNumber && item.phone ? " | " : ""}
                               {item.phone ? (
                                 <>
                                   <span>SĐT: </span>
-                                  <HighlightedText text={item.phone} highlight={searchTerm} />
+                                  {highlightText(item.phone, searchTerm)}
                                 </>
                               ) : null}
                               {item.bankName ? ` (${item.bankName})` : ""}
