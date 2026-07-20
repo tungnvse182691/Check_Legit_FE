@@ -18,10 +18,6 @@ export function AdminOverview() {
             <h2 className="text-2xl md:text-3.5xl font-black text-slate-900 tracking-tight">Tổng quan hệ thống</h2>
             <p className="text-xs text-slate-500 mt-0.5">Số liệu thống kê thời gian thực từ cơ sở dữ liệu quốc gia Check Zone.</p>
           </div>
-          <span className="bg-emerald-55 bg-emerald-50 text-[#2e7d32] px-4 py-2 rounded-2xl font-mono text-xs font-bold border border-emerald-200 shadow-sm inline-flex items-center gap-1.5 self-start sm:self-auto uppercase">
-            <span className="w-2 h-2 rounded-full bg-[#2e7d32] animate-ping"></span>
-            Máy chủ đồng bộ • LIVE
-          </span>
         </header>
 
         {/* Stats Grid section using clean, white minimalist cards */}
