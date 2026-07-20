@@ -27,7 +27,7 @@ export function ScamList() {
         <div className="max-w-3xl">
 
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 text-red-600 tracking-tight leading-tight">
-            Danh sách đen tố cáo
+            Danh sách tố cáo
           </h1>
           <p className="text-body-lg text-on-surface-variant leading-relaxed">
             Danh sách các đối tượng, số điện thoại, và tài khoản ngân hàng đã được cộng đồng kiểm duyệt, xác thực hành vi lừa đảo trực tuyến. Hãy tra cứu kỹ thông tin trước khi thực hiện giao dịch chuyển tiền.
@@ -68,9 +68,6 @@ export function ScamList() {
               <div className="flex justify-between items-start gap-2.5">
                 <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-semibold capitalize leading-normal">
                   {scam.type}
-                </span>
-                <span className="text-[#9ca3af] text-[11px] shrink-0 text-right mt-1 whitespace-nowrap">
-                  {scam.time} - {scam.date}
                 </span>
               </div>
 

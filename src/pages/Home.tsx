@@ -626,7 +626,7 @@ export function Home() {
       <section className="max-w-[1400px] mx-auto px-6 mb-24">
         <div className="flex items-center gap-3 mb-8">
           <span className="material-symbols-outlined text-primary text-3xl font-bold">newspaper</span>
-          <h2 className="text-2xl font-extrabold text-on-surface">Tin tức cảnh báo mới</h2>
+          <h2 className="text-2xl font-extrabold text-on-surface">Tin tức mới</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
