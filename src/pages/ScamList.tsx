@@ -1,10 +1,13 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useApp } from "../context/AppContext";
+
+const ITEMS_PER_PAGE = 12;
 
 export function ScamList() {
   const { scams } = useApp();
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const approvedScams = scams.filter(s => s.status === "Đã phê duyệt" && s.category === "Lừa đảo tài chính");
 
@@ -20,12 +23,25 @@ export function ScamList() {
     );
   });
 
+  const totalPages = Math.ceil(filteredScams.length / ITEMS_PER_PAGE) || 1;
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const currentItems = filteredScams.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleClearSearch = () => {
+    setSearchTerm("");
+    setCurrentPage(1);
+  };
+
   return (
     <div className="max-w-max-width mx-auto px-6 md:px-margin-desktop py-12 min-h-screen">
       {/* Header Info */}
       <section className="mb-12">
         <div className="max-w-3xl">
-
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 text-red-600 tracking-tight leading-tight">
             Danh sách tố cáo
           </h1>
@@ -43,11 +59,11 @@ export function ScamList() {
               className="w-full border-none focus:outline-none bg-transparent text-sm sm:text-base py-2.5 text-on-surface outline-none"
               placeholder="Nhập số điện thoại, tài khoản, tên đối tượng..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
             />
             {searchTerm && (
               <button
-                onClick={() => setSearchTerm("")}
+                onClick={handleClearSearch}
                 className="text-on-surface-variant hover:text-red-600 mr-2 cursor-pointer focus:outline-none"
               >
                 <span className="material-symbols-outlined align-middle">close</span>
@@ -57,68 +73,124 @@ export function ScamList() {
         </div>
       </section>
 
-      {/* Grid of Scam Reports in 3 columns for large screens */}
-      {filteredScams.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredScams.map((scam) => (
-            <div
-              key={scam.id}
-              className="bg-white border border-[#e5e7eb] rounded-xl p-6 flex flex-col gap-4 transition-all duration-300 hover:border-red-500 hover:shadow-[0_10px_25px_-5px_rgba(239,68,68,0.1)] hover:-translate-y-0.5 animate-fade-in"
-            >
-              <div className="flex justify-between items-start gap-2.5">
-                <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-semibold capitalize leading-normal">
-                  {scam.type}
-                </span>
+      {/* Grid of Scam Reports in 3 columns (3 x 4 = 12 items per page) */}
+      {currentItems.length > 0 ? (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {currentItems.map((scam) => (
+              <div
+                key={scam.id}
+                className="bg-white border border-[#e5e7eb] rounded-xl p-6 flex flex-col gap-4 transition-all duration-300 hover:border-red-500 hover:shadow-[0_10px_25px_-5px_rgba(239,68,68,0.1)] hover:-translate-y-0.5 animate-fade-in"
+              >
+                <div className="flex justify-between items-start gap-2.5">
+                  <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs font-semibold capitalize leading-normal">
+                    {scam.type}
+                  </span>
+                </div>
+
+                <h3 className="text-lg font-bold text-slate-900 leading-snug m-0 line-clamp-1">
+                  {scam.name}
+                </h3>
+
+                {scam.reportCount > 1 && (
+                  <div className="inline-flex items-center gap-1 bg-red-50 text-red-600 px-2.5 py-1 rounded-md text-xs font-bold border border-red-100 w-fit">
+                    <span className="material-symbols-outlined text-[14px] text-red-600 font-bold shrink-0">warning</span>
+                    <span>{scam.reportCount} lượt tố cáo</span>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-4 bg-slate-50 p-3 px-4 rounded-lg">
+                  <div className="flex flex-col">
+                    <span className="text-[#6b7280] text-xs mb-1 block">SĐT / Zalo:</span>
+                    <span className="text-slate-800 text-sm font-semibold truncate block">
+                      {scam.phone || "Không có"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[#6b7280] text-xs mb-1 block">Tài khoản ngân hàng:</span>
+                    <span className="text-slate-800 text-sm font-semibold truncate block">
+                      {scam.accountNumber}
+                    </span>
+                    <span className="text-slate-600 text-xs mt-0.5 block">
+                      {scam.bankName}
+                    </span>
+                  </div>
+                </div>
+
+                <p className="text-slate-650 text-sm leading-relaxed m-0 line-clamp-2 grow">
+                  {scam.desc}
+                </p>
+
+                <div className="flex justify-end items-center pt-4 border-t border-dashed border-[#e5e7eb]">
+                  <Link
+                    to={`/reports/${scam.id}`}
+                    className="flex items-center gap-1.5 bg-transparent border border-red-500 text-red-500 px-4 py-1.5 rounded-full text-sm font-medium hover:bg-red-50 transition-colors duration-200"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                    Chi tiết
+                  </Link>
+                </div>
               </div>
+            ))}
+          </div>
 
-              <h3 className="text-lg font-bold text-slate-900 leading-snug m-0 line-clamp-1">
-                {scam.name}
-              </h3>
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200 pt-6">
+              <span className="text-sm text-slate-500 font-medium">
+                Hiển thị <strong className="text-slate-800">{startIndex + 1}</strong> - <strong className="text-slate-800">{Math.min(startIndex + ITEMS_PER_PAGE, filteredScams.length)}</strong> trên tổng số <strong className="text-slate-800">{filteredScams.length}</strong> báo cáo
+              </span>
 
-              {scam.reportCount > 1 && (
-                <div className="inline-flex items-center gap-1 bg-red-50 text-red-600 px-2.5 py-1 rounded-md text-xs font-bold border border-red-100 w-fit">
-                  <span className="material-symbols-outlined text-[14px] text-red-600 font-bold shrink-0">warning</span>
-                  <span>{scam.reportCount} lượt tố cáo</span>
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-4 bg-slate-50 p-3 px-4 rounded-lg">
-                <div className="flex flex-col">
-                  <span className="text-[#6b7280] text-xs mb-1 block">SĐT / Zalo:</span>
-                  <span className="text-slate-800 text-sm font-semibold truncate block">
-                    {scam.phone || "Không có"}
-                  </span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[#6b7280] text-xs mb-1 block">Tài khoản ngân hàng:</span>
-                  <span className="text-slate-800 text-sm font-semibold truncate block">
-                    {scam.accountNumber}
-                  </span>
-                  <span className="text-slate-600 text-xs mt-0.5 block">
-                    {scam.bankName}
-                  </span>
-                </div>
-              </div>
-
-              <p className="text-slate-650 text-sm leading-relaxed m-0 line-clamp-2 grow">
-                {scam.desc}
-              </p>
-
-              <div className="flex justify-end items-center pt-4 border-t border-dashed border-[#e5e7eb]">
-                <Link
-                  to={`/reports/${scam.id}`}
-                  className="flex items-center gap-1.5 bg-transparent border border-red-500 text-red-500 px-4 py-1.5 rounded-full text-sm font-medium hover:bg-red-550/5 hover:bg-red-50 transition-colors duration-200"
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    setCurrentPage((prev) => Math.max(prev - 1, 1));
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  disabled={currentPage === 1}
+                  className="px-3.5 py-2 rounded-xl text-sm font-bold border border-slate-200 text-slate-700 bg-white hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center gap-1 cursor-pointer"
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
-                  Chi tiết
-                </Link>
+                  <span className="material-symbols-outlined text-sm">chevron_left</span>
+                  <span>Trang trước</span>
+                </button>
+
+                <div className="flex items-center gap-1.5 px-2">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => {
+                        setCurrentPage(page);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      className={`w-9 h-9 rounded-xl text-sm font-extrabold transition-all cursor-pointer ${
+                        currentPage === page
+                          ? "bg-red-600 text-white shadow-sm scale-105"
+                          : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-100"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => {
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  disabled={currentPage === totalPages}
+                  className="px-3.5 py-2 rounded-xl text-sm font-bold border border-slate-200 text-slate-700 bg-white hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Trang sau</span>
+                  <span className="material-symbols-outlined text-sm">chevron_right</span>
+                </button>
               </div>
             </div>
-          ))}
-        </div>
+          )}
+        </>
       ) : (
         <div className="bg-slate-50 border border-outline-variant rounded-2xl p-12 text-center text-on-surface-variant">
           <span className="material-symbols-outlined text-5xl text-emerald-600 mb-4 font-bold">gpp_good</span>
