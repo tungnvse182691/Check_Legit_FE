@@ -201,40 +201,44 @@ export function Header() {
 export function Footer() {
   return (
     <footer className="bg-surface-container-low border-t border-outline-variant pt-16 pb-8">
-      <div className="max-w-max-width mx-auto px-6 md:px-margin-desktop grid grid-cols-1 md:grid-cols-4 gap-gutter mb-12">
+      <div className="max-w-max-width mx-auto px-6 md:px-margin-desktop grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
         <div className="md:col-span-1">
           <div className="text-headline-md text-primary font-extrabold mb-4 tracking-tight">CHECK ZONE</div>
-          <p className="text-body-md text-on-surface-variant">© 2024 CHECK ZONE. Uncompromising Vigilance.</p>
+          <p className="text-body-md text-on-surface-variant leading-relaxed">© 2024 CHECK ZONE. Uncompromising Vigilance.</p>
         </div>
         <div>
-          <div className="font-bold mb-4 uppercase text-xs tracking-widest text-on-surface">THÔNG TIN</div>
-          <ul className="space-y-2">
-            <li><Link to="/about" className="text-on-surface-variant hover:underline text-label-sm">Giới thiệu</Link></li>
-            <li><Link to="/about" className="text-on-surface-variant hover:underline text-label-sm">Liên hệ</Link></li>
-            <li><Link to="/about" className="text-on-surface-variant hover:underline text-label-sm">Chính sách bảo mật</Link></li>
+          <div className="font-extrabold mb-4 uppercase text-xs tracking-widest text-on-surface">THÔNG TIN</div>
+          <ul className="space-y-2 text-xs font-semibold">
+            <li><Link to="/about" className="text-on-surface-variant hover:text-primary hover:underline">GIỚI THIỆU</Link></li>
+            <li><Link to="/about" className="text-on-surface-variant hover:text-primary hover:underline">LIÊN HỆ</Link></li>
+            <li><Link to="/about" className="text-on-surface-variant hover:text-primary hover:underline">CÁCH SỬ DỤNG</Link></li>
+            <li><Link to="/about" className="text-on-surface-variant hover:text-primary hover:underline">QUY CHẾ CỘNG ĐỒNG</Link></li>
+            <li><Link to="/about" className="text-on-surface-variant hover:text-primary hover:underline">Thông báo miễn trừ trách nhiệm</Link></li>
           </ul>
         </div>
         <div>
-          <div className="font-bold mb-4 uppercase text-xs tracking-widest text-on-surface">Pháp lý</div>
-          <ul className="space-y-2">
-            <li><Link to="#" className="text-on-surface-variant hover:underline text-label-sm">Điều khoản sử dụng</Link></li>
-            <li><Link to="#" className="text-on-surface-variant hover:underline text-label-sm">Cơ chế khiếu nại</Link></li>
+          <div className="font-extrabold mb-4 uppercase text-xs tracking-widest text-on-surface">CHÍNH SÁCH</div>
+          <ul className="space-y-2 text-xs font-semibold">
+            <li><Link to="/about" className="text-on-surface-variant hover:text-primary hover:underline">ĐIỀU KHOẢN SỬ DỤNG</Link></li>
+            <li><Link to="/about" className="text-on-surface-variant hover:text-primary hover:underline">CHÍNH SÁCH BẢO MẬT</Link></li>
+            <li><Link to="/about" className="text-on-surface-variant hover:text-primary hover:underline">Chính sách tiếp nhận và xử lý</Link></li>
+            <li><Link to="/about" className="text-on-surface-variant hover:text-primary hover:underline">Chính sách khiếu nại</Link></li>
           </ul>
         </div>
         <div>
-          <div className="font-bold mb-4 uppercase text-xs tracking-widest text-on-surface">Kết nối</div>
-          <div className="flex gap-4">
-            <a href="#" className="bg-on-surface-variant/10 p-2 rounded-full hover:bg-primary/10 transition-colors">
-              <span className="material-symbols-outlined text-primary">public</span>
+          <div className="font-extrabold mb-4 uppercase text-xs tracking-widest text-on-surface">KẾT NỐI</div>
+          <div className="flex gap-3">
+            <a href="#" className="bg-on-surface-variant/10 p-2.5 rounded-full hover:bg-primary/10 transition-colors">
+              <span className="material-symbols-outlined text-primary text-base">public</span>
             </a>
-            <a href="#" className="bg-on-surface-variant/10 p-2 rounded-full hover:bg-primary/10 transition-colors">
-              <span className="material-symbols-outlined text-primary">share</span>
+            <a href="#" className="bg-on-surface-variant/10 p-2.5 rounded-full hover:bg-primary/10 transition-colors">
+              <span className="material-symbols-outlined text-primary text-base">share</span>
             </a>
           </div>
         </div>
       </div>
-      <div className="text-center border-t border-outline-variant pt-8 text-on-surface-variant text-label-sm px-4">
-        Nền tảng được bảo vệ bởi hệ thống an ninh đa lớp. Mọi hành vi tấn công dữ liệu sẽ bị truy cứu trách nhiệm pháp lý.
+      <div className="text-center border-t border-outline-variant pt-8 text-on-surface-variant text-xs font-medium px-4">
+        <span className="font-bold text-on-surface">Miễn trừ trách nhiệm:</span> Thông tin do cộng đồng cung cấp, tham khảo và cần được tự xác minh.
       </div>
     </footer>
   );
