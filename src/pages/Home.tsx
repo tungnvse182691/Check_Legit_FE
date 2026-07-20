@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useApp, API_BASE_URL } from "../context/AppContext";
 import { useDebounce } from "../hooks/useDebounce";
-import { HighlightedText } from "../components/HighlightedText";
+import { removeVietnameseTones, highlightText, HighlightedText } from "../components/HighlightedText";
 
 const MOCK_ARTICLES = [
   {
@@ -31,20 +31,6 @@ const MOCK_ARTICLES = [
   }
 ];
 
-const highlightText = (text: string | undefined | null, highlight: string) => {
-  if (!text) return "";
-  if (!highlight.trim()) return text;
-  const escaped = highlight.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const parts = text.split(new RegExp(`(${escaped})`, "gi"));
-  return parts.map((part, i) =>
-    part.toLowerCase() === highlight.trim().toLowerCase() ? (
-      <strong key={i} className="font-extrabold text-black bg-yellow-200/90 rounded-xs px-0.5">{part}</strong>
-    ) : (
-      part
-    )
-  );
-};
-
 export function Home() {
   const { scams, legitList } = useApp();
   const navigate = useNavigate();
@@ -71,7 +57,7 @@ export function Home() {
 
   useEffect(() => {
     const query = debouncedSearchTerm.trim();
-    if (query.length < 2) {
+    if (!query) {
       setLiveResults([]);
       setShowDropdown(false);
       return;
@@ -80,18 +66,25 @@ export function Home() {
     setIsSearching(true);
     setShowDropdown(true);
 
-    const cleanQ = query.toLowerCase();
-    const cleanQNoSpace = cleanQ.replace(/\s+/g, "");
+    const normQ = removeVietnameseTones(query).toLowerCase();
+    const normQNoSpace = normQ.replace(/\s+/g, "");
 
-    // 1. Search in approved Scam & Warning reports
+    // 1. Search in approved Scam & Warning reports (Accent-Insensitive)
     const matchedScams = scams
       .filter((s) => s.status === "Đã phê duyệt")
       .filter((s) => {
-        const matchName = s.name.toLowerCase().includes(cleanQ);
-        const matchPhone = s.phone ? s.phone.replace(/\s+/g, "").toLowerCase().includes(cleanQNoSpace) : false;
-        const matchAcc = s.accountNumber ? s.accountNumber.replace(/\s+/g, "").toLowerCase().includes(cleanQNoSpace) : false;
-        const matchBank = s.bankName ? s.bankName.toLowerCase().includes(cleanQ) : false;
-        const matchId = s.id ? s.id.toLowerCase().includes(cleanQ) : false;
+        const normName = removeVietnameseTones(s.name).toLowerCase();
+        const normPhone = s.phone ? removeVietnameseTones(s.phone).replace(/\s+/g, "").toLowerCase() : "";
+        const normAcc = s.accountNumber ? removeVietnameseTones(s.accountNumber).replace(/\s+/g, "").toLowerCase() : "";
+        const normBank = s.bankName ? removeVietnameseTones(s.bankName).toLowerCase() : "";
+        const normId = s.id ? s.id.toLowerCase() : "";
+
+        const matchName = normName.includes(normQ);
+        const matchPhone = normPhone ? normPhone.includes(normQNoSpace) : false;
+        const matchAcc = normAcc ? normAcc.includes(normQNoSpace) : false;
+        const matchBank = normBank ? normBank.includes(normQ) : false;
+        const matchId = normId ? normId.includes(normQ) : false;
+
         return matchName || matchPhone || matchAcc || matchBank || matchId;
       })
       .map((s) => ({
@@ -107,14 +100,21 @@ export function Home() {
         link: `/reports/${s.id}`
       }));
 
-    // 2. Search in verified Legit merchant profiles
+    // 2. Search in verified Legit merchant profiles (Accent-Insensitive)
     const matchedLegit = legitList
       .filter((l) => {
-        const matchName = l.name.toLowerCase().includes(cleanQ);
-        const matchPhone = l.phone ? l.phone.replace(/\s+/g, "").toLowerCase().includes(cleanQNoSpace) : false;
-        const matchTelegram = l.telegram ? l.telegram.toLowerCase().includes(cleanQ) : false;
-        const matchBusiness = l.businessType ? l.businessType.toLowerCase().includes(cleanQ) : false;
-        const matchRole = l.role ? l.role.toLowerCase().includes(cleanQ) : false;
+        const normName = removeVietnameseTones(l.name).toLowerCase();
+        const normPhone = l.phone ? removeVietnameseTones(l.phone).replace(/\s+/g, "").toLowerCase() : "";
+        const normTelegram = l.telegram ? removeVietnameseTones(l.telegram).toLowerCase() : "";
+        const normBusiness = l.businessType ? removeVietnameseTones(l.businessType).toLowerCase() : "";
+        const normRole = l.role ? removeVietnameseTones(l.role).toLowerCase() : "";
+
+        const matchName = normName.includes(normQ);
+        const matchPhone = normPhone ? normPhone.includes(normQNoSpace) : false;
+        const matchTelegram = normTelegram ? normTelegram.includes(normQ) : false;
+        const matchBusiness = normBusiness ? normBusiness.includes(normQ) : false;
+        const matchRole = normRole ? normRole.includes(normQ) : false;
+
         return matchName || matchPhone || matchTelegram || matchBusiness || matchRole;
       })
       .map((l) => ({
@@ -132,7 +132,8 @@ export function Home() {
         link: `/legit/${l.id}`
       }));
 
-    const combined = [...matchedScams, ...matchedLegit];
+    // Merge & limit results to max 15 items to prevent rendering lag
+    const combined = [...matchedScams, ...matchedLegit].slice(0, 15);
     setLiveResults(combined);
     setIsSearching(false);
   }, [debouncedSearchTerm, scams, legitList]);
@@ -154,15 +155,16 @@ export function Home() {
     if (!searchTerm.trim()) return;
 
     setShowDropdown(false);
-    const term = searchTerm.trim().replace(/\s+/g, "").toLowerCase();
+    const term = removeVietnameseTones(searchTerm.trim()).replace(/\s+/g, "").toLowerCase();
 
     // Check scam database
     const foundScam = scams.find((s) => {
       if (s.status !== "Đã phê duyệt") return false;
-      const matchPhone = s.phone?.replace(/\s+/g, "").toLowerCase() === term;
-      const matchAccountNumber = s.accountNumber?.replace(/\s+/g, "").toLowerCase() === term;
-      const matchName = s.name.replace(/\s+/g, "").toLowerCase().includes(term);
-      return matchPhone || matchAccountNumber || matchName;
+      const normPhone = s.phone ? removeVietnameseTones(s.phone).replace(/\s+/g, "").toLowerCase() : "";
+      const normAcc = s.accountNumber ? removeVietnameseTones(s.accountNumber).replace(/\s+/g, "").toLowerCase() : "";
+      const normName = removeVietnameseTones(s.name).replace(/\s+/g, "").toLowerCase();
+
+      return normPhone === term || normAcc === term || normName.includes(term);
     });
 
     if (foundScam) {
@@ -176,10 +178,11 @@ export function Home() {
 
     // Check legit database
     const foundLegit = legitList.find((l) => {
-      const matchPhone = l.phone?.replace(/\s+/g, "").toLowerCase() === term;
-      const matchTelegram = l.telegram?.replace(/\s+/g, "").toLowerCase() === term;
-      const matchName = l.name.replace(/\s+/g, "").toLowerCase().includes(term);
-      return matchPhone || matchTelegram || matchName;
+      const normPhone = l.phone ? removeVietnameseTones(l.phone).replace(/\s+/g, "").toLowerCase() : "";
+      const normTelegram = l.telegram ? removeVietnameseTones(l.telegram).replace(/\s+/g, "").toLowerCase() : "";
+      const normName = removeVietnameseTones(l.name).replace(/\s+/g, "").toLowerCase();
+
+      return normPhone === term || normTelegram === term || normName.includes(term);
     });
 
     if (foundLegit) {
