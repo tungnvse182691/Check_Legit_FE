@@ -361,7 +361,7 @@ export function Home() {
               className="w-full sm:w-1/2 flex items-center justify-center gap-3 bg-red-600 text-white hover:bg-red-700 py-4.5 px-6 rounded-2xl font-bold hover:scale-[1.02] hover:shadow-lg transition-all duration-300 text-center shadow-sm cursor-pointer"
             >
               <span className="material-symbols-outlined text-2xl">gpp_bad</span>
-              <span>BÁO CÁO LỪA ĐẢO</span>
+              <span>BÁO CÁO NGAY</span>
             </Link>
           </div>
         </div>
@@ -537,21 +537,11 @@ export function Home() {
                       </div>
                     </div>
 
-                    {/* Right: Amount & Detail link */}
+                    {/* Right: Detail link */}
                     <div className="flex flex-col items-start sm:items-end text-left sm:text-right shrink-0">
-                      {isReportWarning ? (
-                        <span className="text-sm font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-200/50">Phi tài sản (0đ)</span>
-                      ) : (
-                        <span className="text-lg sm:text-xl font-extrabold text-[#dc2626] tracking-tight">
-                          {Number(report.amount).toLocaleString("vi-VN")} đ
-                        </span>
-                      )}
-                      <span className="text-[11px] text-slate-400 font-medium mt-1">
-                        {report.time}
-                      </span>
                       <Link 
                         to={`/reports/${report.id}`} 
-                        className="mt-3.5 inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-[11px] font-bold text-slate-700 hover:text-slate-900 rounded-lg transition-all border border-slate-200/60"
+                        className="inline-flex items-center justify-center gap-1 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-[11px] font-bold text-slate-700 hover:text-slate-900 rounded-lg transition-all border border-slate-200/60"
                       >
                         <span>Chi tiết</span>
                         <span className="material-symbols-outlined text-[12px]">arrow_forward</span>
@@ -597,11 +587,6 @@ export function Home() {
                       <span className="material-symbols-outlined text-primary text-lg shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
                     </div>
                     <div className="text-xs text-slate-500 mt-0.5 truncate">{legit.role}</div>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <span className="text-[10px] text-[#2e7d32] font-black bg-emerald-50 border border-emerald-100 px-2.5 py-1 rounded-full whitespace-nowrap inline-block">
-                      {(legit.insurance).toLocaleString("vi-VN")}đ Quỹ
-                    </span>
                   </div>
                 </Link>
               ))}
