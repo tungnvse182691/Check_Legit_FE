@@ -59,7 +59,7 @@ export function ScamDetail() {
           </div>
           <div className="text-center md:text-left flex-1">
             <h1 className={`text-2xl sm:text-3xl font-black ${isWarning ? "text-amber-700" : "text-red-600"} uppercase tracking-tight`}>
-              {isWarning ? "Cảnh báo: Hành vi giao dịch xấu" : "Cảnh báo: Đối tượng lừa đảo"}
+              CẢNH BÁO GIAO DỊCH
             </h1>
             <p className={`text-sm sm:text-base ${isWarning ? "text-amber-950" : "text-red-955 text-red-950"} font-medium mt-1 leading-relaxed`}>
               {isWarning 
@@ -265,7 +265,7 @@ export function ScamDetail() {
             
             <div className={`${isWarning ? "bg-amber-50 border-amber-100" : "bg-red-50 border-red-100"} border p-5 rounded-2xl text-center mb-5`}>
               <span className={`font-mono text-3xl font-black ${isWarning ? "text-amber-600" : "text-red-600"} tracking-wider`}>
-                {isWarning ? "WARNING" : "SCAM"}
+                CẢNH BÁO
               </span>
               <p className={`text-xs ${isWarning ? "text-amber-800" : "text-red-800"} font-bold uppercase tracking-wider mt-2`}>
                 ĐÃ ĐƯỢC PHÊ DUYỆT

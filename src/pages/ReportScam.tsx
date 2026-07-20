@@ -29,6 +29,9 @@ export function ReportScam() {
   const [facebook, setFacebook] = useState("");
   const [amount, setAmount] = useState<number>(0);
   const [type, setType] = useState("");
+  const [customType, setCustomType] = useState("");
+  const [verifierName, setVerifierName] = useState("");
+  const [verifierZalo, setVerifierZalo] = useState("");
   const [desc, setDesc] = useState("");
 
   // Feedback States
@@ -226,13 +229,15 @@ export function ReportScam() {
         bankName: bankName === "Other" ? customBankName.trim() : bankName,
         accountNumber,
         desc,
-        type,
+        type: type === "Khác" ? (customType.trim() || "Khác") : type,
         amount: category === "Cảnh báo hành vi" ? 0 : amount,
         victim: "Ẩn danh",
         facebook,
         images: imageUrls,
         category,
-        turnstileToken: captchaToken
+        turnstileToken: captchaToken,
+        verifierName,
+        verifierZalo
       });
 
       // Show Success Modal
@@ -248,6 +253,9 @@ export function ReportScam() {
       setFacebook("");
       setAmount(0);
       setType("");
+      setCustomType("");
+      setVerifierName("");
+      setVerifierZalo("");
       setDesc("");
       setSelectedFiles([]);
       setCaptchaToken("");
@@ -328,8 +336,8 @@ export function ReportScam() {
                   className="mt-1 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300"
                 />
                 <div>
-                  <p className="font-bold text-sm text-red-900">Tố cáo lừa đảo tài chính</p>
-                  <p className="text-xs text-on-surface-variant mt-1">Giao dịch mất tiền cọc, đầu tư sàn ảo, hack tài khoản chiếm giữ số tiền...</p>
+                  <p className="font-bold text-sm text-red-900">TỐ CÁO LỪA ĐẢO</p>
+                  <p className="text-xs text-on-surface-variant mt-1">Giao dịch lừa tiền cọc, lừa tiền, hack tài khoản, lừa đảo....</p>
                 </div>
               </label>
 
@@ -346,8 +354,8 @@ export function ReportScam() {
                   className="mt-1 h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300"
                 />
                 <div>
-                  <p className="font-bold text-sm text-amber-900">Cảnh báo hành vi xấu</p>
-                  <p className="text-xs text-on-surface-variant mt-1">Boom hàng (bom hàng), giao hàng giả nhái, thái độ lồi lõm toxic khi giao dịch...</p>
+                  <p className="font-bold text-sm text-amber-900">CẢNH BÁO GIAO DỊCH / HÀNH VI XẤU</p>
+                  <p className="text-xs text-on-surface-variant mt-1">Boom hàng, hàng giả, hàng nhái, hàng sai mô tả, sai phạm khi giao dịch...</p>
                 </div>
               </label>
             </div>
@@ -497,6 +505,15 @@ export function ReportScam() {
                     </>
                   )}
                 </select>
+                {type === "Khác" && (
+                  <input
+                    type="text"
+                    className="border-outline border px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary mt-2"
+                    placeholder="Nhập loại hình cụ thể..."
+                    value={customType}
+                    onChange={(e) => setCustomType(e.target.value)}
+                  />
+                )}
               </div>
               <div className="md:col-span-2 flex flex-col gap-2">
                 <label className="text-label-sm text-on-surface-variant">Chi tiết vụ việc</label>
@@ -551,7 +568,7 @@ export function ReportScam() {
                           e.stopPropagation();
                           handleRemoveFile(idx);
                         }}
-                        className="absolute top-1 right-1 bg-red-650 bg-red-600 text-white rounded-full p-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity cursor-pointer flex items-center justify-center"
+                        className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity cursor-pointer flex items-center justify-center"
                         type="button"
                       >
                         <span className="material-symbols-outlined text-xs">close</span>
@@ -572,6 +589,36 @@ export function ReportScam() {
                 )}
               </div>
             )}
+          </section>
+
+          {/* Group 3.5: Verifier Fields */}
+          <section className="bg-surface-container-lowest p-8 border border-outline-variant rounded-xl">
+            <div className="flex items-center gap-2 mb-6 text-primary">
+              <span className="material-symbols-outlined">verified_user</span>
+              <h2 className="text-headline-md font-bold">Người xác thực & Zalo xác thực (Tùy chọn)</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="flex flex-col gap-2">
+                <label className="text-label-sm text-on-surface-variant">Người xác thực</label>
+                <input
+                  className="border-outline border px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                  placeholder="Nhập tên người xác thực..."
+                  type="text"
+                  value={verifierName}
+                  onChange={(e) => setVerifierName(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-label-sm text-on-surface-variant">Zalo xác thực</label>
+                <input
+                  className="border-outline border px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                  placeholder="Nhập SĐT / Link Zalo người xác thực..."
+                  type="text"
+                  value={verifierZalo}
+                  onChange={(e) => setVerifierZalo(e.target.value)}
+                />
+              </div>
+            </div>
           </section>
 
           {/* Security & CTA */}
