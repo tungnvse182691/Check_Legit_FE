@@ -5,49 +5,17 @@ import { useApp } from "../context/AppContext";
 export function LegitList() {
   const { legitList } = useApp();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedTag, setSelectedTag] = useState("all");
 
   const filteredLegit = legitList.filter((item) => {
     const query = searchTerm.toLowerCase().trim();
-    // Filter by search bar
-    const matchesSearch =
+    return (
       query === "" ||
       item.name.toLowerCase().includes(query) ||
       item.role.toLowerCase().includes(query) ||
       item.desc.toLowerCase().includes(query) ||
       (item.telegram && item.telegram.toLowerCase().includes(query)) ||
-      (item.phone && item.phone.toLowerCase().includes(query));
-
-    // Filter by tag
-    const matchesTag =
-      selectedTag === "all" ||
-      (selectedTag === "tmdt" && (
-        item.role.toLowerCase().includes("thương mại") ||
-        item.role.toLowerCase().includes("công nghệ") ||
-        item.role.toLowerCase().includes("iphone") ||
-        item.role.toLowerCase().includes("gaming") ||
-        item.role.toLowerCase().includes("order") ||
-        item.role.toLowerCase().includes("thiết bị") ||
-        item.role.toLowerCase().includes("thời trang") ||
-        item.role.toLowerCase().includes("mỹ phẩm") ||
-        item.role.toLowerCase().includes("f&b")
-      )) ||
-      (selectedTag === "agency" && (
-        item.role.toLowerCase().includes("freelancer") ||
-        item.role.toLowerCase().includes("sáng tạo") ||
-        item.role.toLowerCase().includes("thiết kế") ||
-        item.role.toLowerCase().includes("agency") ||
-        item.role.toLowerCase().includes("mạng") ||
-        item.role.toLowerCase().includes("nội dung")
-      )) ||
-      (selectedTag === "local" && (
-        item.role.toLowerCase().includes("dịch vụ") ||
-        item.role.toLowerCase().includes("tư vấn") ||
-        item.role.toLowerCase().includes("chuyên nghiệp") ||
-        item.role.toLowerCase().includes("trung gian")
-      ));
-
-    return matchesSearch && matchesTag;
+      (item.phone && item.phone.toLowerCase().includes(query))
+    );
   });
 
 
@@ -84,7 +52,7 @@ export function LegitList() {
               Danh sách uy tín
             </h1>
             <p className="text-body-lg text-on-surface-variant leading-relaxed">
-              Những nhà kinh doanh, cửa hàng và đơn vị chuyển đổi số được xét duyệt kỹ lưỡng và ký quỹ bảo hiểm giao dịch thành công. Toàn bộ thông tin được ghi nhận minh bạch và bảo mật cao.
+              Những người kinh doanh, seller, admin, cửa hàng và đơn vị được xét duyệt kỹ lưỡng và xác minh giao dịch thành công. Toàn bộ thông tin được ghi nhận minh bạch và bảo mật cao.
             </p>
           </div>
           
@@ -107,33 +75,6 @@ export function LegitList() {
                 </button>
               )}
             </div>
-          </div>
-          
-          <div className="flex flex-wrap gap-2.5">
-            <button 
-              onClick={() => setSelectedTag("all")}
-              className={`px-5 py-2 rounded-full text-label-sm border transition-all duration-305 font-bold cursor-pointer ${selectedTag === "all" ? "bg-primary text-white border-primary shadow-sm" : "bg-surface-container-low text-on-surface-variant border-outline-variant hover:border-primary"}`}
-            >
-              Tất cả cửa hàng
-            </button>
-            <button 
-              onClick={() => setSelectedTag("tmdt")}
-              className={`px-5 py-2 rounded-full text-label-sm border transition-all duration-305 font-bold cursor-pointer ${selectedTag === "tmdt" ? "bg-primary text-white border-primary shadow-sm" : "bg-surface-container-low text-on-surface-variant border-outline-variant hover:border-primary"}`}
-            >
-              Thương mại & Đồ công nghệ
-            </button>
-            <button 
-              onClick={() => setSelectedTag("agency")}
-              className={`px-5 py-2 rounded-full text-label-sm border transition-all duration-305 font-bold cursor-pointer ${selectedTag === "agency" ? "bg-primary text-white border-primary shadow-sm" : "bg-surface-container-low text-on-surface-variant border-outline-variant hover:border-primary"}`}
-            >
-              Freelancer & Sáng tạo nội dung
-            </button>
-            <button 
-              onClick={() => setSelectedTag("local")}
-              className={`px-5 py-2 rounded-full text-label-sm border transition-all duration-305 font-bold cursor-pointer ${selectedTag === "local" ? "bg-primary text-white border-primary shadow-sm" : "bg-surface-container-low text-on-surface-variant border-outline-variant hover:border-primary"}`}
-            >
-              Dịch vụ & Tư vấn chuyên nghiệp
-            </button>
           </div>
         </div>
       </section>
@@ -203,14 +144,7 @@ export function LegitList() {
                   </div>
                 </div>
 
-                <div className="p-6 pt-4 border-t border-outline-variant flex items-center justify-between bg-emerald-50/20">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] uppercase font-bold text-on-surface-variant tracking-wider">Hồ sơ xác minh</span>
-                    <span className="font-bold text-primary font-sans text-xs mt-0.5 flex items-center gap-0.5">
-                      <span className="material-symbols-outlined text-xs align-middle">gpp_good</span>
-                      Đã ký quỹ thành công
-                    </span>
-                  </div>
+                <div className="p-6 pt-4 border-t border-outline-variant flex items-center justify-end bg-emerald-50/20">
                   <Link 
                     to={`/legit/${item.id}`} 
                     className="text-xs sm:text-sm font-bold border border-outline px-5 py-2.5 rounded-xl hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 bg-white shadow-sm hover:scale-[1.02] active:scale-95 cursor-pointer"
