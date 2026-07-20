@@ -567,7 +567,7 @@ export function Home() {
             <div className="bg-emerald-50 p-6 flex items-center justify-between border-b border-emerald-200">
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-primary font-bold">verified</span>
-                <h2 className="text-xl sm:text-headline-md font-extrabold text-emerald-950">Danh sách uy tín đã ký quỹ</h2>
+                <h2 className="text-xl sm:text-headline-md font-extrabold text-emerald-950">Danh sách hồ sơ uy tín</h2>
               </div>
               <span className="text-primary text-label-sm font-extrabold uppercase tracking-widest bg-white px-3 py-1 rounded-full border border-emerald-100">Uy tín</span>
             </div>
@@ -602,7 +602,7 @@ export function Home() {
       <section className="max-w-[1400px] mx-auto px-6 mb-16">
         <div className="bg-primary hover:scale-[1.01] transition-all duration-300 text-on-primary rounded-3xl p-10 sm:p-12 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8 shadow-md">
           <div className="relative z-10 text-center md:text-left">
-            <span className="bg-white/20 text-white text-[10px] font-bold uppercase tracking-widest px-3.5 py-1 rounded-full inline-block mb-3 border border-white/10">Hồ sơ tín nhiệm</span>
+            <span className="bg-white/20 text-white text-[10px] font-bold uppercase tracking-widest px-3.5 py-1 rounded-full inline-block mb-3 border border-white/10">HỒ SƠ UY TÍN</span>
             <h2 className="text-2xl sm:text-headline-lg font-extrabold mb-4 leading-snug">
               Hãy tạo hồ sơ để tăng độ tin cậy với khách hàng và cộng đồng
             </h2>
