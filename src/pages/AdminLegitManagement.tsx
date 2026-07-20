@@ -32,21 +32,48 @@ export function AdminLegitManagement() {
   const [successNotif, setSuccessNotif] = useState("");
   const [alertMsg, setAlertMsg] = useState("");
 
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
 
-  const handleAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        setAlertMsg("Dung lượng ảnh không được vượt quá 5MB.");
-        return;
-      }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImgUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setAlertMsg("Dung lượng ảnh không được vượt quá 5MB.");
+      return;
     }
+
+    setAlertMsg("");
+    setIsUploadingAvatar(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+      const apiKey = import.meta.env.VITE_IMGBB_API_KEY || "49299870d79f975d7cbf058f2d0d7d39";
+      const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const resData = await response.json();
+        if (resData.success && resData.data && resData.data.url) {
+          setImgUrl(resData.data.url);
+          setIsUploadingAvatar(false);
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn("ImgBB upload error, falling back to data URL:", err);
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImgUrl(reader.result as string);
+      setIsUploadingAvatar(false);
+    };
+    reader.readAsDataURL(file);
   };
 
   const insuranceValue = Number(insurance) || 0;
@@ -498,14 +525,17 @@ export function AdminLegitManagement() {
                       className="w-14 h-14 rounded-full object-cover border-2 border-emerald-500 shadow-sm shrink-0"
                     />
                     <div className="flex-1 space-y-1.5">
-                      <label className="bg-[#2e7d32] hover:bg-[#205c22] text-white font-bold text-xs py-2 px-3.5 rounded-xl cursor-pointer inline-flex items-center gap-1.5 shadow-sm transition-all">
-                        <span className="material-symbols-outlined text-sm">cloud_upload</span>
-                        Tải ảnh từ máy tính
+                      <label className={`bg-[#2e7d32] hover:bg-[#205c22] text-white font-bold text-xs py-2 px-3.5 rounded-xl cursor-pointer inline-flex items-center gap-1.5 shadow-sm transition-all ${isUploadingAvatar ? "opacity-60 pointer-events-none" : ""}`}>
+                        <span className={`material-symbols-outlined text-sm ${isUploadingAvatar ? "animate-spin" : ""}`}>
+                          {isUploadingAvatar ? "sync" : "cloud_upload"}
+                        </span>
+                        {isUploadingAvatar ? "Đang tải ảnh lên..." : "Tải ảnh từ máy tính"}
                         <input
                           type="file"
                           accept="image/*"
                           className="hidden"
                           onChange={handleAvatarFileChange}
+                          disabled={isUploadingAvatar}
                         />
                       </label>
                       <p className="text-[10px] text-slate-400 font-semibold">Tự động chọn file từ máy tính (JPG, PNG, WEBP)</p>
