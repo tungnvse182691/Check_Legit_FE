@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { API_BASE_URL } from "../context/AppContext";
 
 export function About() {
   const { hash } = useLocation();
@@ -8,6 +9,7 @@ export function About() {
   const [senderName, setSenderName] = useState("");
   const [senderEmail, setSenderEmail] = useState("");
   const [senderMessage, setSenderMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   useEffect(() => {
@@ -23,19 +25,44 @@ export function About() {
     }
   }, [hash]);
 
-  const handleContactSubmit = (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!senderName.trim() || !senderEmail.trim() || !senderMessage.trim()) {
       alert("Vui lòng điền đầy đủ tất cả thông tin liên lạc trước khi gửi bưu chính.");
       return;
     }
-    setSubmitSuccess(true);
-    setSenderName("");
-    setSenderEmail("");
-    setSenderMessage("");
-    setTimeout(() => {
-      setSubmitSuccess(false);
-    }, 4500);
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/public/contact`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: senderName.trim(),
+          email: senderEmail.trim(),
+          message: senderMessage.trim()
+        })
+      });
+
+      if (response.ok) {
+        setSubmitSuccess(true);
+        setSenderName("");
+        setSenderEmail("");
+        setSenderMessage("");
+        setTimeout(() => {
+          setSubmitSuccess(false);
+        }, 5000);
+      } else {
+        alert("Gửi liên hệ thất bại. Vui lòng thử lại sau.");
+      }
+    } catch (error) {
+      console.error("Lỗi khi gửi liên hệ:", error);
+      alert("Có lỗi xảy ra khi kết nối tới máy chủ.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -196,10 +223,11 @@ export function About() {
 
               <button
                 type="submit"
-                className="w-full bg-[#2e7d32] hover:bg-[#205c22] text-white font-extrabold uppercase py-3.5 rounded-xl transition-all shadow-md active:scale-[0.98] cursor-pointer text-center text-xs flex items-center justify-center gap-1"
+                disabled={isSubmitting}
+                className="w-full bg-[#2e7d32] hover:bg-[#205c22] disabled:bg-slate-300 text-white font-extrabold uppercase py-3.5 rounded-xl transition-all shadow-md active:scale-[0.98] cursor-pointer text-center text-xs flex items-center justify-center gap-1"
               >
                 <span className="material-symbols-outlined text-sm">send</span>
-                Gửi Thông Tin Liên Hệ
+                {isSubmitting ? "Đang gửi..." : "Gửi Thông Tin Liên Hệ"}
               </button>
             </form>
 
