@@ -32,7 +32,7 @@ const MOCK_ARTICLES = [
 ];
 
 export function Home() {
-  const { scams, legitList } = useApp();
+  const { scams, legitList, blogs } = useApp();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearching, setIsSearching] = useState(false);
@@ -622,7 +622,7 @@ export function Home() {
         </div>
       </section>
 
-      {/* News/Blog Section Placeholder - Grid of 3 minimal card placeholders */}
+      {/* News/Blog Section - Dynamic data from Backend API */}
       <section className="max-w-[1400px] mx-auto px-6 mb-24">
         <div className="flex items-center gap-3 mb-8">
           <span className="material-symbols-outlined text-primary text-3xl font-bold">newspaper</span>
@@ -630,23 +630,30 @@ export function Home() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {MOCK_ARTICLES.map((article) => {
+          {(blogs && blogs.length > 0 ? blogs : MOCK_ARTICLES).slice(0, 6).map((article: any) => {
             const fallbackImage = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=600&q=80";
+            const thumbnail = article.thumbnail || article.thumbnailUrl || fallbackImage;
+            const categoryLower = (article.category || "").toLowerCase();
+            const isUrgent = categoryLower.includes("khẩn");
+            const isGuide = categoryLower.includes("hướng dẫn") || categoryLower.includes("thủ thuật");
+            const isFinance = categoryLower.includes("tài chính") || categoryLower.includes("đầu tư");
+
             return (
-              <article key={article.id} className="bg-white border border-outline-variant rounded-2xl overflow-hidden shadow-sm hover:scale-[1.03] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+              <article key={article.id} className="bg-white border border-outline-variant rounded-2xl overflow-hidden shadow-sm hover:scale-[1.02] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
                 <div className="aspect-video w-full bg-slate-100 border-b border-slate-100 overflow-hidden relative">
                   <img
-                    src={article.thumbnailUrl || fallbackImage}
+                    src={thumbnail}
                     alt={article.title}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      e.currentTarget.src = fallbackImage;
+                      (e.target as HTMLImageElement).src = fallbackImage;
                     }}
                   />
                   <div className="absolute top-3 left-3">
-                    <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-md shadow-sm text-white ${
-                      article.category.includes("khẩn") ? "bg-red-600" :
-                      article.category.includes("HƯỚNG") ? "bg-emerald-600" : "bg-amber-600"
+                    <span className={`text-[9px] font-black uppercase px-2.5 py-1 rounded-md shadow-sm text-white ${
+                      isUrgent ? "bg-red-600" :
+                      isGuide ? "bg-emerald-600" :
+                      isFinance ? "bg-amber-600" : "bg-emerald-700"
                     }`}>
                       {article.category}
                     </span>
@@ -655,16 +662,18 @@ export function Home() {
                 
                 <div className="p-5 flex-grow flex flex-col justify-between">
                   <div>
-                    <span className="text-[10px] text-on-surface-variant font-bold block mb-2">{article.date}</span>
-                    <h3 className="text-base font-extrabold text-on-surface mb-2 line-clamp-2 hover:text-primary transition-colors text-left">
+                    <span className="text-[10px] text-on-surface-variant font-bold block mb-2 font-mono">
+                      {article.createdAt || article.date || "Mới đăng"}
+                    </span>
+                    <h3 className="text-base font-extrabold text-on-surface mb-2 line-clamp-2 hover:text-primary transition-colors text-left leading-snug">
                       {article.title}
                     </h3>
-                    <p className="text-xs sm:text-sm text-on-surface-variant line-clamp-3 leading-relaxed text-left">
-                      {article.desc}
+                    <p className="text-xs sm:text-sm text-on-surface-variant line-clamp-3 leading-relaxed text-left opacity-90">
+                      {article.content || article.desc || "Chi tiết thông tin cảnh báo từ hệ thống giám sát an toàn giao dịch Check Zone."}
                     </p>
                   </div>
-                  <div className="pt-4 text-left">
-                    <span className="text-xs font-bold text-primary hover:underline cursor-pointer flex items-center gap-1">
+                  <div className="pt-4 text-left border-t border-slate-100 mt-4">
+                    <span className="text-xs font-extrabold text-primary hover:underline cursor-pointer flex items-center gap-1">
                       Đọc bài viết <span className="text-sm">→</span>
                     </span>
                   </div>

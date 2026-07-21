@@ -19,7 +19,7 @@ interface PolicyArticle {
 }
 
 export function AdminSettings() {
-  const { systemSettings, fetchSystemSettings, updateSystemSettings } = useApp();
+  const { systemSettings, fetchSystemSettings, updateSystemSettings, blogs, addBlogArticle, updateBlogArticle, deleteBlogArticle, fetchBlogs } = useApp();
 
   const [requireEvidence, setRequireEvidence] = useState(true);
   const [autoApprove, setAutoApprove] = useState(false);
@@ -32,6 +32,7 @@ export function AdminSettings() {
 
   React.useEffect(() => {
     fetchSystemSettings();
+    fetchBlogs();
   }, []);
 
   React.useEffect(() => {
@@ -49,18 +50,127 @@ export function AdminSettings() {
   // Active Tab for Settings Sub-Modules
   const [activeTab, setActiveTab] = useState<"general" | "blog" | "policy">("general");
 
-  // CMS: Interactive list for Blog/SEO warning articles
-  const [blogArticles, setBlogArticles] = useState<BlogArticle[]>([
-    { id: "ART-01", title: "Cảnh báo khẩn cấp chiêu trò giả mạo shipper gọi điện nhận hàng", category: "Cảnh báo phổ thông", date: "16 thg 6, 2026", slug: "canh-bao-gia-mao-shipper-giao-hang", status: "Đã đăng" },
-    { id: "ART-02", title: "Nhận biết sàn đầu tư phái sinh lừa đảo cam kết lãi 300%", category: "Đầu tư ảo", date: "12 thg 6, 2026", slug: "dau-tu-singapore-lua-dao-moi", status: "Đã đăng" },
-    { id: "ART-03", title: "An toàn giao dịch trung gian khi mua bán tài khoản MMO trên Facebook", category: "Thủ thuật", date: "08 thg 6, 2026", slug: "huong-dan-trung-gian-truc-tuyen", status: "Bản nháp" },
-  ]);
-
   // CMS: Blog Form States
   const [newBlogTitle, setNewBlogTitle] = useState("");
-  const [newBlogCategory, setNewBlogCategory] = useState("Cảnh báo phổ thông");
+  const [newBlogCategory, setNewBlogCategory] = useState("Cảnh báo khẩn cấp");
   const [newBlogSlug, setNewBlogSlug] = useState("");
+  const [newBlogContent, setNewBlogContent] = useState("");
+  const [newBlogThumbnail, setNewBlogThumbnail] = useState("");
+  const [editingBlogId, setEditingBlogId] = useState<string | null>(null);
+  const [isUploadingThumbnail, setIsUploadingThumbnail] = useState(false);
   const [blogNotif, setBlogNotif] = useState("");
+
+  const thumbnailFileInputRef = React.useRef<HTMLInputElement | null>(null);
+
+  const handleThumbnailFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Vui lòng chỉ chọn định dạng hình ảnh (PNG, JPG, WEBP).");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Dung lượng file tối đa là 5MB.");
+      return;
+    }
+
+    setIsUploadingThumbnail(true);
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+      const apiKey = import.meta.env.VITE_IMGBB_API_KEY || "49299870d79f975d7cbf058f2d0d7d39";
+      const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+      if (data.success && data.data?.url) {
+        setNewBlogThumbnail(data.data.url);
+      } else {
+        alert("Không thể tải ảnh lên ImgBB. Vui lòng kiểm tra lại kết nối.");
+      }
+    } catch (error) {
+      console.error("Lỗi khi upload ảnh:", error);
+      alert("Lỗi khi tải ảnh lên ImgBB.");
+    } finally {
+      setIsUploadingThumbnail(false);
+    }
+  };
+
+  // Blog creation / update action
+  const handleSaveBlog = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newBlogTitle.trim()) {
+      alert("Vui lòng bổ sung tiêu đề bài viết.");
+      return;
+    }
+    const slug = newBlogSlug.trim() || newBlogTitle.trim().toLowerCase().replace(/ /g, "-").replace(/[^\w-]+/g, "");
+    
+    if (editingBlogId) {
+      const success = await updateBlogArticle(editingBlogId, {
+        title: newBlogTitle,
+        category: newBlogCategory,
+        slug,
+        status: "Đã đăng",
+        content: newBlogContent,
+        thumbnail: newBlogThumbnail
+      });
+      if (success) {
+        setBlogNotif(`Đã cập nhật bài viết: "${newBlogTitle}" thành công!`);
+        resetBlogForm();
+      } else {
+        alert("Cập nhật bài viết thất bại.");
+      }
+    } else {
+      const success = await addBlogArticle({
+        title: newBlogTitle,
+        category: newBlogCategory,
+        slug,
+        status: "Đã đăng",
+        content: newBlogContent,
+        thumbnail: newBlogThumbnail
+      });
+      if (success) {
+        setBlogNotif(`Đã xuất bản bài viết SEO: "${newBlogTitle}" thành công!`);
+        resetBlogForm();
+      } else {
+        alert("Tạo bài viết mới thất bại.");
+      }
+    }
+    setTimeout(() => setBlogNotif(""), 3500);
+  };
+
+  const resetBlogForm = () => {
+    setEditingBlogId(null);
+    setNewBlogTitle("");
+    setNewBlogCategory("Cảnh báo khẩn cấp");
+    setNewBlogSlug("");
+    setNewBlogContent("");
+    setNewBlogThumbnail("");
+  };
+
+  const handleEditBlog = (art: any) => {
+    setEditingBlogId(art.id);
+    setNewBlogTitle(art.title);
+    setNewBlogCategory(art.category);
+    setNewBlogSlug(art.slug);
+    setNewBlogContent(art.content || "");
+    setNewBlogThumbnail(art.thumbnail || "");
+    window.scrollTo({ top: 300, behavior: "smooth" });
+  };
+
+  const handleDeleteBlog = async (id: string, title: string) => {
+    if (confirm(`Bạn có chắc chắn muốn xóa bài viết "${title}"?`)) {
+      const success = await deleteBlogArticle(id);
+      if (success) {
+        setBlogNotif(`Đã xóa thành công bài viết.`);
+        setTimeout(() => setBlogNotif(""), 3500);
+      } else {
+        alert("Xóa bài viết thất bại.");
+      }
+    }
+  };
 
   // CMS: Interactive list for policies/terms
   const [policies, setPolicies] = useState<PolicyArticle[]>([
@@ -101,29 +211,6 @@ export function AdminSettings() {
         setIsSaved(false);
       }, 3000);
     }
-  };
-
-  // Blog creation action
-  const handleCreateBlog = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newBlogTitle.trim()) {
-      alert("Vui lòng bổ sung tiêu đề bài viết.");
-      return;
-    }
-    const slug = newBlogSlug.trim() || newBlogTitle.trim().toLowerCase().replace(/ /g, "-").replace(/[^\w-]+/g, "");
-    const newArt: BlogArticle = {
-      id: `ART-${Math.floor(10 + Math.random() * 90)}`,
-      title: newBlogTitle,
-      category: newBlogCategory,
-      date: new Date().toLocaleDateString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }),
-      slug: slug,
-      status: "Đã đăng",
-    };
-    setBlogArticles([newArt, ...blogArticles]);
-    setNewBlogTitle("");
-    setNewBlogSlug("");
-    setBlogNotif(`Đã xuất bản thành công bài viết Tin tức/SEO: "${newArt.title}"`);
-    setTimeout(() => setBlogNotif(""), 3500);
   };
 
   // Policy creation action
@@ -359,45 +446,114 @@ export function AdminSettings() {
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
               {/* Content Form Creator (5/12) */}
               <div className="md:col-span-5 bg-white border border-outline-variant p-5 sm:p-6 rounded-2xl shadow-sm space-y-4 h-fit">
-                <h3 className="font-extrabold text-base text-slate-900 flex items-center gap-1.5 border-b pb-3">
-                  <span className="material-symbols-outlined text-xl text-[#2e7d32]">post_add</span>
-                  Soạn tin cảnh bạo mới
-                </h3>
+                <div className="flex items-center justify-between border-b pb-3">
+                  <h3 className="font-extrabold text-base text-slate-900 flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-xl text-[#2e7d32]">post_add</span>
+                    {editingBlogId ? "Hiệu chỉnh bài viết" : "Soạn tin cảnh báo mới"}
+                  </h3>
+                  {editingBlogId && (
+                    <button
+                      type="button"
+                      onClick={resetBlogForm}
+                      className="text-xs text-red-600 font-bold hover:underline"
+                    >
+                      Hủy sửa
+                    </button>
+                  )}
+                </div>
 
-                <form onSubmit={handleCreateBlog} className="space-y-4">
+                <form onSubmit={handleSaveBlog} className="space-y-4">
                   <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-650 text-slate-600 mb-1">Tiêu đề bài viết SEO *</label>
+                    <label className="block text-[10px] uppercase font-bold text-slate-600 mb-1">Tiêu đề bài viết SEO *</label>
                     <input
                       type="text"
                       className="w-full border-2 border-outline-variant rounded-xl px-3.5 py-2.5 text-xs focus:border-[#2e7d32] outline-none"
-                      placeholder="e.g. Cảnh báo hình thức scam thẻ nạp"
+                      placeholder="e.g. Cảnh báo hình thức scam shipper gọi điện"
                       value={newBlogTitle}
                       onChange={(e) => setNewBlogTitle(e.target.value)}
+                      required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-650 text-slate-600 mb-1">Thể loại bài viết</label>
+                    <label className="block text-[10px] uppercase font-bold text-slate-600 mb-1">Thể loại bài viết</label>
                     <select
                       className="w-full border-2 border-outline-variant rounded-xl px-3.5 py-2.5 text-xs focus:border-[#2e7d32] outline-none bg-white text-slate-800"
                       value={newBlogCategory}
                       onChange={(e) => setNewBlogCategory(e.target.value)}
                     >
+                      <option value="Cảnh báo khẩn cấp">Cảnh báo khẩn cấp (Badge Đỏ)</option>
+                      <option value="HƯỚNG DẪN & THỦ THUẬT">HƯỚNG DẪN & THỦ THUẬT (Badge Xanh)</option>
+                      <option value="Cảnh báo tài chính">Cảnh báo tài chính (Badge Cam)</option>
                       <option value="Cảnh báo phổ thông">Cảnh báo phổ thông</option>
-                      <option value="Đầu tư ảo">Đầu tư ảo</option>
-                      <option value="Thủ thuật bảo mật">Thủ thuật bảo mật</option>
-                      <option value="Cẩm nang an toàn">Cẩm nang an toàn</option>
                     </select>
                   </div>
 
+                  {/* Thumbnail Input (File Upload via ImgBB OR URL string input) */}
                   <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-650 text-slate-600 mb-1">Đường dẫn thân thiện (Slug)</label>
+                    <label className="block text-[10px] uppercase font-bold text-slate-600 mb-1">Ảnh đại diện (Thumbnail)</label>
+                    <div className="space-y-2">
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          className="flex-1 border-2 border-outline-variant rounded-xl px-3.5 py-2.5 text-xs focus:border-[#2e7d32] outline-none"
+                          placeholder="Dán URL ảnh hoặc tải từ máy..."
+                          value={newBlogThumbnail}
+                          onChange={(e) => setNewBlogThumbnail(e.target.value)}
+                        />
+                        <input
+                          type="file"
+                          ref={thumbnailFileInputRef}
+                          onChange={handleThumbnailFileChange}
+                          accept="image/*"
+                          className="hidden"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => thumbnailFileInputRef.current?.click()}
+                          disabled={isUploadingThumbnail}
+                          className="bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1 shrink-0 cursor-pointer"
+                        >
+                          <span className="material-symbols-outlined text-sm">cloud_upload</span>
+                          <span>{isUploadingThumbnail ? "Đang tải..." : "Tải ảnh"}</span>
+                        </button>
+                      </div>
+
+                      {/* Thumbnail Preview */}
+                      {newBlogThumbnail && (
+                        <div className="relative aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-50 mt-2">
+                          <img
+                            src={newBlogThumbnail}
+                            alt="Thumbnail preview"
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=600&q=80";
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] uppercase font-bold text-slate-600 mb-1">Đường dẫn thân thiện (Slug)</label>
                     <input
                       type="text"
                       className="w-full border-2 border-outline-variant rounded-xl px-3.5 py-2.5 text-xs focus:border-[#2e7d32] outline-none font-mono"
-                      placeholder="e.g. canh-bao-luong-thuong-gia"
+                      placeholder="Tự động tạo từ tiêu đề nếu để trống"
                       value={newBlogSlug}
                       onChange={(e) => setNewBlogSlug(e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] uppercase font-bold text-slate-600 mb-1">Nội dung tóm tắt / Chi tiết</label>
+                    <textarea
+                      rows={4}
+                      className="w-full border-2 border-outline-variant rounded-xl px-3.5 py-2.5 text-xs focus:border-[#2e7d32] outline-none"
+                      placeholder="Nhập nội dung ngắn mô tả chi tiết bài viết..."
+                      value={newBlogContent}
+                      onChange={(e) => setNewBlogContent(e.target.value)}
                     />
                   </div>
 
@@ -405,44 +561,82 @@ export function AdminSettings() {
                     type="submit"
                     className="w-full bg-[#2e7d32] hover:bg-[#205c22] text-white font-extrabold text-[11px] uppercase py-3.5 rounded-xl transition-all shadow-sm cursor-pointer"
                   >
-                    Đăng tin SEO & Công bố
+                    {editingBlogId ? "Lưu thay đổi bài viết" : "Đăng tin SEO & Công bố"}
                   </button>
                 </form>
               </div>
 
               {/* Content List Table (7/12) */}
               <div className="md:col-span-7 bg-white border border-outline-variant rounded-2xl shadow-sm overflow-hidden flex flex-col">
-                <div className="p-4 sm:p-5 border-b bg-slate-50/50">
-                  <h4 className="font-extrabold text-slate-900 uppercase text-[11px] tracking-wide">Kho lưu trữ bài viết & Cảnh bạo</h4>
+                <div className="p-4 sm:p-5 border-b bg-slate-50/50 flex justify-between items-center">
+                  <h4 className="font-extrabold text-slate-900 uppercase text-[11px] tracking-wide">Kho lưu trữ bài viết & Cảnh báo ({blogs.length})</h4>
+                  <button
+                    onClick={() => fetchBlogs()}
+                    className="text-[10px] text-primary font-bold hover:underline flex items-center gap-1"
+                  >
+                    <span className="material-symbols-outlined text-xs">refresh</span> Tải lại
+                  </button>
                 </div>
                 <div className="overflow-x-auto text-xs">
                   <table className="w-full text-left">
                     <thead>
                       <tr className="bg-slate-50 border-b border-outline-variant text-[10px] uppercase font-bold text-slate-600 opacity-75 whitespace-nowrap">
+                        <th className="p-4 whitespace-nowrap">Hình ảnh</th>
                         <th className="p-4 whitespace-nowrap">Bài viết</th>
                         <th className="p-4 text-center whitespace-nowrap">Trạng thái</th>
-                        <th className="p-4 text-right whitespace-nowrap">Khởi tạo</th>
+                        <th className="p-4 text-right whitespace-nowrap">Thao tác</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-outline-variant font-medium">
-                      {blogArticles.map((art) => (
-                        <tr key={art.id} className="hover:bg-slate-50/40 transition-colors">
-                          <td className="p-4">
-                            <p className="font-bold text-slate-800 line-clamp-2 leading-tight">{art.title}</p>
-                            <span className="text-[10px] text-slate-500 font-mono mt-0.5 inline-block capitalize">{art.category}</span>
-                          </td>
-                          <td className="p-4 text-center whitespace-nowrap">
-                            <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border ${
-                              art.status === "Đã đăng" ? "bg-emerald-50 text-[#2e7d32] border-emerald-200" : "bg-slate-100 text-slate-650 border-slate-3 * border-slate-200"
-                            }`}>
-                              {art.status}
-                            </span>
-                          </td>
-                          <td className="p-4 text-right font-mono text-slate-400 text-[10px] whitespace-nowrap">
-                            {art.date}
-                          </td>
+                      {blogs.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="p-6 text-center text-slate-400 font-bold">Chưa có bài viết nào. Hãy soạn bài viết đầu tiên bên trái!</td>
                         </tr>
-                      ))}
+                      ) : (
+                        blogs.map((art) => (
+                          <tr key={art.id} className="hover:bg-slate-50/40 transition-colors">
+                            <td className="p-4 w-16">
+                              <img
+                                src={art.thumbnail || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=600&q=80"}
+                                alt={art.title}
+                                className="w-12 h-12 rounded-lg object-cover border border-slate-200"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=600&q=80";
+                                }}
+                              />
+                            </td>
+                            <td className="p-4 min-w-[200px]">
+                              <p className="font-bold text-slate-800 line-clamp-2 leading-tight">{art.title}</p>
+                              <span className="text-[10px] text-slate-500 font-mono mt-0.5 inline-block capitalize">{art.category}</span>
+                            </td>
+                            <td className="p-4 text-center whitespace-nowrap">
+                              <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border ${
+                                art.status === "Đã đăng" ? "bg-emerald-50 text-[#2e7d32] border-emerald-200" : "bg-slate-100 text-slate-600 border-slate-200"
+                              }`}>
+                                {art.status}
+                              </span>
+                            </td>
+                            <td className="p-4 text-right whitespace-nowrap">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  onClick={() => handleEditBlog(art)}
+                                  className="p-1.5 text-slate-600 hover:text-primary hover:bg-slate-100 rounded-lg transition-colors"
+                                  title="Chỉnh sửa bài viết"
+                                >
+                                  <span className="material-symbols-outlined text-base">edit</span>
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteBlog(art.id, art.title)}
+                                  className="p-1.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                  title="Xóa bài viết"
+                                >
+                                  <span className="material-symbols-outlined text-base">delete</span>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>

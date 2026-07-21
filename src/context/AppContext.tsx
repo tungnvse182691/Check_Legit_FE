@@ -42,6 +42,18 @@ export interface LegitProfile {
   website?: string;
 }
 
+export interface BlogArticle {
+  id: string;
+  title: string;
+  category: string;
+  createdAt: string;
+  date?: string;
+  slug: string;
+  status: "Đã đăng" | "Bản nháp";
+  content: string;
+  thumbnail: string;
+}
+
 export interface SystemSettings {
   id: number;
   requireEvidence: boolean;
@@ -56,6 +68,7 @@ export interface SystemSettings {
 interface AppContextType {
   scams: ScamReport[];
   legitList: LegitProfile[];
+  blogs: BlogArticle[];
   token: string | null;
   isAuthenticated: boolean;
   systemSettings: SystemSettings | null;
@@ -67,6 +80,10 @@ interface AppContextType {
   deleteLegitProfile: (id: string | number) => void;
   updateScamReport: (id: string, updatedReport: Partial<ScamReport>) => Promise<boolean>;
   updateLegitProfile: (id: number, updatedProfile: Partial<LegitProfile>) => Promise<boolean>;
+  addBlogArticle: (blog: Omit<BlogArticle, "id" | "createdAt">) => Promise<boolean>;
+  updateBlogArticle: (id: string, updatedBlog: Partial<BlogArticle>) => Promise<boolean>;
+  deleteBlogArticle: (id: string) => Promise<boolean>;
+  fetchBlogs: () => Promise<void>;
   login: (token: string) => void;
   logout: () => void;
   fetchSystemSettings: () => Promise<void>;
@@ -83,6 +100,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [scams, setScams] = useState<ScamReport[]>([]);
   const [legitList, setLegitList] = useState<LegitProfile[]>([]);
+  const [blogs, setBlogs] = useState<BlogArticle[]>([]);
   const [systemSettings, setSystemSettings] = useState<SystemSettings | null>(null);
   const [token, setToken] = useState<string | null>(() => localStorage.getItem("token"));
   const isAuthenticated = !!token;
@@ -103,6 +121,108 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return new Date(dateStr + "Z");
     }
     return new Date(dateStr);
+  };
+
+  const mapBlogDto = (dto: any): BlogArticle => {
+    const parsedDate = parseUtcDate(dto.createdAt);
+    return {
+      id: dto.id,
+      title: dto.title,
+      category: dto.category || "Cảnh báo phổ thông",
+      createdAt: parsedDate.toLocaleDateString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }),
+      date: parsedDate.toLocaleDateString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }),
+      slug: dto.slug || "",
+      status: dto.status || "Đã đăng",
+      content: dto.content || "",
+      thumbnail: dto.thumbnail || dto.thumbnailUrl || ""
+    };
+  };
+
+  const fetchBlogs = async () => {
+    try {
+      const url = token ? `${API_BASE_URL}/admin/blogs` : `${API_BASE_URL}/public/blogs`;
+      const headers: HeadersInit = token ? { "Authorization": `Bearer ${token}` } : {};
+      const res = await fetch(url, { headers });
+      if (res.ok) {
+        const data = await res.json();
+        setBlogs(data.map(mapBlogDto));
+      }
+    } catch (e) {
+      console.error("Error fetching blogs:", e);
+    }
+  };
+
+  const addBlogArticle = async (blog: Omit<BlogArticle, "id" | "createdAt">): Promise<boolean> => {
+    const payload = {
+      title: blog.title,
+      category: blog.category,
+      slug: blog.slug,
+      status: blog.status,
+      content: blog.content,
+      thumbnail: blog.thumbnail
+    };
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/blogs`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        await fetchBlogs();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.error("Error creating blog:", e);
+      return false;
+    }
+  };
+
+  const updateBlogArticle = async (id: string, updatedBlog: Partial<BlogArticle>): Promise<boolean> => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/blogs/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(updatedBlog)
+      });
+
+      if (res.ok) {
+        await fetchBlogs();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.error("Error updating blog:", e);
+      return false;
+    }
+  };
+
+  const deleteBlogArticle = async (id: string): Promise<boolean> => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/blogs/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+
+      if (res.ok) {
+        await fetchBlogs();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.error("Error deleting blog:", e);
+      return false;
+    }
   };
 
   const mapScamDto = (dto: any, category: "Lừa đảo tài chính" | "Cảnh báo hành vi"): ScamReport => {
@@ -235,6 +355,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   useEffect(() => {
     fetchAllData();
+    fetchBlogs();
     if (token) {
       fetchSystemSettings();
     } else {
@@ -611,6 +732,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       value={{
         scams,
         legitList,
+        blogs,
         token,
         isAuthenticated,
         systemSettings,
@@ -622,6 +744,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         deleteLegitProfile,
         updateScamReport,
         updateLegitProfile,
+        addBlogArticle,
+        updateBlogArticle,
+        deleteBlogArticle,
+        fetchBlogs,
         login,
         logout,
         fetchSystemSettings,
