@@ -68,19 +68,22 @@ export function Header() {
                 {isDropdownOpen && (
                   <div className="absolute top-full left-0 mt-1 bg-white border border-outline-variant rounded-xl shadow-lg py-2 w-48 z-50 animate-fade-in">
                     <Link 
-                      to="/about" 
+                      to="/about#about-us" 
+                      onClick={() => setIsDropdownOpen(false)}
                       className="block px-4 py-2 text-sm text-on-surface hover:bg-emerald-50 hover:text-primary transition-colors font-bold uppercase"
                     >
                       GIỚI THIỆU
                     </Link>
                     <Link 
-                      to="/about" 
+                      to="/about#contact" 
+                      onClick={() => setIsDropdownOpen(false)}
                       className="block px-4 py-2 text-sm text-on-surface hover:bg-emerald-50 hover:text-primary transition-colors font-bold uppercase"
                     >
                       LIÊN HỆ
                     </Link>
                     <Link 
-                      to="/about" 
+                      to="/about#policies" 
+                      onClick={() => setIsDropdownOpen(false)}
                       className="block px-4 py-2 text-sm text-on-surface hover:bg-emerald-50 hover:text-primary transition-colors font-bold uppercase"
                     >
                       CHÍNH SÁCH
@@ -209,20 +212,20 @@ export function Footer() {
         <div>
           <div className="font-extrabold mb-4 uppercase text-xs tracking-widest text-on-surface">THÔNG TIN</div>
           <ul className="space-y-2 text-xs font-semibold">
-            <li><Link to="/about" className="text-on-surface-variant hover:text-primary hover:underline">GIỚI THIỆU</Link></li>
-            <li><Link to="/about" className="text-on-surface-variant hover:text-primary hover:underline">LIÊN HỆ</Link></li>
-            <li><Link to="/about" className="text-on-surface-variant hover:text-primary hover:underline">CÁCH SỬ DỤNG</Link></li>
-            <li><Link to="/about" className="text-on-surface-variant hover:text-primary hover:underline">QUY CHẾ CỘNG ĐỒNG</Link></li>
-            <li><Link to="/about" className="text-on-surface-variant hover:text-primary hover:underline">Thông báo miễn trừ trách nhiệm</Link></li>
+            <li><Link to="/about#about-us" className="text-on-surface-variant hover:text-primary hover:underline">GIỚI THIỆU</Link></li>
+            <li><Link to="/about#contact" className="text-on-surface-variant hover:text-primary hover:underline">LIÊN HỆ</Link></li>
+            <li><Link to="/about#about-us" className="text-on-surface-variant hover:text-primary hover:underline">CÁCH SỬ DỤNG</Link></li>
+            <li><Link to="/about#policies" className="text-on-surface-variant hover:text-primary hover:underline">QUY CHẾ CỘNG ĐỒNG</Link></li>
+            <li><Link to="/about#policies" className="text-on-surface-variant hover:text-primary hover:underline">Thông báo miễn trừ trách nhiệm</Link></li>
           </ul>
         </div>
         <div>
           <div className="font-extrabold mb-4 uppercase text-xs tracking-widest text-on-surface">CHÍNH SÁCH</div>
           <ul className="space-y-2 text-xs font-semibold">
-            <li><Link to="/about" className="text-on-surface-variant hover:text-primary hover:underline">ĐIỀU KHOẢN SỬ DỤNG</Link></li>
-            <li><Link to="/about" className="text-on-surface-variant hover:text-primary hover:underline">CHÍNH SÁCH BẢO MẬT</Link></li>
-            <li><Link to="/about" className="text-on-surface-variant hover:text-primary hover:underline">Chính sách tiếp nhận và xử lý</Link></li>
-            <li><Link to="/about" className="text-on-surface-variant hover:text-primary hover:underline">Chính sách khiếu nại</Link></li>
+            <li><Link to="/about#policies" className="text-on-surface-variant hover:text-primary hover:underline">ĐIỀU KHOẢN SỬ DỤNG</Link></li>
+            <li><Link to="/about#policies" className="text-on-surface-variant hover:text-primary hover:underline">CHÍNH SÁCH BẢO MẬT</Link></li>
+            <li><Link to="/about#policies" className="text-on-surface-variant hover:text-primary hover:underline">Chính sách tiếp nhận và xử lý</Link></li>
+            <li><Link to="/about#contact" className="text-on-surface-variant hover:text-primary hover:underline">Chính sách khiếu nại</Link></li>
           </ul>
         </div>
         <div>
