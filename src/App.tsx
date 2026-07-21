@@ -15,6 +15,7 @@ import { ScamDetail } from "./pages/ScamDetail";
 import { ScamList } from "./pages/ScamList";
 import { Warnings } from "./pages/Warnings";
 import { About } from "./pages/About";
+import { BlogDetail } from "./pages/BlogDetail";
 import { AdminOverview } from "./pages/AdminOverview";
 import { AdminScamManagement } from "./pages/AdminScamManagement";
 import { AdminLegitManagement } from "./pages/AdminLegitManagement";
@@ -54,6 +55,7 @@ export default function App() {
           <Route path="/reports/:id" element={<Layout><ScamDetail /></Layout>} />
           <Route path="/warnings" element={<Layout><Warnings /></Layout>} />
           <Route path="/about" element={<Layout><About /></Layout>} />
+          <Route path="/news/:slug" element={<Layout><BlogDetail /></Layout>} />
           <Route path="/login" element={<Login />} />
           
           {/* Admin Routes */}

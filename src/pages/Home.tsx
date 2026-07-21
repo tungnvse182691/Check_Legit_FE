@@ -640,34 +640,38 @@ export function Home() {
 
             return (
               <article key={article.id} className="bg-white border border-outline-variant rounded-2xl overflow-hidden shadow-sm hover:scale-[1.02] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
-                <div className="aspect-video w-full bg-slate-100 border-b border-slate-100 overflow-hidden relative">
-                  <img
-                    src={thumbnail}
-                    alt={article.title}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = fallbackImage;
-                    }}
-                  />
-                  <div className="absolute top-3 left-3">
-                    <span className={`text-[9px] font-black uppercase px-2.5 py-1 rounded-md shadow-sm text-white ${
-                      isUrgent ? "bg-red-600" :
-                      isGuide ? "bg-emerald-600" :
-                      isFinance ? "bg-amber-600" : "bg-emerald-700"
-                    }`}>
-                      {article.category}
-                    </span>
+                <Link to={`/news/${article.slug || article.id}`} className="block">
+                  <div className="aspect-video w-full bg-slate-100 border-b border-slate-100 overflow-hidden relative">
+                    <img
+                      src={thumbnail}
+                      alt={article.title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = fallbackImage;
+                      }}
+                    />
+                    <div className="absolute top-3 left-3">
+                      <span className={`text-[9px] font-black uppercase px-2.5 py-1 rounded-md shadow-sm text-white ${
+                        isUrgent ? "bg-red-600" :
+                        isGuide ? "bg-emerald-600" :
+                        isFinance ? "bg-amber-600" : "bg-emerald-700"
+                      }`}>
+                        {article.category}
+                      </span>
+                    </div>
                   </div>
-                </div>
+                </Link>
                 
                 <div className="p-5 flex-grow flex flex-col justify-between">
                   <div>
                     <span className="text-[10px] text-on-surface-variant font-bold block mb-2 font-mono">
                       {article.createdAt || article.date || "Mới đăng"}
                     </span>
-                    <h3 className="text-base font-extrabold text-on-surface mb-2 line-clamp-2 hover:text-primary transition-colors text-left leading-snug">
-                      {article.title}
-                    </h3>
+                    <Link to={`/news/${article.slug || article.id}`}>
+                      <h3 className="text-base font-extrabold text-on-surface mb-2 line-clamp-2 hover:text-primary transition-colors text-left leading-snug">
+                        {article.title}
+                      </h3>
+                    </Link>
                     <p className="text-xs sm:text-sm text-on-surface-variant line-clamp-3 leading-relaxed text-left opacity-90">
                       {article.content || article.desc || "Chi tiết thông tin cảnh báo từ hệ thống giám sát an toàn giao dịch Check Zone."}
                     </p>
