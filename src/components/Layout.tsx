@@ -51,46 +51,14 @@ export function Header() {
               <Link to="/legit" className={navItemClass("/legit")}>HỒ SƠ UY TÍN</Link>
             </li>
             <li className="flex items-center">
-              {/* Information Dropdown for THÔNG TIN */}
-              <div 
-                className="relative"
-                onMouseEnter={() => setIsDropdownOpen(true)}
-                onMouseLeave={() => setIsDropdownOpen(false)}
+              <Link 
+                to="/about" 
+                className={`text-on-surface-variant hover:text-primary transition-colors text-sm sm:text-base font-bold pb-2 tracking-wider uppercase ${
+                  location.pathname === "/about" ? "text-primary border-b-2 border-primary font-extrabold" : ""
+                }`}
               >
-                <button 
-                  type="button"
-                  className="flex items-center justify-center gap-1 text-on-surface-variant hover:text-primary transition-colors text-sm sm:text-base font-bold pb-2 tracking-wider cursor-pointer focus:outline-none uppercase"
-                >
-                  <span>THÔNG TIN</span>
-                  <span className="material-symbols-outlined text-sm">keyboard_arrow_down</span>
-                </button>
-                
-                {isDropdownOpen && (
-                  <div className="absolute top-full left-0 mt-1 bg-white border border-outline-variant rounded-xl shadow-lg py-2 w-48 z-50 animate-fade-in">
-                    <Link 
-                      to="/about#about-us" 
-                      onClick={() => setIsDropdownOpen(false)}
-                      className="block px-4 py-2 text-sm text-on-surface hover:bg-emerald-50 hover:text-primary transition-colors font-bold uppercase"
-                    >
-                      GIỚI THIỆU
-                    </Link>
-                    <Link 
-                      to="/about#contact" 
-                      onClick={() => setIsDropdownOpen(false)}
-                      className="block px-4 py-2 text-sm text-on-surface hover:bg-emerald-50 hover:text-primary transition-colors font-bold uppercase"
-                    >
-                      LIÊN HỆ
-                    </Link>
-                    <Link 
-                      to="/about#policies" 
-                      onClick={() => setIsDropdownOpen(false)}
-                      className="block px-4 py-2 text-sm text-on-surface hover:bg-emerald-50 hover:text-primary transition-colors font-bold uppercase"
-                    >
-                      CHÍNH SÁCH
-                    </Link>
-                  </div>
-                )}
-              </div>
+                THÔNG TIN
+              </Link>
             </li>
           </ul>
         </nav>
