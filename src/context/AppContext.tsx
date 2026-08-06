@@ -21,6 +21,7 @@ export interface ScamReport {
   verifierZalo?: string;
   reportCount: number;
   isDuplicate?: boolean;
+  accountHolderName?: string; // Tên chủ tài khoản (ưu tiên hiển thị hơn tên đối tượng nếu có)
 }
 
 export interface LegitProfile {
@@ -40,6 +41,9 @@ export interface LegitProfile {
   facebook?: string;
   address?: string;
   website?: string;
+  accountNumber?: string; // Số tài khoản đã xác thực
+  bankName?: string; // Ngân hàng đã xác thực
+  slug?: string; // Đường dẫn tùy chỉnh (URL slug, ví dụ: topzone_shop)
 }
 
 export interface BlogArticle {
@@ -52,6 +56,8 @@ export interface BlogArticle {
   status: "Đã đăng" | "Bản nháp";
   content: string;
   thumbnail: string;
+  metaDescription?: string;
+  metaKeywords?: string;
 }
 
 export interface SystemSettings {
@@ -134,7 +140,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       slug: dto.slug || "",
       status: dto.status || "Đã đăng",
       content: dto.content || "",
-      thumbnail: dto.thumbnail || dto.thumbnailUrl || ""
+      thumbnail: dto.thumbnail || dto.thumbnailUrl || "",
+      metaDescription: dto.metaDescription || dto.meta_description || "",
+      metaKeywords: dto.metaKeywords || dto.meta_keywords || ""
     };
   };
 
@@ -159,7 +167,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       slug: blog.slug,
       status: blog.status,
       content: blog.content,
-      thumbnail: blog.thumbnail
+      thumbnail: blog.thumbnail,
+      metaDescription: blog.metaDescription || "",
+      metaKeywords: blog.metaKeywords || ""
     };
 
     try {
@@ -268,7 +278,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       tier: dto.tier,
       facebook: dto.facebook || "",
       address: dto.address || "",
-      website: dto.website || ""
+      website: dto.website || "",
+      accountNumber: dto.accountNumber || dto.account_number || "",
+      bankName: dto.bankName || dto.bank_name || "",
+      slug: dto.slug || dto.urlSlug || dto.url_slug || dto.id?.toString() || ""
     };
   };
 
@@ -363,6 +376,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [token]);
 
+  const parseResponseError = async (response: Response, defaultMessage: string): Promise<string> => {
+    if (response.status === 502 || response.status === 503 || response.status === 504) {
+      return "Máy chủ Backend hiện đang tạm dừng hoặc không thể kết nối (Mã lỗi " + response.status + "). Vui lòng liên hệ quản trị viên để bật lại dịch vụ.";
+    }
+    if (response.status === 500) {
+      return "Lỗi hệ thống phía máy chủ (500). Vui lòng thử lại sau.";
+    }
+    try {
+      const text = await response.text();
+      if (!text || text.trim().startsWith("<!DOCTYPE") || text.trim().startsWith("<html")) {
+        return `${defaultMessage} (Mã lỗi ${response.status}).`;
+      }
+      return `${defaultMessage}: ${text}`;
+    } catch {
+      return `${defaultMessage} (Mã lỗi ${response.status}).`;
+    }
+  };
+
   const addScamReport = async (report: Omit<ScamReport, "id" | "status" | "time" | "date" | "tags"> & { turnstileToken: string }) => {
     const categoryEnum = report.category === "Cảnh báo hành vi" ? 1 : 0;
     const payload = {
@@ -398,12 +429,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         alert("Gửi tố cáo thành công! Báo cáo đang chờ ban quản trị phê duyệt.");
         await fetchAllData();
       } else {
-        if (response.status === 500) {
-          throw new Error("Lỗi hệ thống phía máy chủ (500). Vui lòng thử lại sau.");
-        } else {
-          const errorText = await response.text();
-          throw new Error("Gửi tố cáo thất bại: " + errorText);
-        }
+        const errorMsg = await parseResponseError(response, "Gửi tố cáo thất bại");
+        throw new Error(errorMsg);
       }
     } catch (error: any) {
       console.error("Error submitting report:", error);
@@ -411,12 +438,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const addLegitProfile = async (profile: Omit<LegitProfile, "id" | "score" | "img" | "successTrans" | "joinDate">) => {
+  const addLegitProfile = async (profile: Omit<LegitProfile, "id" | "score" | "successTrans" | "joinDate">) => {
     const payload = {
       name: profile.name,
       role: profile.role,
       score: 98,
-      img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=300&q=80",
+      img: profile.img || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=300&q=80",
       desc: profile.desc,
       phone: profile.phone,
       telegram: profile.telegram,
@@ -426,7 +453,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       businessType: profile.businessType,
       facebook: profile.facebook || "",
       address: profile.address || "",
-      website: profile.website || ""
+      website: profile.website || "",
+      accountNumber: profile.accountNumber || "",
+      bankName: profile.bankName || "",
+      slug: profile.slug || ""
     };
 
     try {
@@ -640,7 +670,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       businessType: updatedProfile.businessType || updatedProfile.role,
       facebook: updatedProfile.facebook || "",
       address: updatedProfile.address || "",
-      website: updatedProfile.website || ""
+      website: updatedProfile.website || "",
+      accountNumber: updatedProfile.accountNumber || "",
+      bankName: updatedProfile.bankName || "",
+      slug: updatedProfile.slug || ""
     };
 
     try {

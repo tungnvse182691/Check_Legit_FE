@@ -89,7 +89,7 @@ export function ScamList() {
                 </div>
 
                 <h3 className="text-lg font-bold text-slate-900 leading-snug m-0 line-clamp-1">
-                  {scam.name}
+                  {(scam.accountHolderName && scam.accountHolderName.trim()) ? scam.accountHolderName : scam.name}
                 </h3>
 
                 {scam.reportCount > 1 && (

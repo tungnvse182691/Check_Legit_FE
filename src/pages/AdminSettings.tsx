@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { useApp } from "../context/AppContext";
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
+import { FileText, ShieldCheck, Search, CloudUpload } from "lucide-react";
 
 interface BlogArticle {
   id: string;
@@ -17,6 +20,31 @@ interface PolicyArticle {
   lastUpdated: string;
   active: boolean;
 }
+
+const slugifyVietnamese = (str: string): string => {
+  if (!str) return "";
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "d")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+};
+
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, 3, 4, 5, 6, false] }],
+    ["bold", "italic", "underline", "strike", "blockquote"],
+    [{ list: "ordered" }, { list: "bullet" }],
+    [{ color: [] }, { background: [] }],
+    ["link", "image"],
+    ["clean"]
+  ]
+};
 
 export function AdminSettings() {
   const { systemSettings, fetchSystemSettings, updateSystemSettings, blogs, addBlogArticle, updateBlogArticle, deleteBlogArticle, fetchBlogs } = useApp();
@@ -56,6 +84,8 @@ export function AdminSettings() {
   const [newBlogSlug, setNewBlogSlug] = useState("");
   const [newBlogContent, setNewBlogContent] = useState("");
   const [newBlogThumbnail, setNewBlogThumbnail] = useState("");
+  const [newMetaDescription, setNewMetaDescription] = useState("");
+  const [newMetaKeywords, setNewMetaKeywords] = useState("");
   const [editingBlogId, setEditingBlogId] = useState<string | null>(null);
   const [isUploadingThumbnail, setIsUploadingThumbnail] = useState(false);
   const [blogNotif, setBlogNotif] = useState("");
@@ -105,7 +135,7 @@ export function AdminSettings() {
       alert("Vui lòng bổ sung tiêu đề bài viết.");
       return;
     }
-    const slug = newBlogSlug.trim() || newBlogTitle.trim().toLowerCase().replace(/ /g, "-").replace(/[^\w-]+/g, "");
+    const slug = newBlogSlug.trim() ? slugifyVietnamese(newBlogSlug) : slugifyVietnamese(newBlogTitle);
     
     if (editingBlogId) {
       const success = await updateBlogArticle(editingBlogId, {
@@ -114,7 +144,9 @@ export function AdminSettings() {
         slug,
         status: "Đã đăng",
         content: newBlogContent,
-        thumbnail: newBlogThumbnail
+        thumbnail: newBlogThumbnail,
+        metaDescription: newMetaDescription,
+        metaKeywords: newMetaKeywords
       });
       if (success) {
         setBlogNotif(`Đã cập nhật bài viết: "${newBlogTitle}" thành công!`);
@@ -129,7 +161,9 @@ export function AdminSettings() {
         slug,
         status: "Đã đăng",
         content: newBlogContent,
-        thumbnail: newBlogThumbnail
+        thumbnail: newBlogThumbnail,
+        metaDescription: newMetaDescription,
+        metaKeywords: newMetaKeywords
       });
       if (success) {
         setBlogNotif(`Đã xuất bản bài viết SEO: "${newBlogTitle}" thành công!`);
@@ -148,6 +182,8 @@ export function AdminSettings() {
     setNewBlogSlug("");
     setNewBlogContent("");
     setNewBlogThumbnail("");
+    setNewMetaDescription("");
+    setNewMetaKeywords("");
   };
 
   const handleEditBlog = (art: any) => {
@@ -157,6 +193,8 @@ export function AdminSettings() {
     setNewBlogSlug(art.slug);
     setNewBlogContent(art.content || "");
     setNewBlogThumbnail(art.thumbnail || "");
+    setNewMetaDescription(art.metaDescription || art.meta_description || "");
+    setNewMetaKeywords(art.metaKeywords || art.meta_keywords || "");
     window.scrollTo({ top: 300, behavior: "smooth" });
   };
 
@@ -241,7 +279,7 @@ export function AdminSettings() {
     <div className="flex-grow flex flex-col min-h-screen bg-slate-50/50">
       {/* Page Header */}
       <header className="bg-white border-b border-outline-variant px-6 py-6 md:px-margin-desktop sticky top-0 z-10 shadow-sm shrink-0">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <span className="text-[#2e7d32] text-xs font-black uppercase tracking-widest bg-emerald-50 border border-emerald-100 px-3.5 py-1 rounded-full inline-block mb-1.5">
               Bảng điều khiển máy chủ
@@ -258,7 +296,7 @@ export function AdminSettings() {
 
       {/* Settings Navigation Tabs */}
       <div className="bg-white border-b border-outline-variant px-6 md:px-margin-desktop shrink-0">
-        <div className="max-w-4xl mx-auto flex gap-4">
+        <div className="max-w-7xl mx-auto flex gap-4">
           <button
             onClick={() => setActiveTab("general")}
             className={`py-4 px-2 font-bold text-xs uppercase tracking-wider relative cursor-pointer flex items-center gap-1.5 transition-all text-stone-700 ${
@@ -290,7 +328,7 @@ export function AdminSettings() {
       </div>
 
       {/* Main Settings Content Form/CMS Panels */}
-      <div className="max-w-4xl mx-auto w-full px-6 md:px-margin-desktop py-8 flex-1 space-y-6">
+      <div className="max-w-7xl mx-auto w-full px-6 md:px-margin-desktop py-8 flex-1 space-y-6">
         
         {/* TAB 1: General configuration and system info */}
         {activeTab === "general" && (
@@ -437,67 +475,149 @@ export function AdminSettings() {
         {activeTab === "blog" && (
           <div className="space-y-6 animate-fade-in text-xs sm:text-sm">
             {blogNotif && (
-              <div className="bg-emerald-50 border border-[#2e7d32]/30 text-emerald-950 p-4 rounded-xl flex items-center gap-2.5 font-bold">
+              <div className="bg-emerald-50 border border-[#2e7d32]/30 text-emerald-950 p-4 rounded-xl flex items-center gap-2.5 font-bold shadow-sm">
                 <span className="material-symbols-outlined text-[#2e7d32]">check_circle</span>
                 <span>{blogNotif}</span>
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-              {/* Content Form Creator (5/12) */}
-              <div className="md:col-span-5 bg-white border border-outline-variant p-5 sm:p-6 rounded-2xl shadow-sm space-y-4 h-fit">
-                <div className="flex items-center justify-between border-b pb-3">
-                  <h3 className="font-extrabold text-base text-slate-900 flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-xl text-[#2e7d32]">post_add</span>
-                    {editingBlogId ? "Hiệu chỉnh bài viết" : "Soạn tin cảnh báo mới"}
-                  </h3>
+            <form onSubmit={handleSaveBlog} className="space-y-6">
+              {/* CMS Top Header Bar */}
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-[#2e7d32] shrink-0">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-black text-slate-900">
+                      {editingBlogId ? "Hiệu chỉnh bài viết" : "Trình soạn thảo CMS & SEO"}
+                    </h2>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      {editingBlogId ? "Đang cập nhật bài viết sẵn có trên hệ thống" : "Tạo bài viết mới tối ưu chuẩn Google Search"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
                   {editingBlogId && (
                     <button
                       type="button"
                       onClick={resetBlogForm}
-                      className="text-xs text-red-600 font-bold hover:underline"
+                      className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors cursor-pointer"
                     >
-                      Hủy sửa
+                      Hủy chỉnh sửa
                     </button>
                   )}
+                  <button
+                    type="submit"
+                    className="px-6 py-2.5 bg-[#2e7d32] hover:bg-[#205c22] text-white font-black rounded-xl text-xs uppercase tracking-wider shadow-sm transition-all active:scale-95 flex items-center gap-2 cursor-pointer"
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    {editingBlogId ? "Lưu thay đổi" : "Xuất bản bài viết"}
+                  </button>
+                </div>
+              </div>
+
+              {/* Main Content Grid: 8 Cols Editor / 4 Cols Sidebar */}
+              <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+                
+                {/* CỘT TRÁI (8/12): SOẠN THẢO NỘI DUNG */}
+                <div className="xl:col-span-8 space-y-6">
+                  
+                  {/* Card 1: Title & Slug */}
+                  <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                        Tiêu đề bài viết *
+                      </label>
+                      <input
+                        required
+                        className="w-full border-b-2 border-slate-200 py-2 text-xl sm:text-2xl font-black text-slate-900 placeholder-slate-300 focus:outline-none focus:border-[#2e7d32] transition-colors"
+                        placeholder="Nhập tiêu đề bài viết..."
+                        value={newBlogTitle}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setNewBlogTitle(val);
+                          if (!editingBlogId) {
+                            setNewBlogSlug(slugifyVietnamese(val));
+                          }
+                        }}
+                      />
+                    </div>
+
+                    {/* Clean Permalink Bar */}
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 pt-2 text-xs">
+                      <span className="text-slate-500 font-medium shrink-0">Đường dẫn thân thiện (URL):</span>
+                      <div className="flex items-center flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 focus-within:border-[#2e7d32] transition-colors">
+                        <span className="font-mono text-slate-400 text-[11px] shrink-0">checkzone.vn/news/</span>
+                        <input
+                          className="flex-1 bg-transparent outline-none font-mono text-slate-800 text-[11px] font-bold px-1"
+                          placeholder="duong-dan-bai-viet"
+                          value={newBlogSlug}
+                          onChange={(e) => setNewBlogSlug(slugifyVietnamese(e.target.value))}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card 2: Rich Text Editor */}
+                  <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-3">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                      <label className="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-[#2e7d32]"></span>
+                        Nội dung chi tiết bài viết
+                      </label>
+                      <span className="text-[10px] text-slate-400 font-mono">Soạn thảo Rich Text</span>
+                    </div>
+
+                    <div className="border border-slate-200 rounded-xl overflow-hidden">
+                      <ReactQuill
+                        theme="snow"
+                        value={newBlogContent}
+                        onChange={setNewBlogContent}
+                        modules={quillModules}
+                        placeholder="Bắt đầu viết nội dung bài viết..."
+                        className="bg-white [&_.ql-toolbar]:border-none [&_.ql-toolbar]:bg-slate-50/80 [&_.ql-toolbar]:border-b [&_.ql-toolbar]:border-slate-200 [&_.ql-container]:border-none [&_.ql-container]:min-h-[520px] [&_.ql-editor]:min-h-[520px] [&_.ql-editor]:text-sm [&_.ql-editor]:leading-relaxed [&_.ql-editor]:p-5"
+                      />
+                    </div>
+                  </div>
+
                 </div>
 
-                <form onSubmit={handleSaveBlog} className="space-y-4">
-                  <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-600 mb-1">Tiêu đề bài viết SEO *</label>
-                    <input
-                      type="text"
-                      className="w-full border-2 border-outline-variant rounded-xl px-3.5 py-2.5 text-xs focus:border-[#2e7d32] outline-none"
-                      placeholder="e.g. Cảnh báo hình thức scam shipper gọi điện"
-                      value={newBlogTitle}
-                      onChange={(e) => setNewBlogTitle(e.target.value)}
-                      required
-                    />
-                  </div>
+                {/* CỘT PHẢI (4/12): SEO & METADATA */}
+                <div className="xl:col-span-4 space-y-6">
+                  
+                  {/* Card 1: Category & Thumbnail */}
+                  <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-5">
+                    <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-3">
+                      Phân loại & Ảnh đại diện
+                    </h3>
 
-                  <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-600 mb-1">Thể loại bài viết</label>
-                    <select
-                      className="w-full border-2 border-outline-variant rounded-xl px-3.5 py-2.5 text-xs focus:border-[#2e7d32] outline-none bg-white text-slate-800"
-                      value={newBlogCategory}
-                      onChange={(e) => setNewBlogCategory(e.target.value)}
-                    >
-                      <option value="Cảnh báo khẩn cấp">Cảnh báo khẩn cấp (Badge Đỏ)</option>
-                      <option value="HƯỚNG DẪN & THỦ THUẬT">HƯỚNG DẪN & THỦ THUẬT (Badge Xanh)</option>
-                      <option value="Cảnh báo tài chính">Cảnh báo tài chính (Badge Cam)</option>
-                      <option value="Cảnh báo phổ thông">Cảnh báo phổ thông</option>
-                    </select>
-                  </div>
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1.5">
+                        Thể loại bài viết
+                      </label>
+                      <select
+                        className="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs focus:border-[#2e7d32] outline-none bg-white font-medium text-slate-800"
+                        value={newBlogCategory}
+                        onChange={(e) => setNewBlogCategory(e.target.value)}
+                      >
+                        <option value="Cảnh báo khẩn cấp">Cảnh báo khẩn cấp (Badge Đỏ)</option>
+                        <option value="HƯỚNG DẪN & THỦ THUẬT">HƯỚNG DẪN & THỦ THUẬT (Badge Xanh)</option>
+                        <option value="Cảnh báo tài chính">Cảnh báo tài chính (Badge Cam)</option>
+                        <option value="Cảnh báo phổ thông">Cảnh báo phổ thông</option>
+                        <option value="Quy chế & Chính sách">Quy chế & Chính sách (Ẩn tin mới)</option>
+                      </select>
+                    </div>
 
-                  {/* Thumbnail Input (File Upload via ImgBB OR URL string input) */}
-                  <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-600 mb-1">Ảnh đại diện (Thumbnail)</label>
-                    <div className="space-y-2">
-                      <div className="flex gap-2">
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1.5">
+                        Ảnh Thumbnail Cover
+                      </label>
+                      <div className="flex gap-2 mb-3">
                         <input
-                          type="text"
-                          className="flex-1 border-2 border-outline-variant rounded-xl px-3.5 py-2.5 text-xs focus:border-[#2e7d32] outline-none"
-                          placeholder="Dán URL ảnh hoặc tải từ máy..."
+                          className="flex-1 border border-slate-300 rounded-xl px-3 py-2 text-xs focus:border-[#2e7d32] outline-none"
+                          placeholder="Dán URL ảnh đại diện..."
                           value={newBlogThumbnail}
                           onChange={(e) => setNewBlogThumbnail(e.target.value)}
                         />
@@ -512,16 +632,15 @@ export function AdminSettings() {
                           type="button"
                           onClick={() => thumbnailFileInputRef.current?.click()}
                           disabled={isUploadingThumbnail}
-                          className="bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1 shrink-0 cursor-pointer"
+                          className="bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1 shrink-0 cursor-pointer transition-colors"
                         >
-                          <span className="material-symbols-outlined text-sm">cloud_upload</span>
-                          <span>{isUploadingThumbnail ? "Đang tải..." : "Tải ảnh"}</span>
+                          <CloudUpload className="w-3.5 h-3.5" />
+                          <span>{isUploadingThumbnail ? "..." : "Tải ảnh"}</span>
                         </button>
                       </div>
 
-                      {/* Thumbnail Preview */}
-                      {newBlogThumbnail && (
-                        <div className="relative aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-50 mt-2">
+                      {newBlogThumbnail ? (
+                        <div className="relative aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-50 shadow-sm">
                           <img
                             src={newBlogThumbnail}
                             alt="Thumbnail preview"
@@ -531,117 +650,176 @@ export function AdminSettings() {
                             }}
                           />
                         </div>
+                      ) : (
+                        <div className="aspect-video rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 flex flex-col items-center justify-center text-slate-400 gap-1 p-4 text-center">
+                          <span className="material-symbols-outlined text-2xl">image</span>
+                          <span className="text-[11px] font-medium">Chưa có ảnh bìa. Hãy chọn ảnh tải lên hoặc dán URL.</span>
+                        </div>
                       )}
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-600 mb-1">Đường dẫn thân thiện (Slug)</label>
-                    <input
-                      type="text"
-                      className="w-full border-2 border-outline-variant rounded-xl px-3.5 py-2.5 text-xs focus:border-[#2e7d32] outline-none font-mono"
-                      placeholder="Tự động tạo từ tiêu đề nếu để trống"
-                      value={newBlogSlug}
-                      onChange={(e) => setNewBlogSlug(e.target.value)}
-                    />
+                  {/* Card 2: Meta SEO Config */}
+                  <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-5">
+                    <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-3 flex items-center gap-2">
+                      <Search className="w-4 h-4 text-amber-500" /> Tối ưu Meta SEO
+                    </h3>
+
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1.5">
+                        Từ khóa chính (Focus Keywords)
+                      </label>
+                      <input
+                        className="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs focus:border-[#2e7d32] outline-none"
+                        placeholder="VD: lừa đảo chuyển khoản, check zone"
+                        value={newMetaKeywords}
+                        onChange={(e) => setNewMetaKeywords(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between items-end mb-1.5">
+                        <label className="block text-[11px] font-bold text-slate-700 uppercase">
+                          Thẻ mô tả (Meta Description)
+                        </label>
+                        <span className={`text-[10px] font-mono font-bold ${newMetaDescription.length > 160 ? 'text-red-500' : 'text-emerald-600'}`}>
+                          {newMetaDescription.length} / 160
+                        </span>
+                      </div>
+                      <textarea
+                        rows={3}
+                        className="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs focus:border-[#2e7d32] outline-none resize-none leading-relaxed"
+                        placeholder="Mô tả tóm tắt 150-160 ký tự giúp Google trích dẫn bài viết của bạn..."
+                        value={newMetaDescription}
+                        onChange={(e) => setNewMetaDescription(e.target.value)}
+                      />
+                    </div>
                   </div>
 
-                  <div>
-                    <label className="block text-[10px] uppercase font-bold text-slate-600 mb-1">Nội dung tóm tắt / Chi tiết</label>
-                    <textarea
-                      rows={4}
-                      className="w-full border-2 border-outline-variant rounded-xl px-3.5 py-2.5 text-xs focus:border-[#2e7d32] outline-none"
-                      placeholder="Nhập nội dung ngắn mô tả chi tiết bài viết..."
-                      value={newBlogContent}
-                      onChange={(e) => setNewBlogContent(e.target.value)}
-                    />
+                  {/* Card 3: Google SERP Preview */}
+                  <div className="bg-slate-900 text-white border border-slate-800 p-5 rounded-2xl shadow-sm space-y-3">
+                    <div className="flex items-center justify-between text-[11px] text-slate-400 font-bold uppercase tracking-wider border-b border-slate-800 pb-2">
+                      <span>Xem trước trên Google</span>
+                      <span className="text-[9px] text-slate-500 font-normal">Mobile Preview</span>
+                    </div>
+
+                    <div className="bg-white text-slate-900 p-3.5 rounded-xl shadow-md border border-slate-100">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <div className="w-5 h-5 bg-[#2e7d32] text-white rounded-full flex items-center justify-center text-[8px] font-black shrink-0">
+                          CZ
+                        </div>
+                        <div className="leading-tight overflow-hidden">
+                          <p className="text-[11px] text-slate-800 font-bold">Check Zone</p>
+                          <p className="text-[10px] text-slate-500 truncate max-w-[200px]">
+                            https://checkzone.vn/news/{newBlogSlug || 'bai-viet-moi'}
+                          </p>
+                        </div>
+                      </div>
+                      <h4 className="text-[#1a0dab] text-[14px] font-medium hover:underline truncate leading-snug">
+                        {newBlogTitle || 'Tiêu đề bài viết sẽ hiển thị ở đây'}
+                      </h4>
+                      <p className="text-[12px] text-[#4d5156] line-clamp-2 mt-1 leading-normal">
+                        {newMetaDescription || 'Vui lòng cung cấp thẻ mô tả (Meta description). Thẻ này rất quan trọng để Google và người dùng hiểu nội dung bài viết của bạn...'}
+                      </p>
+                    </div>
                   </div>
 
-                  <button
-                    type="submit"
-                    className="w-full bg-[#2e7d32] hover:bg-[#205c22] text-white font-extrabold text-[11px] uppercase py-3.5 rounded-xl transition-all shadow-sm cursor-pointer"
-                  >
-                    {editingBlogId ? "Lưu thay đổi bài viết" : "Đăng tin SEO & Công bố"}
-                  </button>
-                </form>
+                </div>
+              </div>
+            </form>
+
+            {/* BẢNG KHO LƯU TRỮ BÀI VIẾT (Archive Table) */}
+            <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+              <div className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/60 flex justify-between items-center">
+                <div>
+                  <h4 className="font-black text-slate-900 uppercase text-xs tracking-wide">
+                    Kho lưu trữ bài viết & Cảnh báo ({blogs.length})
+                  </h4>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Danh sách các bài viết đã xuất bản trên hệ thống</p>
+                </div>
+                <button
+                  onClick={() => fetchBlogs()}
+                  className="text-xs text-[#2e7d32] font-bold hover:underline flex items-center gap-1 cursor-pointer bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200"
+                >
+                  <span className="material-symbols-outlined text-sm">refresh</span> Tải lại
+                </button>
               </div>
 
-              {/* Content List Table (7/12) */}
-              <div className="md:col-span-7 bg-white border border-outline-variant rounded-2xl shadow-sm overflow-hidden flex flex-col">
-                <div className="p-4 sm:p-5 border-b bg-slate-50/50 flex justify-between items-center">
-                  <h4 className="font-extrabold text-slate-900 uppercase text-[11px] tracking-wide">Kho lưu trữ bài viết & Cảnh báo ({blogs.length})</h4>
-                  <button
-                    onClick={() => fetchBlogs()}
-                    className="text-[10px] text-primary font-bold hover:underline flex items-center gap-1"
-                  >
-                    <span className="material-symbols-outlined text-xs">refresh</span> Tải lại
-                  </button>
-                </div>
-                <div className="overflow-x-auto text-xs">
-                  <table className="w-full text-left">
-                    <thead>
-                      <tr className="bg-slate-50 border-b border-outline-variant text-[10px] uppercase font-bold text-slate-600 opacity-75 whitespace-nowrap">
-                        <th className="p-4 whitespace-nowrap">Hình ảnh</th>
-                        <th className="p-4 whitespace-nowrap">Bài viết</th>
-                        <th className="p-4 text-center whitespace-nowrap">Trạng thái</th>
-                        <th className="p-4 text-right whitespace-nowrap">Thao tác</th>
+              <div className="overflow-x-auto text-xs">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-200 text-[10px] uppercase font-bold text-slate-500 tracking-wider whitespace-nowrap">
+                      <th className="p-4 w-16">Hình ảnh</th>
+                      <th className="p-4">Tiêu đề bài viết</th>
+                      <th className="p-4 text-center">Thể loại</th>
+                      <th className="p-4 text-center">Trạng thái</th>
+                      <th className="p-4 text-right">Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 font-medium">
+                    {blogs.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="p-8 text-center text-slate-400 font-bold">
+                          Chưa có bài viết nào. Hãy soạn bài viết đầu tiên bên trên!
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody className="divide-y divide-outline-variant font-medium">
-                      {blogs.length === 0 ? (
-                        <tr>
-                          <td colSpan={4} className="p-6 text-center text-slate-400 font-bold">Chưa có bài viết nào. Hãy soạn bài viết đầu tiên bên trái!</td>
+                    ) : (
+                      blogs.map((art) => (
+                        <tr key={art.id} className="hover:bg-slate-50/60 transition-colors">
+                          <td className="p-4">
+                            <img
+                              src={art.thumbnail || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=600&q=80"}
+                              alt={art.title}
+                              className="w-12 h-12 rounded-xl object-cover border border-slate-200 shadow-sm"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=600&q=80";
+                              }}
+                            />
+                          </td>
+                          <td className="p-4 min-w-[240px]">
+                            <p className="font-bold text-slate-900 line-clamp-2 leading-snug">{art.title}</p>
+                            <p className="text-[10px] text-slate-400 font-mono mt-1">/news/{art.slug}</p>
+                          </td>
+                          <td className="p-4 text-center whitespace-nowrap">
+                            <span className="px-2.5 py-1 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                              {art.category}
+                            </span>
+                          </td>
+                          <td className="p-4 text-center whitespace-nowrap">
+                            <span className={`px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wider border ${
+                              art.status === "Đã đăng"
+                                ? "bg-emerald-50 text-[#2e7d32] border-emerald-200"
+                                : "bg-slate-100 text-slate-600 border-slate-200"
+                            }`}>
+                              {art.status}
+                            </span>
+                          </td>
+                          <td className="p-4 text-right whitespace-nowrap">
+                            <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={() => handleEditBlog(art)}
+                                className="px-3 py-1.5 bg-slate-100 hover:bg-[#2e7d32] hover:text-white text-slate-700 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                              >
+                                <span className="material-symbols-outlined text-sm">edit</span>
+                                Sửa
+                              </button>
+                              <button
+                                onClick={() => handleDeleteBlog(art.id, art.title)}
+                                className="px-3 py-1.5 bg-red-50 hover:bg-red-600 hover:text-white text-red-600 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                              >
+                                <span className="material-symbols-outlined text-sm">delete</span>
+                                Xóa
+                              </button>
+                            </div>
+                          </td>
                         </tr>
-                      ) : (
-                        blogs.map((art) => (
-                          <tr key={art.id} className="hover:bg-slate-50/40 transition-colors">
-                            <td className="p-4 w-16">
-                              <img
-                                src={art.thumbnail || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=600&q=80"}
-                                alt={art.title}
-                                className="w-12 h-12 rounded-lg object-cover border border-slate-200"
-                                onError={(e) => {
-                                  (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=600&q=80";
-                                }}
-                              />
-                            </td>
-                            <td className="p-4 min-w-[200px]">
-                              <p className="font-bold text-slate-800 line-clamp-2 leading-tight">{art.title}</p>
-                              <span className="text-[10px] text-slate-500 font-mono mt-0.5 inline-block capitalize">{art.category}</span>
-                            </td>
-                            <td className="p-4 text-center whitespace-nowrap">
-                              <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border ${
-                                art.status === "Đã đăng" ? "bg-emerald-50 text-[#2e7d32] border-emerald-200" : "bg-slate-100 text-slate-600 border-slate-200"
-                              }`}>
-                                {art.status}
-                              </span>
-                            </td>
-                            <td className="p-4 text-right whitespace-nowrap">
-                              <div className="flex items-center justify-end gap-1.5">
-                                <button
-                                  onClick={() => handleEditBlog(art)}
-                                  className="p-1.5 text-slate-600 hover:text-primary hover:bg-slate-100 rounded-lg transition-colors"
-                                  title="Chỉnh sửa bài viết"
-                                >
-                                  <span className="material-symbols-outlined text-base">edit</span>
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteBlog(art.id, art.title)}
-                                  className="p-1.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                  title="Xóa bài viết"
-                                >
-                                  <span className="material-symbols-outlined text-base">delete</span>
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
+                      ))
+                    )}
+                  </tbody>
+                </table>
               </div>
             </div>
+
           </div>
         )}
 

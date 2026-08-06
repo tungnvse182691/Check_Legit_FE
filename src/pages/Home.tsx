@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useApp, API_BASE_URL } from "../context/AppContext";
 import { useDebounce } from "../hooks/useDebounce";
 import { removeVietnameseTones, highlightText, HighlightedText } from "../components/HighlightedText";
+import { NewsCarousel } from "../components/NewsCarousel";
 
 const MOCK_ARTICLES = [
   {
@@ -377,7 +378,7 @@ export function Home() {
                 <div className="flex-grow">
                   <h3 className="text-lg sm:text-headline-md font-extrabold text-red-600 uppercase">XÁC ĐỊNH LỪA ĐẢO TRÙNG KHỚP!</h3>
                   <p className="text-xs sm:text-body-md text-red-950 font-semibold mt-1">
-                    Thông tin "<span className="underline font-bold">{searchResult.searchedTerm}</span>" trùng khớp với hồ sơ lừa đảo đã xác thực của <span className="font-extrabold text-red-700">{searchResult.item.name}</span>!
+                    Thông tin "<span className="underline font-bold">{searchResult.searchedTerm}</span>" trùng khớp với hồ sơ lừa đảo đã xác thực của <span className="font-extrabold text-red-700">{(searchResult.item.accountHolderName && searchResult.item.accountHolderName.trim()) ? searchResult.item.accountHolderName : searchResult.item.name}</span>!
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4 mt-4 bg-white/80 p-4 rounded-2xl text-xs sm:text-sm border border-red-200 shadow-inner">
                     <div><strong className="text-on-surface-variant">Số tài khoản:</strong> {searchResult.item.accountNumber} ({searchResult.item.bankName})</div>
@@ -404,7 +405,7 @@ export function Home() {
                 <div className="flex-grow">
                   <h3 className="text-lg sm:text-headline-md font-extrabold text-amber-700 uppercase">PHÁT HIỆN CẢNH BÁO HÀNH VI XẤU!</h3>
                   <p className="text-xs sm:text-body-md text-amber-955 font-semibold mt-1">
-                    Thông tin "<span className="underline font-bold">{searchResult.searchedTerm}</span>" trùng khớp với hồ sơ cảnh báo hành vi vi phạm uy tín của <span className="font-extrabold text-amber-700">{searchResult.item.name}</span>!
+                    Thông tin "<span className="underline font-bold">{searchResult.searchedTerm}</span>" trùng khớp với hồ sơ cảnh báo hành vi vi phạm uy tín của <span className="font-extrabold text-amber-700">{(searchResult.item.accountHolderName && searchResult.item.accountHolderName.trim()) ? searchResult.item.accountHolderName : searchResult.item.name}</span>!
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4 mt-4 bg-white/80 p-4 rounded-2xl text-xs sm:text-sm border border-amber-200 shadow-inner">
                     <div><strong className="text-on-surface-variant">Kênh nhận diện / Tài khoản:</strong> {searchResult.item.accountNumber} ({searchResult.item.bankName})</div>
@@ -446,7 +447,7 @@ export function Home() {
                 </div>
                 <div className="w-full sm:w-auto mt-4 sm:mt-0">
                   <Link
-                    to={`/legit/${searchResult.item.id}`}
+                    to={`/legit/${searchResult.item.slug || searchResult.item.id}`}
                     className="block text-center bg-emerald-600 text-white font-bold px-6 py-3 rounded-xl text-label-sm hover:scale-[1.05] hover:shadow-md transition-all whitespace-nowrap"
                   >
                     XEM CỬA HÀNG
@@ -514,7 +515,9 @@ export function Home() {
                     {/* Left: Target details */}
                     <div className="flex flex-col gap-2.5 flex-grow min-w-0">
                       <div className="flex items-center gap-2.5 flex-wrap">
-                        <h3 className="text-base font-bold text-slate-800 leading-tight">{report.name}</h3>
+                        <h3 className="text-base font-bold text-slate-800 leading-tight">
+                          {(report.accountHolderName && report.accountHolderName.trim()) ? report.accountHolderName : report.name}
+                        </h3>
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shrink-0 ${
                           isReportWarning 
                             ? "bg-amber-100 text-amber-800" 
@@ -576,7 +579,7 @@ export function Home() {
             <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100 bg-white">
               {topLegit.map((legit) => (
                 <Link 
-                  to={`/legit/${legit.id}`} 
+                  to={`/legit/${legit.slug || legit.id}`} 
                   key={legit.id} 
                   className="p-6 flex items-center gap-4 hover:bg-emerald-50/40 hover:scale-[1.02] transition-all duration-300 block"
                 >
@@ -611,7 +614,7 @@ export function Home() {
             </p>
           </div>
           <Link
-            to="/legit"
+            to="/legit/register"
             className="relative z-10 bg-white text-primary px-8 py-4.5 rounded-2xl font-bold hover:scale-[1.05] hover:shadow-xl active:scale-95 transition-all duration-300 inline-block text-center whitespace-nowrap"
           >
             Tạo Hồ Sơ Legit Ngay
@@ -622,71 +625,8 @@ export function Home() {
         </div>
       </section>
 
-      {/* News/Blog Section - Dynamic data from Backend API */}
-      <section className="max-w-[1400px] mx-auto px-6 mb-24">
-        <div className="flex items-center gap-3 mb-8">
-          <span className="material-symbols-outlined text-primary text-3xl font-bold">newspaper</span>
-          <h2 className="text-2xl font-extrabold text-on-surface">Tin tức mới</h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {(blogs && blogs.length > 0 ? blogs : MOCK_ARTICLES).slice(0, 6).map((article: any) => {
-            const fallbackImage = "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=600&q=80";
-            const thumbnail = article.thumbnail || article.thumbnailUrl || fallbackImage;
-            const categoryLower = (article.category || "").toLowerCase();
-            const isUrgent = categoryLower.includes("khẩn");
-            const isGuide = categoryLower.includes("hướng dẫn") || categoryLower.includes("thủ thuật");
-            const isFinance = categoryLower.includes("tài chính") || categoryLower.includes("đầu tư");
-
-            return (
-              <article key={article.id} className="bg-white border border-outline-variant rounded-2xl overflow-hidden shadow-sm hover:scale-[1.02] hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
-                <Link to={`/news/${article.slug || article.id}`} className="block">
-                  <div className="aspect-video w-full bg-slate-100 border-b border-slate-100 overflow-hidden relative">
-                    <img
-                      src={thumbnail}
-                      alt={article.title}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = fallbackImage;
-                      }}
-                    />
-                    <div className="absolute top-3 left-3">
-                      <span className={`text-[9px] font-black uppercase px-2.5 py-1 rounded-md shadow-sm text-white ${
-                        isUrgent ? "bg-red-600" :
-                        isGuide ? "bg-emerald-600" :
-                        isFinance ? "bg-amber-600" : "bg-emerald-700"
-                      }`}>
-                        {article.category}
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-                
-                <div className="p-5 flex-grow flex flex-col justify-between">
-                  <div>
-                    <span className="text-[10px] text-on-surface-variant font-bold block mb-2 font-mono">
-                      {article.createdAt || article.date || "Mới đăng"}
-                    </span>
-                    <Link to={`/news/${article.slug || article.id}`}>
-                      <h3 className="text-base font-extrabold text-on-surface mb-2 line-clamp-2 hover:text-primary transition-colors text-left leading-snug">
-                        {article.title}
-                      </h3>
-                    </Link>
-                    <p className="text-xs sm:text-sm text-on-surface-variant line-clamp-3 leading-relaxed text-left opacity-90">
-                      {article.content || article.desc || "Chi tiết thông tin cảnh báo từ hệ thống giám sát an toàn giao dịch Check Zone."}
-                    </p>
-                  </div>
-                  <div className="pt-4 text-left border-t border-slate-100 mt-4">
-                    <span className="text-xs font-extrabold text-primary hover:underline cursor-pointer flex items-center gap-1">
-                      Đọc bài viết <span className="text-sm">→</span>
-                    </span>
-                  </div>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      </section>
+      {/* News/Blog Section - Carousel tự cuộn 3s, max 9 bài mới nhất */}
+      <NewsCarousel blogs={blogs} />
     </div>
   );
 }

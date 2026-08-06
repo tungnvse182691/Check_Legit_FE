@@ -56,25 +56,35 @@ export function LegitList() {
             </p>
           </div>
           
-          <div className="relative w-full md:w-2/3 lg:w-1/2">
-            <div className="flex items-center bg-white border-2 border-outline rounded-2xl p-2.5 focus-within:border-primary shadow-sm focus-within:ring-4 focus-within:ring-emerald-50 transition-all duration-300">
-              <span className="material-symbols-outlined px-3 text-emerald-750">search</span>
-              <input 
-                className="w-full border-none focus:outline-none bg-transparent text-sm sm:text-base py-2.5 outline-none text-on-surface" 
-                placeholder="Tìm theo tên cửa hàng, sản phẩm hoặc định danh..." 
-                type="text" 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              {searchTerm && (
-                <button 
-                  onClick={() => setSearchTerm("")}
-                  className="px-2 text-on-surface-variant hover:text-primary text-xs sm:text-sm font-bold cursor-pointer focus:outline-none"
-                >
-                  Xoá
-                </button>
-              )}
+          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4">
+            <div className="relative w-full md:w-2/3 lg:w-1/2">
+              <div className="flex items-center bg-white border-2 border-outline rounded-2xl p-2.5 focus-within:border-primary shadow-sm focus-within:ring-4 focus-within:ring-emerald-50 transition-all duration-300">
+                <span className="material-symbols-outlined px-3 text-emerald-750">search</span>
+                <input 
+                  className="w-full border-none focus:outline-none bg-transparent text-sm sm:text-base py-2.5 outline-none text-on-surface" 
+                  placeholder="Tìm theo tên cửa hàng, sản phẩm hoặc định danh..." 
+                  type="text" 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                {searchTerm && (
+                  <button 
+                    onClick={() => setSearchTerm("")}
+                    className="px-2 text-on-surface-variant hover:text-primary text-xs sm:text-sm font-bold cursor-pointer focus:outline-none"
+                  >
+                    Xoá
+                  </button>
+                )}
+              </div>
             </div>
+            
+            <Link
+              to="/legit/register"
+              className="bg-primary hover:bg-emerald-800 text-white font-black px-6 py-3.5 rounded-2xl shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2 whitespace-nowrap text-sm cursor-pointer hover:scale-[1.02] active:scale-95"
+            >
+              <span className="material-symbols-outlined text-xl">verified</span>
+              <span>ĐĂNG KÝ LÀM HỒ SƠ UY TÍN</span>
+            </Link>
           </div>
         </div>
       </section>
@@ -146,7 +156,7 @@ export function LegitList() {
 
                 <div className="p-6 pt-4 border-t border-outline-variant flex items-center justify-end bg-emerald-50/20">
                   <Link 
-                    to={`/legit/${item.id}`} 
+                    to={`/legit/${item.slug || item.id}`} 
                     className="text-xs sm:text-sm font-bold border border-outline px-5 py-2.5 rounded-xl hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 bg-white shadow-sm hover:scale-[1.02] active:scale-95 cursor-pointer"
                   >
                     Xem hồ sơ

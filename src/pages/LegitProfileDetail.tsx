@@ -5,8 +5,12 @@ export function LegitProfileDetail() {
   const { id } = useParams();
   const { legitList } = useApp();
 
-  // Find merchant, fallback to first if not found
-  const merchant = legitList.find((l) => l.id === Number(id)) || legitList[0];
+  const param = (id || "").toLowerCase();
+  const merchant = legitList.find((l) =>
+    (l.slug && l.slug.toLowerCase() === param) ||
+    l.id.toString() === param ||
+    l.id === Number(id)
+  ) || legitList[0];
 
   if (!merchant) {
     return (
@@ -93,7 +97,7 @@ export function LegitProfileDetail() {
                 {/* Role / Business Type Display */}
                 <div className="flex items-center gap-1.5 text-emerald-800 font-extrabold text-sm uppercase tracking-widest bg-emerald-50 px-3.5 py-1.5 rounded-full inline-flex border border-emerald-100/60">
                   <span className="material-symbols-outlined text-base">category</span>
-                  Ngành: {merchant.role}
+                  {merchant.role}
                 </div>
 
                 {/* Tier Badge */}
@@ -110,7 +114,7 @@ export function LegitProfileDetail() {
             <div className="pt-8">
               <h3 className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-3 flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-sm">info</span>
-                Mô tả tiểu thương
+                Hồ sơ năng lực
               </h3>
               <p className="text-on-surface-variant text-base leading-relaxed bg-slate-50 border border-slate-100 p-6 rounded-2xl whitespace-pre-line font-medium text-slate-700">
                 {merchant.desc}
@@ -162,7 +166,7 @@ export function LegitProfileDetail() {
                   Kênh Liên Hệ Đã Xác Minh
                 </h2>
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  Để đảm bảo giao dịch an toàn và tránh các tài khoản lừa đảo giả mạo danh nghĩa của tiểu thương, xin vui lòng chỉ trao đổi trực tiếp qua các thông tin định danh dưới đây.
+                  Để đảm bảo giao dịch an toàn và tránh các tài khoản lừa đảo giả mạo danh nghĩa của hồ sơ này, xin vui lòng chỉ trao đổi trực tiếp qua các thông tin định danh dưới đây.
                 </p>
               </div>
 
@@ -170,7 +174,7 @@ export function LegitProfileDetail() {
               <div className="space-y-4 pt-2">
                 
                 {/* Telegram */}
-                {merchant.telegram && (
+                {merchant.telegram && merchant.telegram.trim() && merchant.telegram !== "@verified_merchant" && (
                   <div className="bg-white/5 border border-white/10 p-4 rounded-2xl flex items-center justify-between hover:bg-white/10 transition-colors shadow-sm">
                     <div className="flex items-center gap-3.5 w-full">
                       <div className="w-11 h-11 rounded-xl bg-cyan-600 flex items-center justify-center shadow-inner shrink-0">

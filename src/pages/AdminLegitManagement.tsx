@@ -20,6 +20,7 @@ export function AdminLegitManagement() {
   const { legitList, addLegitProfile, deleteLegitProfile, updateLegitProfile } = useApp();
 
   const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
   const [role, setRole] = useState("Thương mại điện tử & Đồ công nghệ");
   const [insurance, setInsurance] = useState("50000000");
   const [desc, setDesc] = useState("");
@@ -29,6 +30,8 @@ export function AdminLegitManagement() {
   const [facebook, setFacebook] = useState("");
   const [address, setAddress] = useState("");
   const [website, setWebsite] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
+  const [bankName, setBankName] = useState("");
   const [successNotif, setSuccessNotif] = useState("");
   const [alertMsg, setAlertMsg] = useState("");
 
@@ -38,6 +41,11 @@ export function AdminLegitManagement() {
   const handleAvatarFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setAlertMsg("Vui lòng chỉ chọn file ảnh (JPG, PNG, WEBP).");
+      return;
+    }
 
     if (file.size > 5 * 1024 * 1024) {
       setAlertMsg("Dung lượng ảnh không được vượt quá 5MB.");
@@ -64,16 +72,14 @@ export function AdminLegitManagement() {
           return;
         }
       }
+      // ImgBB returned non-ok or no URL → show error, do NOT fallback to base64
+      setAlertMsg("Tải ảnh lên thất bại. Vui lòng thử lại hoặc dán URL ảnh trực tiếp vào ô bên dưới.");
     } catch (err) {
-      console.warn("ImgBB upload error, falling back to data URL:", err);
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImgUrl(reader.result as string);
+      console.error("ImgBB upload error:", err);
+      setAlertMsg("Lỗi kết nối khi tải ảnh lên. Vui lòng dán URL ảnh trực tiếp vào ô bên dưới.");
+    } finally {
       setIsUploadingAvatar(false);
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
   const insuranceValue = Number(insurance) || 0;
@@ -104,6 +110,7 @@ export function AdminLegitManagement() {
 
   const resetForm = () => {
     setName("");
+    setSlug("");
     setDesc("");
     setTelegram("");
     setPhone("");
@@ -112,12 +119,15 @@ export function AdminLegitManagement() {
     setFacebook("");
     setAddress("");
     setWebsite("");
+    setAccountNumber("");
+    setBankName("");
     setEditingId(null);
   };
 
   const handleEditClick = (item: LegitProfile) => {
     setEditingId(item.id);
     setName(item.name);
+    setSlug(item.slug || "");
     setRole(item.role);
     setInsurance(item.insurance.toString());
     setDesc(item.desc);
@@ -127,6 +137,8 @@ export function AdminLegitManagement() {
     setFacebook(item.facebook || "");
     setAddress(item.address || "");
     setWebsite(item.website || "");
+    setAccountNumber(item.accountNumber || "");
+    setBankName(item.bankName || "");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -156,6 +168,7 @@ export function AdminLegitManagement() {
     if (editingId !== null) {
       const success = await updateLegitProfile(editingId, {
         name: name.trim(),
+        slug: slug.trim() || undefined,
         role: role.trim(),
         desc: desc.trim(),
         insurance: insuranceValue,
@@ -165,7 +178,9 @@ export function AdminLegitManagement() {
         businessType: role.trim(),
         facebook: facebook.trim(),
         address: address.trim(),
-        website: website.trim()
+        website: website.trim(),
+        accountNumber: accountNumber.trim(),
+        bankName: bankName.trim()
       });
       if (success) {
         setSuccessNotif(`Đã cập nhật thông tin thành công cho đơn vị: "${name.trim()}".`);
@@ -174,6 +189,7 @@ export function AdminLegitManagement() {
     } else {
       await addLegitProfile({
         name: name.trim(),
+        slug: slug.trim() || undefined,
         role: role.trim(),
         desc: desc.trim(),
         insurance: insuranceValue,
@@ -186,7 +202,9 @@ export function AdminLegitManagement() {
         businessType: role.trim(),
         facebook: facebook.trim(),
         address: address.trim(),
-        website: website.trim()
+        website: website.trim(),
+        accountNumber: accountNumber.trim(),
+        bankName: bankName.trim()
       });
       setSuccessNotif(`Đã cấp hồ sơ ký quỹ uy tín thành công cho đơn vị: "${name.trim()}".`);
       resetForm();
@@ -390,261 +408,249 @@ export function AdminLegitManagement() {
   return (
     <div className="flex-grow flex flex-col min-h-screen bg-slate-50/50">
       {/* Page Header */}
-      <header className="bg-white border-b border-outline-variant px-6 py-6 md:px-6 sticky top-0 z-10 shadow-sm shrink-0">
-        <div className="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3.5xl font-black text-on-surface tracking-tight">
-              Quản lý danh sách uy tín
-            </h1>
-          </div>
-          <span className="bg-[#2e7d32] text-white px-4 py-2 rounded-2xl font-mono text-xs font-bold shadow-sm inline-flex items-center gap-1.5 self-start sm:self-auto uppercase">
-            <span className="material-symbols-outlined text-xs">verified_user</span>
-            {legitList.length} Thương nhân hợp tác
-          </span>
+      <header className="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-10 shadow-sm flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-black text-slate-900">Quản lý danh sách uy tín</h1>
+          <p className="text-xs text-slate-500 mt-1">Hệ thống quản trị và kiểm duyệt hồ sơ thương nhân</p>
         </div>
+        <span className="bg-[#2e7d32] text-white px-4 py-2 rounded-full font-mono text-xs font-bold shadow-sm">
+          {legitList.length} Thương nhân hợp tác
+        </span>
       </header>
 
-      {/* Main Grid View */}
-      <div className="w-full px-6 md:px-6 py-8 pb-20 grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1">
-        
-        {/* Creation Form Column (5/12 width) */}
-        <section className="col-span-12 lg:col-span-4">
-          <div className="bg-white border border-outline-variant rounded-2xl p-6 md:p-8 shadow-sm space-y-6 sticky top-28 animate-fade-in">
-            <div>
-              <h2 className="text-xl font-black text-[#2e7d32] flex items-center gap-2">
-                <span className="material-symbols-outlined font-bold text-xl">
-                  {editingId !== null ? "edit_document" : "add_circle"}
+      <div className="w-full max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 xl:grid-cols-3 gap-8">
+        {/* CỘT TRÁI: FORM NHẬP LIỆU */}
+        <section className="xl:col-span-2 space-y-6">
+          <form onSubmit={handleCreate} className="space-y-6">
+
+            {/* Card 1: Thông tin cơ bản */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+              <h2 className="text-lg font-black text-[#2e7d32] mb-4 flex items-center gap-2">
+                <span className="bg-green-100 p-1.5 rounded-lg text-green-700">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </span>
-                {editingId !== null ? `Cập nhật hồ sơ Legit` : "Cấp hồ sơ Legit mới"}
+                {editingId !== null ? "Cập nhật hồ sơ" : "Thông tin thương hiệu"}
               </h2>
-              <p className="text-xs text-on-surface-variant mt-1">
-                {editingId !== null ? "Chỉnh sửa thông tin chi tiết của thương nhân đã được cấp bảo chứng." : "Đăng ký mới một thương nhân đã được bộ phận rà soát thực tế ký quỹ giao dịch."}
-              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className="block font-bold text-slate-700 text-xs mb-1.5">Tên thương hiệu / Người bán *</label>
+                  <input
+                    className="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:border-[#2e7d32] focus:ring-2 focus:ring-green-100 outline-none transition-all"
+                    placeholder="Ví dụ: Tech Global Store"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 text-xs mb-1.5">Đường dẫn tùy chỉnh (Slug)</label>
+                  <input
+                    className="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm font-mono text-slate-600 focus:border-[#2e7d32] focus:ring-2 focus:ring-green-100 outline-none transition-all bg-slate-50"
+                    placeholder="Ví dụ: topzone_shop"
+                    value={slug}
+                    onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""))}
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block font-bold text-slate-700 text-xs mb-1.5">Lĩnh vực hoạt động *</label>
+                  <input
+                    list="business-types"
+                    className="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:border-[#2e7d32] outline-none"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                  />
+                  <datalist id="business-types">
+                    {PREDEFINED_SECTORS.map((sector, i) => <option key={i} value={sector} />)}
+                  </datalist>
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block font-bold text-slate-700 text-xs mb-1.5">Mô tả / Hồ sơ năng lực kinh doanh *</label>
+                  <textarea
+                    rows={4}
+                    className="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm focus:border-[#2e7d32] focus:ring-2 focus:ring-green-100 outline-none transition-all resize-none"
+                    placeholder="Mô tả các sản phẩm kinh doanh chính và cam kết bảo hành..."
+                    value={desc}
+                    onChange={(e) => setDesc(e.target.value)}
+                  />
+                </div>
+              </div>
             </div>
 
-            {alertMsg && (
-              <div className="p-4 bg-red-50 border border-red-200 text-red-900 rounded-xl text-xs font-semibold flex items-center gap-2.5 animate-pulse">
-                <span className="material-symbols-outlined text-red-650 font-bold text-sm">warning</span>
-                <span>{alertMsg}</span>
-              </div>
-            )}
-
-            {successNotif && (
-              <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-955 rounded-xl text-xs font-semibold flex items-center gap-2.5">
-                <span className="material-symbols-outlined text-[#2e7d32] font-bold text-sm">check_circle</span>
-                <span>{successNotif}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleCreate} className="space-y-4 text-xs">
-              <div>
-                <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">Tên thương hiệu / Người bán *</label>
-                <input
-                  className="w-full border-2 border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-[#2e7d32] outline-none shadow-sm transition-all focus:ring-4 focus:ring-emerald-50"
-                  placeholder="Ví dụ: Tech Global Store"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">Lĩnh vực hoạt động *</label>
-                <input
-                  type="text"
-                  list="business-types"
-                  className="w-full border-2 border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-[#2e7d32] outline-none bg-white shadow-sm transition-all text-slate-800 focus:ring-4 focus:ring-emerald-50"
-                  placeholder="Chọn từ gợi ý hoặc tự nhập lĩnh vực khác"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                />
-                <datalist id="business-types">
-                  {PREDEFINED_SECTORS.map((sector, index) => (
-                    <option key={index} value={sector} />
-                  ))}
-                </datalist>
-              </div>
-
-              <div>
-                <label className="block font-bold text-[#2e7d32] uppercase tracking-wider text-[10px] mb-1.5">Ký quỹ tiền bảo lãnh thương mại (VNĐ) *</label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-4 flex items-center text-[#2e7d32] font-bold">đ</span>
+            {/* Card 2: Tài chính & Xác thực ngân hàng */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+              <h2 className="text-lg font-black text-emerald-700 mb-4 flex items-center gap-2">
+                <span className="bg-emerald-100 p-1.5 rounded-lg text-emerald-700">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </span>
+                Tài chính &amp; Xác thực ngân hàng
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div className="sm:col-span-2">
+                  <label className="block font-bold text-emerald-800 text-xs mb-1.5">Ký quỹ bảo lãnh (VNĐ) *</label>
                   <input
-                    className="w-full border-2 border-[#2e7d32]/30 rounded-xl pl-9 pr-4 py-3 font-mono font-black text-sm text-[#2e7d32] focus:border-[#2e7d32] outline-none shadow-sm transition-all focus:ring-4 focus:ring-emerald-50"
-                    placeholder="e.g. 100000000"
                     type="number"
+                    className="w-full border-2 border-emerald-200 bg-emerald-50 rounded-xl px-4 py-3 text-lg font-mono font-black text-emerald-700 focus:border-emerald-500 outline-none"
                     value={insurance}
                     onChange={(e) => setInsurance(e.target.value)}
                   />
-                </div>
-
-                <div className="mt-2.5 p-3 rounded-xl flex items-center justify-between text-[11px] font-bold shadow-sm transition-all duration-300 bg-slate-50/50 border border-slate-100">
-                  <span className="text-slate-500 font-semibold">Bậc ký duyệt tự động:</span>
-                  <div className={`px-2.5 py-1 rounded-full flex items-center gap-1 uppercase tracking-wide text-[10px] ${liveTier.className}`}>
-                    <span className="material-symbols-outlined text-xs align-middle">{liveTier.icon}</span>
-                    {liveTier.label}
+                  <div className="mt-2 flex items-center gap-2 text-xs">
+                    Bậc duyệt tự động:
+                    <span className={`px-2 py-1 rounded font-bold ${liveTier?.className || ''}`}>
+                      {liveTier?.label || 'Đang cập nhật'}
+                    </span>
                   </div>
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">Telegram liên hệ</label>
+                  <label className="block font-bold text-slate-700 text-xs mb-1.5">Số tài khoản đã xác thực</label>
                   <input
-                    className="w-full border-2 border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-[#2e7d32] outline-none shadow-sm transition-all focus:ring-4 focus:ring-emerald-50"
-                    placeholder="Ví dụ: @techglobal"
-                    type="text"
-                    value={telegram}
-                    onChange={(e) => setTelegram(e.target.value)}
+                    className="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm font-mono font-bold focus:border-emerald-500 outline-none"
+                    placeholder="Ví dụ: 190382918390"
+                    value={accountNumber}
+                    onChange={(e) => setAccountNumber(e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">Hotline / Zalo *</label>
+                  <label className="block font-bold text-slate-700 text-xs mb-1.5">Ngân hàng đã xác thực</label>
                   <input
-                    className="w-full border-2 border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-[#2e7d32] outline-none shadow-sm transition-all focus:ring-4 focus:ring-emerald-50"
-                    placeholder="Ví dụ: 0912345678"
-                    type="text"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ""))}
+                    className="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:border-emerald-500 outline-none"
+                    placeholder="Ví dụ: MB Bank"
+                    value={bankName}
+                    onChange={(e) => setBankName(e.target.value)}
                   />
                 </div>
               </div>
+            </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">
-                  Ảnh đại diện / Logo thương nhân *
-                </label>
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-xl border border-slate-200">
-                    <img
-                      src={imgUrl || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=300&q=80"}
-                      alt="Avatar Preview"
-                      className="w-14 h-14 rounded-full object-cover border-2 border-emerald-500 shadow-sm shrink-0"
-                    />
-                    <div className="flex-1 space-y-1.5">
-                      <label className={`bg-[#2e7d32] hover:bg-[#205c22] text-white font-bold text-xs py-2 px-3.5 rounded-xl cursor-pointer inline-flex items-center gap-1.5 shadow-sm transition-all ${isUploadingAvatar ? "opacity-60 pointer-events-none" : ""}`}>
-                        <span className={`material-symbols-outlined text-sm ${isUploadingAvatar ? "animate-spin" : ""}`}>
-                          {isUploadingAvatar ? "sync" : "cloud_upload"}
-                        </span>
-                        {isUploadingAvatar ? "Đang tải ảnh lên..." : "Tải ảnh từ máy tính"}
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={handleAvatarFileChange}
-                          disabled={isUploadingAvatar}
-                        />
-                      </label>
-                      <p className="text-[10px] text-slate-400 font-semibold">Tự động chọn file từ máy tính (JPG, PNG, WEBP)</p>
-                    </div>
-                  </div>
+          </form>
+        </section>
 
-                  <input
-                    className="w-full border-2 border-outline-variant rounded-xl px-4 py-2.5 text-xs focus:border-[#2e7d32] outline-none shadow-sm transition-all text-slate-600"
-                    placeholder="Hoặc dán đường dẫn ảnh (URL) tại đây..."
-                    type="text"
-                    value={imgUrl}
-                    onChange={(e) => setImgUrl(e.target.value)}
-                  />
-                </div>
+        {/* CỘT PHẢI: ẢNH + LIÊN HỆ + ACTION */}
+        <section className="xl:col-span-1 space-y-6">
+
+          {/* Card 3: Ảnh đại diện */}
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+            <label className="block font-bold text-slate-700 text-xs mb-3">Ảnh đại diện / Logo thương nhân *</label>
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-24 h-24 rounded-full border-4 border-slate-100 overflow-hidden bg-slate-50 flex items-center justify-center">
+                {imgUrl ? (
+                  <img src={imgUrl} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-slate-400 text-xs text-center">Chưa có<br />ảnh</span>
+                )}
               </div>
+              <label className="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold py-2 px-4 rounded-lg w-full text-center transition-colors">
+                {isUploadingAvatar ? "Đang tải lên..." : "Tải ảnh từ máy tính"}
+                <input type="file" className="hidden" accept="image/*" onChange={handleAvatarFileChange} disabled={isUploadingAvatar} />
+              </label>
+              <input
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-500 outline-none focus:border-[#2e7d32]"
+                placeholder="Hoặc dán URL ảnh vào đây..."
+                value={imgUrl}
+                onChange={(e) => setImgUrl(e.target.value)}
+              />
+            </div>
+          </div>
 
+          {/* Card 4: Thông tin liên hệ */}
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+            <h3 className="font-bold text-slate-700 text-sm mb-4 border-b border-slate-100 pb-2">Thông tin liên hệ</h3>
+            <div className="space-y-4">
               <div>
-                <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5 font-sans">Facebook URL</label>
+                <label className="block font-bold text-slate-700 text-[10px] uppercase mb-1">Hotline / Zalo *</label>
                 <input
-                  className="w-full border-2 border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-[#2e7d32] outline-none shadow-sm transition-all focus:ring-4 focus:ring-emerald-50"
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-[#2e7d32] outline-none"
+                  placeholder="Ví dụ: 0912345678"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ""))}
+                />
+              </div>
+              <div>
+                <label className="block font-bold text-slate-700 text-[10px] uppercase mb-1">Telegram liên hệ</label>
+                <input
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-[#2e7d32] outline-none"
+                  placeholder="Ví dụ: @techglobal"
+                  value={telegram}
+                  onChange={(e) => setTelegram(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block font-bold text-slate-700 text-[10px] uppercase mb-1">Website</label>
+                <input
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-[#2e7d32] outline-none"
+                  placeholder="Ví dụ: techglobal.com"
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block font-bold text-slate-700 text-[10px] uppercase mb-1">Facebook URL</label>
+                <input
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-[#2e7d32] outline-none"
                   placeholder="Ví dụ: https://facebook.com/techglobal"
-                  type="text"
                   value={facebook}
                   onChange={(e) => setFacebook(e.target.value)}
                 />
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">Địa chỉ</label>
-                  <input
-                    className="w-full border-2 border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-[#2e7d32] outline-none shadow-sm transition-all focus:ring-4 focus:ring-emerald-50"
-                    placeholder="Ví dụ: Hà Nội, Việt Nam"
-                    type="text"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">Website</label>
-                  <input
-                    className="w-full border-2 border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-[#2e7d32] outline-none shadow-sm transition-all focus:ring-4 focus:ring-emerald-50"
-                    placeholder="Ví dụ: techglobal.com"
-                    type="text"
-                    value={website}
-                    onChange={(e) => setWebsite(e.target.value)}
-                  />
-                </div>
-              </div>
-
               <div>
-                <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px] mb-1.5">Giới thiệu ngắn & năng lực giao dịch *</label>
-                <textarea
-                  className="w-full border-2 border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-[#2e7d32] outline-none resize-none shadow-sm transition-all focus:ring-4 focus:ring-emerald-50 text-slate-800"
-                  placeholder="Mô tả các sản phẩm kinh doanh chính và cam kết bảo hành..."
-                  rows={3}
-                  value={desc}
-                  onChange={(e) => setDesc(e.target.value)}
+                <label className="block font-bold text-slate-700 text-[10px] uppercase mb-1">Địa chỉ trụ sở</label>
+                <input
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-[#2e7d32] outline-none"
+                  placeholder="Ví dụ: Hà Nội, Việt Nam"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
                 />
               </div>
-
-              <div className="flex gap-3">
-                <button
-                  type="submit"
-                  className="flex-grow bg-[#2e7d32] hover:bg-[#205c22] text-white text-xs py-3.5 rounded-xl mt-4 transition-all duration-300 font-extrabold uppercase tracking-widest shadow-md cursor-pointer active:scale-95 text-center flex items-center justify-center gap-1.5"
-                >
-                  <span className="material-symbols-outlined text-sm">
-                    {editingId !== null ? "save" : "verified_user"}
-                  </span>
-                  {editingId !== null ? "Lưu chỉnh sửa" : "Ký duyệt cấp bảo hộ uy tín"}
-                </button>
-                {editingId !== null && (
-                  <button
-                    type="button"
-                    onClick={resetForm}
-                    className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs py-3.5 px-5 rounded-xl mt-4 border border-slate-300 transition-all duration-300 font-extrabold uppercase tracking-widest cursor-pointer"
-                  >
-                    Hủy bỏ
-                  </button>
-                )}
-              </div>
-            </form>
-          </div>
-        </section>
-
-        {/* Verified Businesses Dashboard List (7/12 width) */}
-        <section className="col-span-12 lg:col-span-8 flex flex-col gap-6">
-          
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex-1 flex flex-col">
-            <div className="mb-4">
-              <h3 className="text-base font-black text-on-surface uppercase tracking-tight flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-xl text-[#2e7d32] fill-1">verified_user</span>
-                Cơ sở thương nhân ký quỹ vận hành
-              </h3>
-              <p className="text-xs text-slate-500 mt-0.5 font-semibold">Danh sách các hồ sơ an toàn đã đóng gói quỹ bảo hộ rủi ro giao dịch.</p>
-            </div>
-
-            <div className="flex-1">
-              <AnimatedTable
-                data={legitList}
-                columns={columns}
-                searchPlaceholder="Tìm tên thương nhân, lĩnh vực, số điện thoại..."
-                searchKeys={["name", "role", "telegram", "phone", "desc"]}
-                expandableRender={renderExpandableLegit}
-                bulkActions={bulkActions}
-                rowKey={(item) => item.id}
-              />
             </div>
           </div>
-        </section>
 
+          {/* Nút Submit */}
+          <button
+            onClick={handleCreate}
+            className="w-full bg-[#2e7d32] hover:bg-[#205c22] text-white text-sm py-4 rounded-xl font-extrabold uppercase tracking-wide shadow-lg shadow-green-900/20 transition-all active:scale-95 flex justify-center items-center gap-2"
+          >
+            <span className="material-symbols-outlined text-base">
+              {editingId !== null ? "save" : "verified_user"}
+            </span>
+            {editingId !== null ? "Lưu cập nhật hồ sơ" : "Xác nhận cấp hồ sơ uy tín"}
+          </button>
+
+          {editingId !== null && (
+            <button
+              type="button"
+              onClick={resetForm}
+              className="w-full text-xs text-slate-500 font-bold hover:text-red-500 transition-colors text-center"
+            >
+              Hủy chỉnh sửa
+            </button>
+          )}
+
+          {alertMsg && <div className="text-red-500 text-xs font-bold text-center bg-red-50 rounded-lg p-2">{alertMsg}</div>}
+          {successNotif && <div className="text-[#2e7d32] text-xs font-bold text-center bg-green-50 rounded-lg p-2">{successNotif}</div>}
+
+        </section>
       </div>
+
+      {/* Bảng danh sách thương nhân */}
+      <div className="w-full max-w-7xl mx-auto px-4 pb-12">
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+          <div className="mb-4">
+            <h3 className="text-base font-black text-on-surface uppercase tracking-tight flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-xl text-[#2e7d32] fill-1">verified_user</span>
+              Cơ sở thương nhân ký quỹ vận hành
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5 font-semibold">Danh sách các hồ sơ an toàn đã đóng gói quỹ bảo hộ rủi ro giao dịch.</p>
+          </div>
+          <AnimatedTable
+            data={legitList}
+            columns={columns}
+            searchPlaceholder="Tìm tên thương nhân, lĩnh vực, số điện thoại..."
+            searchKeys={["name", "role", "telegram", "phone", "desc"]}
+            expandableRender={renderExpandableLegit}
+            bulkActions={bulkActions}
+            rowKey={(item) => item.id}
+          />
+        </div>
+      </div>
+
     </div>
   );
 }

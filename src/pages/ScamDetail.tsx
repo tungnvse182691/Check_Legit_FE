@@ -25,6 +25,11 @@ export function ScamDetail() {
 
   const isWarning = matchedScam.category === "Cảnh báo hành vi";
 
+  // Logic ưu tiên: nếu có tên chủ TK thì hiển thị nó, không hiển thị tên đối tượng
+  const displayName = (matchedScam.accountHolderName && matchedScam.accountHolderName.trim())
+    ? matchedScam.accountHolderName
+    : matchedScam.name;
+
   return (
     <div className="max-w-6xl mx-auto px-6 md:px-margin-desktop py-8 min-h-screen">
       {/* Breadcrumbs */}
@@ -97,8 +102,10 @@ export function ScamDetail() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl">
-                <span className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">Tên đối tượng</span>
-                <span className="text-lg font-black text-on-surface uppercase tracking-tight">{matchedScam.name}</span>
+                <span className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">
+                  {matchedScam.accountHolderName && matchedScam.accountHolderName.trim() ? "Tên chủ tài khoản" : "Tên đối tượng"}
+                </span>
+                <span className="text-lg font-black text-on-surface uppercase tracking-tight">{displayName}</span>
               </div>
               
               <div className={`${isWarning ? "bg-amber-50/30 border-amber-100/60" : "bg-red-50/30 border-red-100/60"} border p-4 rounded-xl`}>

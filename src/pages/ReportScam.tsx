@@ -33,6 +33,7 @@ export function ReportScam() {
   const [verifierName, setVerifierName] = useState("");
   const [verifierZalo, setVerifierZalo] = useState("");
   const [desc, setDesc] = useState("");
+  const [accountHolderName, setAccountHolderName] = useState("");
 
   // Feedback States
   const [captchaToken, setCaptchaToken] = useState("");
@@ -184,31 +185,23 @@ export function ReportScam() {
     };
 
     if (!name.trim()) {
-      showError("Vui lòng nhập tên đối tượng hoặc biệt hiệu.");
-      return;
-    }
-    if (!accountNumber.trim()) {
-      showError("Vui lòng nhập số tài khoản ngân hàng của đối tượng.");
-      return;
-    }
-    if (bankName === "Chọn ngân hàng" || !bankName) {
-      showError("Vui lòng chọn ngân hàng giao dịch.");
+      showError("Vui lòng nhập tên đối tượng hoặc biệt hiệu (*)");
       return;
     }
     if (bankName === "Other" && !customBankName.trim()) {
       showError("Vui lòng nhập tên ngân hàng/ví điện tử.");
       return;
     }
-    if (category === "Lừa đảo tài chính" && amount <= 0) {
-      showError("Vui lòng nhập đúng số tiền đã bị thiệt hại.");
-      return;
-    }
-    if (type === "Chọn loại hình" || type === "Chọn loại hành vi" || !type) {
-      showError(category === "Lừa đảo tài chính" ? "Vui lòng chọn loại hình lừa đảo." : "Vui lòng chọn loại hành vi.");
-      return;
-    }
     if (!desc.trim() || desc.length < 10) {
-      showError("Vui lòng mô tả chi tiết diễn biến sự việc (Tối thiểu 10 ký tự).");
+      showError("Vui lòng mô tả chi tiết vụ việc (*) — Tối thiểu 10 ký tự.");
+      return;
+    }
+    if (!verifierName.trim()) {
+      showError("Vui lòng nhập Người xác thực (*) — thông tin này bắt buộc để duyệt báo cáo.");
+      return;
+    }
+    if (!verifierZalo.trim()) {
+      showError("Vui lòng nhập Zalo xác thực (*) — thông tin này bắt buộc để duyệt báo cáo.");
       return;
     }
 
@@ -228,6 +221,7 @@ export function ReportScam() {
         phone,
         bankName: bankName === "Other" ? customBankName.trim() : bankName,
         accountNumber,
+        accountHolderName: accountHolderName.trim() || undefined,
         desc,
         type: type === "Khác" ? (customType.trim() || "Khác") : type,
         amount: category === "Cảnh báo hành vi" ? 0 : amount,
@@ -257,6 +251,7 @@ export function ReportScam() {
       setVerifierName("");
       setVerifierZalo("");
       setDesc("");
+      setAccountHolderName("");
       setSelectedFiles([]);
       setCaptchaToken("");
       if ((window as any).turnstile) {
@@ -369,7 +364,7 @@ export function ReportScam() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex flex-col gap-2">
-                <label className="text-label-sm text-on-surface-variant">Tên đối tượng / Biệt hiệu</label>
+                <label className="text-label-sm text-on-surface-variant">Tên đối tượng / Biệt hiệu <span className="text-red-500">*</span></label>
                 <input
                   className="border-outline border px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
                   placeholder="Ví dụ: Nguyễn Văn A"
@@ -389,7 +384,7 @@ export function ReportScam() {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-label-sm text-on-surface-variant">Số tài khoản ngân hàng</label>
+                <label className="text-label-sm text-on-surface-variant">Số tài khoản ngân hàng <span className="text-gray-400 text-xs">(không bắt buộc)</span></label>
                 <input
                   className="border-outline border px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
                   placeholder="Nhập số tài khoản"
@@ -399,7 +394,7 @@ export function ReportScam() {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-label-sm text-on-surface-variant">Tên ngân hàng</label>
+                <label className="text-label-sm text-on-surface-variant">Tên ngân hàng <span className="text-gray-400 text-xs">(không bắt buộc)</span></label>
                 <select
                   className="border-outline border px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary bg-white"
                   value={bankName}
@@ -426,6 +421,17 @@ export function ReportScam() {
                     onChange={(e) => setCustomBankName(e.target.value)}
                   />
                 )}
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-label-sm text-on-surface-variant">Tên chủ tài khoản <span className="text-gray-400 text-xs">(không bắt buộc)</span></label>
+                <input
+                  className="border-outline border px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                  placeholder="Ví dụ: Nguyễn Phạm Tuân"
+                  type="text"
+                  value={accountHolderName}
+                  onChange={(e) => setAccountHolderName(e.target.value)}
+                />
+                <p className="text-xs text-amber-700 italic">Điền nếu tên chủ TK khác với tên đối tượng ở trên — sẽ được ưu tiên hiển thị.</p>
               </div>
               <div className="md:col-span-2 flex flex-col gap-2">
                 <label className="text-label-sm text-on-surface-variant">Link Facebook / TikTok / Telegram</label>
@@ -516,7 +522,7 @@ export function ReportScam() {
                 )}
               </div>
               <div className="md:col-span-2 flex flex-col gap-2">
-                <label className="text-label-sm text-on-surface-variant">Chi tiết vụ việc</label>
+                <label className="text-label-sm text-on-surface-variant">Chi tiết vụ việc <span className="text-red-500">*</span></label>
                 <textarea
                   className="border-outline border px-4 py-3 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary resize-y"
                   placeholder={category === "Lừa đảo tài chính" ? "Mô tả chi tiết quá trình bị lừa đảo tài chính..." : "Mô tả chi tiết vụ việc boom hàng, bán hàng lỗi giả nhái hay thái độ giao dịch..."}
@@ -595,7 +601,7 @@ export function ReportScam() {
           <section className="bg-surface-container-lowest p-8 border border-outline-variant rounded-xl">
             <div className="flex items-center gap-2 mb-6 text-primary">
               <span className="material-symbols-outlined">verified_user</span>
-              <h2 className="text-headline-md font-bold">Người xác thực & Zalo xác thực (Tùy chọn)</h2>
+              <h2 className="text-headline-md font-bold">Người xác thực <span className="text-red-500">*</span> & Zalo xác thực <span className="text-red-500">*</span></h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex flex-col gap-2">

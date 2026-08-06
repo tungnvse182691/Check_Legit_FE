@@ -50,16 +50,6 @@ export function Header() {
             <li className="flex items-center">
               <Link to="/legit" className={navItemClass("/legit")}>HỒ SƠ UY TÍN</Link>
             </li>
-            <li className="flex items-center">
-              <Link 
-                to="/about" 
-                className={`text-on-surface-variant hover:text-primary transition-colors text-sm sm:text-base font-bold pb-2 tracking-wider uppercase ${
-                  location.pathname === "/about" ? "text-primary border-b-2 border-primary font-extrabold" : ""
-                }`}
-              >
-                THÔNG TIN
-              </Link>
-            </li>
           </ul>
         </nav>
 
@@ -114,45 +104,6 @@ export function Header() {
             >
               HỒ SƠ UY TÍN
             </Link>
-            
-            {/* Mobile collapsible Information group */}
-            <div>
-              <button
-                type="button"
-                onClick={() => setIsMobileInfoOpen(!isMobileInfoOpen)}
-                className="w-full text-left text-body-md py-2 font-medium border-b border-slate-100 text-on-surface-variant flex justify-between items-center"
-              >
-                <span>THÔNG TIN</span>
-                <span className="material-symbols-outlined text-base">
-                  {isMobileInfoOpen ? "expand_less" : "expand_more"}
-                </span>
-              </button>
-              {isMobileInfoOpen && (
-                <div className="pl-4 mt-2 mb-2 flex flex-col space-y-2 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                  <Link 
-                    to="/about" 
-                    onClick={() => setIsMenuOpen(false)}
-                    className="text-sm py-1.5 text-on-surface-variant hover:text-primary transition-colors"
-                  >
-                    • Giới thiệu
-                  </Link>
-                  <Link 
-                    to="/about" 
-                    onClick={() => setIsMenuOpen(false)}
-                    className="text-sm py-1.5 text-on-surface-variant hover:text-primary transition-colors"
-                  >
-                    • Contact
-                  </Link>
-                  <Link 
-                    to="/about" 
-                    onClick={() => setIsMenuOpen(false)}
-                    className="text-sm py-1.5 text-on-surface-variant hover:text-primary transition-colors"
-                  >
-                    • Chính sách
-                  </Link>
-                </div>
-              )}
-            </div>
 
             <Link 
               to="/report" 
@@ -180,20 +131,19 @@ export function Footer() {
         <div>
           <div className="font-extrabold mb-4 uppercase text-xs tracking-widest text-on-surface">THÔNG TIN</div>
           <ul className="space-y-2 text-xs font-semibold">
-            <li><Link to="/about#about-us" className="text-on-surface-variant hover:text-primary hover:underline">GIỚI THIỆU</Link></li>
-            <li><Link to="/about#contact" className="text-on-surface-variant hover:text-primary hover:underline">LIÊN HỆ</Link></li>
-            <li><Link to="/about#about-us" className="text-on-surface-variant hover:text-primary hover:underline">CÁCH SỬ DỤNG</Link></li>
-            <li><Link to="/about#policies" className="text-on-surface-variant hover:text-primary hover:underline">QUY CHẾ CỘNG ĐỒNG</Link></li>
-            <li><Link to="/about#policies" className="text-on-surface-variant hover:text-primary hover:underline">Thông báo miễn trừ trách nhiệm</Link></li>
+            <li><Link to="/about" className="text-on-surface-variant hover:text-primary hover:underline">GIỚI THIỆU</Link></li>
+            <li><Link to="/news/cach-su-dung" className="text-on-surface-variant hover:text-primary hover:underline">CÁCH SỬ DỤNG</Link></li>
+            <li><Link to="/news/quy-che-cong-dong" className="text-on-surface-variant hover:text-primary hover:underline">QUY CHẾ CỘNG ĐỒNG</Link></li>
+            <li><Link to="/news/mien-tru-trach-nhiem" className="text-on-surface-variant hover:text-primary hover:underline">Thông báo miễn trừ trách nhiệm</Link></li>
           </ul>
         </div>
         <div>
           <div className="font-extrabold mb-4 uppercase text-xs tracking-widest text-on-surface">CHÍNH SÁCH</div>
           <ul className="space-y-2 text-xs font-semibold">
-            <li><Link to="/about#policies" className="text-on-surface-variant hover:text-primary hover:underline">ĐIỀU KHOẢN SỬ DỤNG</Link></li>
-            <li><Link to="/about#policies" className="text-on-surface-variant hover:text-primary hover:underline">CHÍNH SÁCH BẢO MẬT</Link></li>
-            <li><Link to="/about#policies" className="text-on-surface-variant hover:text-primary hover:underline">Chính sách tiếp nhận và xử lý</Link></li>
-            <li><Link to="/about#contact" className="text-on-surface-variant hover:text-primary hover:underline">Chính sách khiếu nại</Link></li>
+            <li><Link to="/news/dieu-khoan-su-dung" className="text-on-surface-variant hover:text-primary hover:underline">ĐIỀU KHOẢN SỬ DỤNG</Link></li>
+            <li><Link to="/news/chinh-sach-bao-mat" className="text-on-surface-variant hover:text-primary hover:underline">CHÍNH SÁCH BẢO MẬT</Link></li>
+            <li><Link to="/news/tiep-nhan-va-xu-ly" className="text-on-surface-variant hover:text-primary hover:underline">Chính sách tiếp nhận và xử lý</Link></li>
+            <li><Link to="/news/chinh-sach-khieu-nai" className="text-on-surface-variant hover:text-primary hover:underline">Chính sách khiếu nại</Link></li>
           </ul>
         </div>
         <div>
