@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22c55e" />
+      <stop offset="100%" stop-color="#15803d" />
+    </linearGradient>
+    <filter id="dropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.25" />
+    </filter>
+  </defs>
+  <!-- Shield Background -->
+  <path d="M256 32 C360 32 448 64 448 64 C448 240 376 392 256 480 C136 392 64 240 64 64 C64 64 152 32 256 32 Z" fill="url(#shieldGrad)" filter="url(#dropShadow)" />
+  <!-- Inner Shield Border -->
+  <path d="M256 56 C344 56 420 84 420 84 C420 236 356 368 256 448 C156 368 92 236 92 84 C92 84 168 56 256 56 Z" fill="none" stroke="#ffffff" stroke-opacity="0.3" stroke-width="12" />
+  <!-- Bold Checkmark Icon -->
+  <path d="M212 344 L136 268 L168 236 L212 280 L344 148 L376 180 Z" fill="#ffffff" />
+</svg>
